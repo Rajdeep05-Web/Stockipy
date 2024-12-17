@@ -1,0 +1,59 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build and coverage directories
+build/
+coverage/
+.nyc_output
+
+# TypeScript
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE-specific
+.idea/
+.vscode/
+*.code-workspace
+
+# MacOS-specific
+*.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux-specific
+*~
+
+# Temporary files
+tmp/
+temp/
+*.bak
+*.swp
+
+# React specific
+build/
+*.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# Others
+.lock-wscript
+bower_components/
