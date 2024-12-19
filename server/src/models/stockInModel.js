@@ -42,10 +42,10 @@ const stockInSchema = mongoose.Schema({
                 type: Number,
                 required: true,
             },
-            productPurchaseRate:{
-                type: Number,
-                required: true,
-            },
+            // productPurchaseRate:{
+            //     type: Number,
+            //     required: true,
+            // },
         },
     ],
 });

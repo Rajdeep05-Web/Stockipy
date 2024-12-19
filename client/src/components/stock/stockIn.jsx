@@ -173,7 +173,7 @@ const StockIn = () => {
     // console.log(invNo, startDate, totalAmount, description);
     let products = [];
     for (const [key, value] of Object.entries(productQuantities)) {
-      console.log(key, value);
+      // console.log(key, value);
       products.push({
         product: key,
         quantity: value,

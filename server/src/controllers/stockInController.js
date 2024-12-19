@@ -4,7 +4,7 @@ import { Product } from "../models/productModel.js";
 import mongoose from "mongoose";
 
 export const addStockIn = async (req, res) => {
-    console.log(req.body);
+    // console.log(req.body);
     const {vendor, invNo, date, description, time, products, totalAmount} = req.body;//destructuring the request body
     if(!vendor || !invNo || !date || !products || !totalAmount){
         return res.status(400).json({error: "All fields are required"});
@@ -41,9 +41,9 @@ export const addStockIn = async (req, res) => {
     if(totalAmount && totalAmount <= 0){
         return res.status(400).json({error: "Total Amount must be greater than 0"});
     }
-    if(products.productPurchaseRate > 0 && products.some(item => item.productPurchaseRate <= 0)){
-        return res.status(400).json({error: "Purchase Price must be greater than 0"});
-    }
+    // if(products.productPurchaseRate > 0 && products.some(item => item.productPurchaseRate <= 0)){
+    //     return res.status(400).json({error: "Purchase Price must be greater than 0"});
+    // }
     //no invalid date
 
 
