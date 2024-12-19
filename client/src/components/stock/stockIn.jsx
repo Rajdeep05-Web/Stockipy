@@ -48,6 +48,7 @@ const StockIn = () => {
   const [selectedProductQuantity, setSelectedProductQuantity] = useState(0);
   const [productQuantities, setProductQuantities] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [productPurchaseRate, setProductPurchaseRate] = useState('');
 
   //vendor----------------->
   useEffect(() => {
@@ -154,7 +155,7 @@ const StockIn = () => {
   const handleProductQuantity = (id, quantity) => {
     productQuantities[id] = quantity;
     setProductQuantities({ ...productQuantities });
-    console.log(productQuantities);
+    // console.log(productQuantities);
   };
 
   const handleDeleteProductFromList = (product) => {
@@ -176,6 +177,7 @@ const StockIn = () => {
       products.push({
         product: key,
         quantity: value,
+        // productPurchaseRate: productPurchaseRate,
       });
     }
     const stockInData = {
@@ -200,6 +202,7 @@ const StockIn = () => {
       setInvNo("");
       setTotalAmount("");
       setDescription("");
+      setProductPurchaseRate('');
       setStartDate(new Date());
     } catch (error) {
       console.log("Failed to add stock in:", error);
@@ -224,7 +227,10 @@ const StockIn = () => {
       {/* {alarts} */}
       {successMsg && <SuccessAlert successMsg={successMsg} />}
       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
-      <ModalAddProduct isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible}/>
+      <ModalAddProduct
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+      />
 
       {/* stockIn */}
       <div class="flex flex-row h-screen gap-6">
@@ -478,59 +484,59 @@ const StockIn = () => {
           </h1>
           {/* search and search result dropdown component */}
           <div className="flex flex-row justify-between gap-3">
-          <div class="mb-5 relative w-4/5">
-            <label
-              for="products"
-              class="block mb-2 text-base font-bold text-gray-900 dark:text-white"
-            >
-              Select products
-            </label>
-            <input
-              type="text"
-              placeholder="Search products name"
-              value={productSearchInput}
-              onChange={handleProductSearch}
-              class="bg-gray-50 border border-gray-300 text-gray-900 text-base font-normal rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            />
-            {filteredProducts.length > 0 &&
-              productSearchInput.trim().length > 0 && (
-                <div class="absolute z-10 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg shadow-md w-full mt-1 max-h-60 overflow-y-auto focus:ring-blue-500 focus:border-blue-500 block p-0.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <table class="w-full">
-                    <thead class="text-base text-gray-1000 uppercase underline bg-blue-300 dark:bg-gray-700 dark:text-gray-400">
-                      <tr>
-                        <th scope="col" class="px-8 py-2 text-left">
-                          Product name
-                        </th>
-                        <th scope="col" class="px-4 py-2 text-right">
-                          Quantity
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredProducts.map((product) => (
-                        <tr
-                          key={product._id}
-                          class=" cursor-pointer bg-gray-50 border-b dark:bg-gray-800 text-base dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
-                          onClick={() => handleProductSelect(product)}
-                        >
-                          <th
-                            scope="row"
-                            class="px-4 py-2 text-left font-medium text-wrap text-gray-900 whitespace-nowrap dark:text-white"
-                          >
-                            {filteredProducts.indexOf(product) + 1}
-                            {". "}
-                            {product.name}
+            <div class="mb-5 relative w-4/5">
+              <label
+                for="products"
+                class="block mb-2 text-base font-bold text-gray-900 dark:text-white"
+              >
+                Select products
+              </label>
+              <input
+                type="text"
+                placeholder="Search products name"
+                value={productSearchInput}
+                onChange={handleProductSearch}
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-base font-normal rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              />
+              {filteredProducts.length > 0 &&
+                productSearchInput.trim().length > 0 && (
+                  <div class="absolute z-10 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg shadow-md w-full mt-1 max-h-60 overflow-y-auto focus:ring-blue-500 focus:border-blue-500 block p-0.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <table class="w-full">
+                      <thead class="text-base text-gray-1000 uppercase underline bg-blue-300 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                          <th scope="col" class="px-8 py-2 text-left">
+                            Product name
                           </th>
-                          <td class="px-4 py-2 text-right">
-                            {product.quantity}
-                          </td>
+                          <th scope="col" class="px-4 py-2 text-right">
+                            Quantity
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-          </div>
+                      </thead>
+                      <tbody>
+                        {filteredProducts.map((product) => (
+                          <tr
+                            key={product._id}
+                            class=" cursor-pointer bg-gray-50 border-b dark:bg-gray-800 text-base dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                            onClick={() => handleProductSelect(product)}
+                          >
+                            <th
+                              scope="row"
+                              class="px-4 py-2 text-left font-medium text-wrap text-gray-900 whitespace-nowrap dark:text-white"
+                            >
+                              {filteredProducts.indexOf(product) + 1}
+                              {". "}
+                              {product.name}
+                            </th>
+                            <td class="px-4 py-2 text-right">
+                              {product.quantity}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+            </div>
             <div class=" my-auto">
               <button
                 type="button"
@@ -549,13 +555,25 @@ const StockIn = () => {
             <table class="w-full text-sm text-left overflow-y-auto rtl:text-right text-gray-500 dark:text-gray-400">
               <thead class="text-xs text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
-                  <th scope="col" class="px-3 py-3 w-2/4">
+                  <th
+                    scope="col"
+                    class="px-3 py-3 w-2/5 border-r border-green-300 dark:border-gray-700"
+                  >
                     Product name
                   </th>
-                  <th scope="col" class="px-6 py-3">
+                  <th
+                    scope="col"
+                    class="px-3 py-3 w-1/5 border-r border-green-300 dark:border-gray-700"
+                  >
+                    Purchase Rate
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 w-1/5 border-r border-green-300 dark:border-gray-700"
+                  >
                     Quantity
                   </th>
-                  <th scope="col" class="px-3 py-3">
+                  <th scope="col" class="px-3 py-3 w-1/5">
                     Action
                   </th>
                 </tr>
@@ -570,12 +588,23 @@ const StockIn = () => {
                     >
                       <th
                         scope="row"
-                        class=" text-wrap px-3 py-0 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        class=" text-wrap px-3 py-0 font-medium text-gray-900 whitespace-nowrap dark:text-white w-2/5 border-r border-green-200 dark:border-gray-700"
                       >
                         {selectedProductList.indexOf(product) + 1}
                         {". "} {product.name}
                       </th>
-                      <td class="px-6 py-0">
+                      <td class="px-6 py-0 w-1/5 border-r border-green-200 dark:border-gray-700">
+                        <input
+                          type="text"
+                          placeholder="rate"
+                          value={productPurchaseRate || ''}
+                          onChange={(e) =>
+                            setProductPurchaseRate(e.target.value)
+                          }
+                          class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                      </td>
+                      <td class="px-6 py-0 w-1/5 border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           placeholder="Quantity"
@@ -585,13 +614,12 @@ const StockIn = () => {
                           }
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
-                        <h1 class="text-black-400 mt-1 font-medium">
+                        <h1 class="text-black-400 mt-1 font-normal">
                           Present stock:{" "}
-                          {product.quantity +
-                            parseInt(productQuantities[product._id] || "0")}
+                          {product.quantity + parseInt("0")}
                         </h1>
                       </td>
-                      <td class="px-3 py-0">
+                      <td class="px-3 py-0 w-1/5 ">
                         <button
                           type="button"
                           onClick={() => handleDeleteProductFromList(product)}

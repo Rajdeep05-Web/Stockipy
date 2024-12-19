@@ -14,6 +14,10 @@ const productSchema = mongoose.Schema({
         required: true,
         default: 0
     },
+    productPurchaseRate:{
+        type: Number,
+        default: 0
+    },
     mrp: {
         type: Number,
         required: true,
