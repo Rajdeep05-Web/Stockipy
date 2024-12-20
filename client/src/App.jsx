@@ -89,6 +89,7 @@ import AddVendor from "./components/vendor/addvendor";
 import VendorList from "./components/vendor/vendorList";
 import UpdateVendor from "./components/vendor/updateVendor";
 import StockIn from "./components/stock/stockIn";
+import Accordion from "./components/useful/stockIn/accordion";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -122,7 +123,9 @@ const App = () => {
           <Route path="/add-vendor" element={<AddVendor />} />
           <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
           <Route path="/vendors" element={<VendorList />} />
-          <Route path="/stock-in" element={<StockIn />} />
+          <Route path="/add-stock-in" element={<StockIn />} />
+          <Route path="/test" element={<Accordion />} />
+          <Route path="/stock-ins" element ={<Accordion />} />
         </Routes>
       </NavbarSidebar>
     </BrowserRouter>

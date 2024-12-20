@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 import UserDropdown from "./userDropDown";
 
@@ -123,10 +123,16 @@ const NavbarSidebar = ({ children }) => { //children coming from App.jsx
             {dropdowns.stock && (
               <div className="ml-4">
                 <Link
-                  to="/stock-in"
+                  to="/add-stock-in"
                   className="block py-2 px-4 hover:bg-gray-700 rounded"
                 >
                   Stock In
+                </Link>
+                <Link
+                  to="/stock-ins"
+                  className="block py-2 px-4 hover:bg-gray-700 rounded"
+                >
+                  Stock Ins
                 </Link>
               </div>
             )}
