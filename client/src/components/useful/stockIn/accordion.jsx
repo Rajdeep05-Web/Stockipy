@@ -8,6 +8,8 @@ import SuccessAlert from "../alerts/successAlert";
 import ErrorAlert from "../alerts/errorAlert";
 
 const Accordion = () => {
+  const { stockIns, loading, error } = useSelector((state) => state.stockIns);
+  console.log(stockIns);
   const items = [
     { id: 1, title: "Accordion Item 1", content: "Content for item 1" },
     { id: 2, title: "Accordion Item 2", content: "Content for item 2" },
