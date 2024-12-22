@@ -86,7 +86,7 @@ export const addStockIn = async (req, res) => {
 
 export const getStockIns = async (req, res) => {
     try {
-    const stockIns = await StockIn.find().populate("vendor", "name").populate("products.product", "name");//populate the vendor and product fields
+    const stockIns = await StockIn.find().populate("vendor").populate("products.product", "name");//populate the vendor and product fields
     return res.status(200).json(stockIns);
     } catch (error) {
         console.log(error);

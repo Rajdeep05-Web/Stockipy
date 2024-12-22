@@ -95,6 +95,7 @@ import Accordion from "./components/useful/stockIn/accordion";
 import { fetchProducts } from "./redux/slices/products/productsSlice";
 import { fetchCustomers } from "./redux/slices/customers/customersSlice";
 import { fetchVendors } from "./redux/slices/vendor/vendorsSlice";
+import { fetchStockIns } from "./redux/slices/stock/stockInSlice";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -105,6 +106,7 @@ const App = () => {
     dispatch(fetchProducts());
     dispatch(fetchCustomers());
     dispatch(fetchVendors());
+    dispatch(fetchStockIns())
   }, [dispatch]);
 
   // if (productsLoading || customersLoading) return <Loading />;
