@@ -3,6 +3,7 @@ import { fetchStockIns } from "../../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import Loading from "../Loading/loading";
+import SearchBar from "../searchBar";
 import SuccessAlert from "../alerts/successAlert";
 import ErrorAlert from "../alerts/errorAlert";
 import { Product } from "../../../../../server/src/models/productModel";
@@ -12,13 +13,7 @@ const Accordion = () => {
 
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-
-  const items = [
-    { id: 1, title: "Accordion Item 1", content: "Content for item 1" },
-    { id: 2, title: "Accordion Item 2", content: "Content for item 2" },
-    { id: 3, title: "Accordion Item 3", content: "Content for item 3" },
-    { id: 4, title: "Accordion Item 4", content: "Content for item 4" },
-  ];
+  const [search, setSearch] = useState("");
 
   const [openAccordions, setOpenAccordions] = useState({});
 
@@ -37,24 +32,54 @@ const Accordion = () => {
     return istDateString;
   };
 
+  const handleCollapse = () => {
+    stockIns.map((item) => toggleAccordion(item._id));
+  };
+
+  const filteredStockIns = stockIns.filter((item) => {
+    const searchLower = search.toLowerCase().trim();
+    return (
+      (item.vendor?.name?.toLowerCase() || "").includes(searchLower) ||
+      item.totalAmount?.toString().includes(searchLower) ||
+      (item.invoiceNo?.toLowerCase() || "").includes(searchLower)
+    );
+  }
+);
+
   if (loading) {
     return <Loading />;
   }
-  if (error) {
+  if (errorMsg) {
     return <ErrorAlert errorMsg={errorMsg} />;
   }
   if (successMsg) {
     return <SuccessAlert successMsg={successMsg} />;
   }
-
   return (
     <div>
-      {stockIns.map((item) => (
+      <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
+        All Stock-Ins
+      </h1>
+      <div className="flex justify-between">
+        <SearchBar
+          placeholderText={"Search for Stock-ins"}
+          setSearch={setSearch}
+          search={search}
+        />
+        <button
+          type="button"
+          onClick={() => handleCollapse()}
+          class="text-white bg-blue-700 mb-4 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-2 py-0 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          Collapse All
+        </button>
+      </div>
+      {filteredStockIns.map((item) => (
         <div key={item._id} id={`accordion-item-${item._id}`} className="mb-4">
           <h2>
             <button
               type="button"
-              className="flex w-full p-3 font-medium text-xs md:text-sm lg:text-base text-gray-500 bg-green-100 border border-gray-200 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-emerald-100 dark:hover:bg-gray-800"
+              className="flex w-full p-3 rounded-md shadow hover:shadow-lg font-medium text-xs md:text-sm lg:text-base text-gray-500 bg-green-100 border border-gray-200 focus:ring-2 focus:ring-green-200 dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-emerald-100 dark:hover:bg-gray-800"
               onClick={() => toggleAccordion(item._id)}
               aria-expanded={openAccordions[item._id] || false}
               aria-controls={`accordion-body-${item._id}`}
@@ -129,22 +154,9 @@ const Accordion = () => {
           {openAccordions[item._id] && (
             <div
               id={`accordion-body-${item._id}`}
-              className="p-5 border border-gray-200 bg-slate-100 rounded-b-lg  dark:border-gray-700"
+              className="p-5 shadow hover:shadow-lg border border-gray-200 bg-slate-100 rounded-b-lg  dark:border-gray-700"
             >
               <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
-              {/* small details */}
-              {/* <div className="mt-2">
-              <span className=" flex basis-1/5 justify-start items-center ">
-                    <h4 className="font-bold text-gray-600">Date:</h4>
-                    &nbsp;
-                    {convertUTC(item.date)}
-                  </span>
-                  <span className="flex basis-1/5 justify-start items-center ">
-                    <h4 className="font-bold text-gray-600">INV no:</h4>
-                    &nbsp;
-                    {item.invoiceNo}
-                  </span>
-              </div> */}
               {/* product and vendor details */}
               <div className="flex flex-row gap-2 mt-2 mx-4">
                 <div className="flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
@@ -184,20 +196,20 @@ const Accordion = () => {
                     <div className="flex justify-between">
                       <span className="flex basis-4/5 justify-start items-center ">
                         <h4 className="font-medium text-gray-600">
-                          {item.products.indexOf(product)+1}{")"}
-                           &nbsp;
+                          {item.products.indexOf(product) + 1}
+                          {")"}
+                          &nbsp;
                           {product.product.name}
                         </h4>
                       </span>
                       <span className="flex basis-1/5 justify-start items-center ">
                         <h4 className="font-bold text-gray-600">
-                        {"x "}{product.quantity}
+                          {"x "}
+                          {product.quantity}
                         </h4>
-                        {/* &nbsp; */}
                       </span>
                     </div>
                   ))}
-                  {/* {console.log(item.products)} */}
                 </div>
               </div>
             </div>
