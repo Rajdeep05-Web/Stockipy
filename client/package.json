@@ -4,12 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-pdf/renderer": "^4.1.6",
     "@reduxjs/toolkit": "^2.3.0",
     "axios": "^1.7.8",
     "flowbite-react": "^0.10.2",

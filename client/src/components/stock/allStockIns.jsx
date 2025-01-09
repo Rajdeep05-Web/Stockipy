@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { fetchStockIns } from "../../../redux/slices/stock/stockInSlice";
+import { fetchStockIns } from "../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import Loading from "../Loading/loading";
-import SearchBar from "../searchBar";
-import SuccessAlert from "../alerts/successAlert";
-import ErrorAlert from "../alerts/errorAlert";
-import { Product } from "../../../../../server/src/models/productModel";
+import Loading from "../useful/Loading/loading";
+import SearchBar from "../useful/searchBar";
+import SuccessAlert from "../useful/alerts/successAlert";
+import ErrorAlert from "../useful/alerts/errorAlert";
+import { Product } from "../../../../server/src/models/productModel";
 
 const Accordion = () => {
   const { stockIns, loading, error } = useSelector((state) => state.stockIns);
@@ -23,6 +23,7 @@ const Accordion = () => {
       [id]: !prevState[id],
     }));
   };
+  
 
   const convertUTC = (dataFromBackend) => {
     const utcDate = new Date(dataFromBackend);

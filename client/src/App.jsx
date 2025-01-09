@@ -25,7 +25,6 @@
 // import { fetchCustomers } from "./redux/slices/customers/customersSlice";
 // import { fetchVendors } from "./redux/slices/vendor/vendorsSlice";
 
-
 // const App = () => {
 //   const dispatch = useDispatch();
 //   const { loading: productsLoading } = useSelector((state) => state.products);
@@ -35,14 +34,14 @@
 //     dispatch(fetchProducts());
 //     dispatch(fetchCustomers());
 //     dispatch(fetchVendors());
-// }, [dispatch]); 
+// }, [dispatch]);
 
 // // if (productsLoading || customersLoading) return <Loading />; // Using this leading leading to not showing success and error alerts
 // //each child component will have its own loading component
 
 //   return (
-//     <BrowserRouter> 
-    
+//     <BrowserRouter>
+
 //     <div className="App">
 
 //       <Routes>
@@ -65,7 +64,7 @@
 //       </Routes>
 
 //     </div>
-//     </BrowserRouter>   
+//     </BrowserRouter>
 //   )
 // }
 
@@ -74,6 +73,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
+import { PDFViewer } from "@react-pdf/renderer";
 
 // Components
 import NavbarSidebar from "./components/useful/navbarSidebar";
@@ -89,7 +89,8 @@ import AddVendor from "./components/vendor/addvendor";
 import VendorList from "./components/vendor/vendorList";
 import UpdateVendor from "./components/vendor/updateVendor";
 import StockIn from "./components/stock/stockIn";
-import Accordion from "./components/useful/stockIn/accordion";
+import Accordion from "./components/stock/allStockIns";
+import MyDocument from "./components/useful/pdf/testpdf";
 // import TooltipButton from "./components/useful/stockIn/tooltip";
 
 // Redux Actions
@@ -107,30 +108,30 @@ const App = () => {
     dispatch(fetchProducts());
     dispatch(fetchCustomers());
     dispatch(fetchVendors());
-    dispatch(fetchStockIns())
+    dispatch(fetchStockIns());
   }, [dispatch]);
 
   // if (productsLoading || customersLoading) return <Loading />;
 
   return (
     <BrowserRouter>
-      <NavbarSidebar>
-        <Routes>
-          <Route path="/" element={<App1 />} />
-          <Route path="/add-product" element={<AddProduct />} />
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/edit-product/:id" element={<UpdateProduct />} />
-          <Route path="/add-customer" element={<AddCustomer />} />
-          <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
-          <Route path="/customers" element={<CustomerList />} />
-          <Route path="/add-vendor" element={<AddVendor />} />
-          <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
-          <Route path="/vendors" element={<VendorList />} />
-          <Route path="/add-stock-in" element={<StockIn />} />
-          {/* <Route path="/test" element={<TooltipButton />} /> */}
-          <Route path="/stock-ins" element ={<Accordion />} />
-        </Routes>
-      </NavbarSidebar>
+        <NavbarSidebar>
+          <Routes>
+            <Route path="/" element={<App1 />} />
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/edit-product/:id" element={<UpdateProduct />} />
+            <Route path="/add-customer" element={<AddCustomer />} />
+            <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
+            <Route path="/customers" element={<CustomerList />} />
+            <Route path="/add-vendor" element={<AddVendor />} />
+            <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
+            <Route path="/vendors" element={<VendorList />} />
+            <Route path="/add-stock-in" element={<StockIn />} />
+            <Route path="/test" element={<MyDocument />} />
+            <Route path="/stock-ins" element={<Accordion />} />
+          </Routes>
+        </NavbarSidebar>
     </BrowserRouter>
   );
 };
