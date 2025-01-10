@@ -90,7 +90,7 @@ import VendorList from "./components/vendor/vendorList";
 import UpdateVendor from "./components/vendor/updateVendor";
 import StockIn from "./components/stock/stockIn";
 import Accordion from "./components/stock/allStockIns";
-import MyDocument from "./components/useful/pdf/testpdf";
+import TestPdf from "./components/useful/pdf/testpdf";
 // import TooltipButton from "./components/useful/stockIn/tooltip";
 
 // Redux Actions
@@ -128,7 +128,7 @@ const App = () => {
             <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
             <Route path="/vendors" element={<VendorList />} />
             <Route path="/add-stock-in" element={<StockIn />} />
-            <Route path="/test" element={<MyDocument />} />
+            <Route path="/test" element={<TestPdf />} />
             <Route path="/stock-ins" element={<Accordion />} />
           </Routes>
         </NavbarSidebar>
