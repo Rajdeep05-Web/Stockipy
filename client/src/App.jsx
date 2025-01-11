@@ -89,7 +89,7 @@ import AddVendor from "./components/vendor/addvendor";
 import VendorList from "./components/vendor/vendorList";
 import UpdateVendor from "./components/vendor/updateVendor";
 import StockIn from "./components/stock/stockIn";
-import Accordion from "./components/stock/allStockIns";
+import AllStockIns from "./components/stock/allStockIns";
 import TestPdf from "./components/useful/pdf/testpdf";
 // import TooltipButton from "./components/useful/stockIn/tooltip";
 
@@ -111,8 +111,6 @@ const App = () => {
     dispatch(fetchStockIns());
   }, [dispatch]);
 
-  // if (productsLoading || customersLoading) return <Loading />;
-
   return (
     <BrowserRouter>
         <NavbarSidebar>
@@ -129,7 +127,7 @@ const App = () => {
             <Route path="/vendors" element={<VendorList />} />
             <Route path="/add-stock-in" element={<StockIn />} />
             <Route path="/test" element={<TestPdf />} />
-            <Route path="/stock-ins" element={<Accordion />} />
+            <Route path="/stock-ins" element={<AllStockIns />} />
           </Routes>
         </NavbarSidebar>
     </BrowserRouter>

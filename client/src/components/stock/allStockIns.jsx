@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchStockIns } from "../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -8,15 +8,16 @@ import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
 import { Product } from "../../../../server/src/models/productModel";
 
-const Accordion = () => {
+const AllStockIns = () => {
+  const dispatch = useDispatch();
   const { stockIns, loading, error } = useSelector((state) => state.stockIns);
-
+  
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [search, setSearch] = useState("");
-
+  
   const [openAccordions, setOpenAccordions] = useState({});
-
+  
   const toggleAccordion = (id) => {
     setOpenAccordions((prevState) => ({
       ...prevState,
@@ -50,13 +51,12 @@ const Accordion = () => {
   if (loading) {
     return <Loading />;
   }
-  if (errorMsg) {
-    return <ErrorAlert errorMsg={errorMsg} />;
-  }
-  if (successMsg) {
-    return <SuccessAlert successMsg={successMsg} />;
-  }
+
   return (
+    <>
+       {/* {alarts} */}
+       {successMsg && <SuccessAlert successMsg={successMsg} />}
+       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
     <div>
       <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
         All Stock-Ins
@@ -75,7 +75,7 @@ const Accordion = () => {
           Collapse All
         </button>
       </div>
-      {filteredStockIns.map((item) => (
+      {filteredStockIns.reverse().map((item) => (
         <div key={item._id} id={`accordion-item-${item._id}`} className="mb-4">
           <h2>
             <button
@@ -218,7 +218,8 @@ const Accordion = () => {
         </div>
       ))}
     </div>
+    </>
   );
 };
 
-export default Accordion;
+export default AllStockIns;

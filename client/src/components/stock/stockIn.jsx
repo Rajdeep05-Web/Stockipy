@@ -13,7 +13,10 @@ import {
   updateVendor,
   fetchVendors,
 } from "../../redux/slices/vendor/vendorsSlice";
-import { addStockIn } from "../../redux/slices/stock/stockInSlice";
+import {
+  addStockIn,
+  fetchStockIns,
+} from "../../redux/slices/stock/stockInSlice";
 import { fetchProducts } from "../../redux/slices/products/productsSlice";
 
 const StockIn = () => {
@@ -48,7 +51,7 @@ const StockIn = () => {
   const [selectedProductQuantity, setSelectedProductQuantity] = useState(0);
   const [productQuantities, setProductQuantities] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [productPurchaseRate, setProductPurchaseRate] = useState('');
+  const [productPurchaseRate, setProductPurchaseRate] = useState("");
 
   //vendor----------------->
   useEffect(() => {
@@ -168,16 +171,11 @@ const StockIn = () => {
   };
 
   const handleSubmitStockIn = async () => {
-    // console.log(vendorSelected);
-    // console.log(productQuantities);
-    // console.log(invNo, startDate, totalAmount, description);
     let products = [];
     for (const [key, value] of Object.entries(productQuantities)) {
-      // console.log(key, value);
       products.push({
         product: key,
         quantity: value,
-        // productPurchaseRate: productPurchaseRate,
       });
     }
     const stockInData = {
@@ -195,6 +193,8 @@ const StockIn = () => {
         setSuccessMsg("");
       }, 3000);
       dispatch(fetchProducts());
+      dispatch(fetchVendors());
+      dispatch(fetchStockIns());
       setProductQuantities({});
       setSelectedProductList([]);
       setVendorSelected("");
@@ -202,7 +202,7 @@ const StockIn = () => {
       setInvNo("");
       setTotalAmount("");
       setDescription("");
-      setProductPurchaseRate('');
+      setProductPurchaseRate("");
       setStartDate(new Date());
     } catch (error) {
       console.log("Failed to add stock in:", error);
@@ -597,7 +597,7 @@ const StockIn = () => {
                         <input
                           type="text"
                           placeholder="rate"
-                          value={productPurchaseRate || ''}
+                          value={productPurchaseRate || ""}
                           onChange={(e) =>
                             setProductPurchaseRate(e.target.value)
                           }
@@ -615,8 +615,7 @@ const StockIn = () => {
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                         <h1 class="text-black-400 mt-1 font-normal">
-                          Present stock:{" "}
-                          {product.quantity + parseInt("0")}
+                          Present stock: {product.quantity + parseInt("0")}
                         </h1>
                       </td>
                       <td class="px-3 py-0 w-1/5 ">
