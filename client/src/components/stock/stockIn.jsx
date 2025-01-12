@@ -233,9 +233,9 @@ const StockIn = () => {
       />
 
       {/* stockIn */}
-      <div class="flex flex-row h-screen gap-6">
-        <div class="basis-2/5 bg-red-50 p-5 border border-red-300 rounded-md overflow-auto max-h-full">
-          <form class="max-w-sm mx-auto">
+      <div class="flex flex-col gap-6 h-auto lg:h-screen sm:flex-row">
+        <div class="basis-2/5 bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
+          <form class=" max-w-full lg:max-w-sm mx-auto">
             <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
               Add Vendor Details
             </h1>
@@ -478,13 +478,13 @@ const StockIn = () => {
           </form>
         </div>
 
-        <div class="basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
+        <div class="basis-full sm:basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
           <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
             Add Products
           </h1>
           {/* search and search result dropdown component */}
-          <div className="flex flex-row justify-between gap-3">
-            <div class="mb-5 relative w-4/5">
+          <div className="flex flex-row justify-between">
+            <div class="mb-5 relative w-4/6 sm:w-3/4">
               <label
                 for="products"
                 class="block mb-2 text-base font-bold text-gray-900 dark:text-white"
@@ -541,7 +541,7 @@ const StockIn = () => {
               <button
                 type="button"
                 onClick={() => setIsModalVisible(!isModalVisible)}
-                class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-md sm:w-auto mt-4 py-3 px-6  text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-md w-auto mt-4 py-3 px-3 sm:px-5  text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Add new
               </button>
@@ -549,11 +549,11 @@ const StockIn = () => {
           </div>
 
           {/* selected product list */}
-          <div class="mb-5 w-full border rounded-lg flex flex-col h-3/5 justify-between overflow-y-auto dark:border-gray-600">
+          <div class="mb-5 w-lvw sm:w-full border rounded-lg flex flex-col h-3/5 justify-between overflow-auto dark:border-gray-600">
             {/* <h1>hi</h1> */}
 
-            <table class="w-full text-sm text-left overflow-y-auto rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead class="text-xs text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400">
+            <table class="w-full text-sm text-left overflow-x rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead class="text-sm text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th
                     scope="col"
@@ -596,7 +596,7 @@ const StockIn = () => {
                       <td class="px-6 py-0 w-1/5 border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
-                          placeholder="rate"
+                          placeholder="Rate"
                           value={productPurchaseRate || ""}
                           onChange={(e) =>
                             setProductPurchaseRate(e.target.value)
@@ -614,7 +614,7 @@ const StockIn = () => {
                           }
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
-                        <h1 class="text-black-400 mt-1 font-normal">
+                        <h1 class={`text-black-400 mt-1 font-normal ${product.quantity < parseInt("5") ? "text-red-500" : "text-green-500"}`}>
                           Present stock: {product.quantity + parseInt("0")}
                         </h1>
                       </td>
