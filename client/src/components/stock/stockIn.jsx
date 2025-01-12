@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, data } from "react-router";
 import DatePicker from "react-datepicker";
+import { Trash2, Plus } from 'lucide-react';
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -543,7 +544,9 @@ const StockIn = () => {
                 onClick={() => setIsModalVisible(!isModalVisible)}
                 class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-md w-auto mt-4 py-3 px-3 sm:px-5  text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                Add new
+                {/* Add new */}
+                <Plus strokeWidth={3} />
+
               </button>
             </div>
           </div>
@@ -557,23 +560,23 @@ const StockIn = () => {
                 <tr>
                   <th
                     scope="col"
-                    class="px-3 py-3 w-2/5 border-r border-green-300 dark:border-gray-700"
+                    class="px-3 py-3 w-6/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Product name
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3 w-1/5 border-r border-green-300 dark:border-gray-700"
+                    class="px-3 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Purchase Rate
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 w-1/5 border-r border-green-300 dark:border-gray-700"
+                    class="px-6 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Quantity
                   </th>
-                  <th scope="col" class="px-3 py-3 w-1/5">
+                  <th scope="col" class="px-3 py-3 w-2/12">
                     Action
                   </th>
                 </tr>
@@ -588,12 +591,12 @@ const StockIn = () => {
                     >
                       <th
                         scope="row"
-                        class=" text-wrap px-3 py-0 font-medium text-gray-900 whitespace-nowrap dark:text-white w-2/5 border-r border-green-200 dark:border-gray-700"
+                        class=" text-wrap text-base px-3 py-0 font-medium text-gray-900 whitespace-nowrap dark:text-white w-6/12 border-r border-green-200 dark:border-gray-700"
                       >
                         {selectedProductList.indexOf(product) + 1}
                         {". "} {product.name}
                       </th>
-                      <td class="px-6 py-0 w-1/5 border-r border-green-200 dark:border-gray-700">
+                      <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           placeholder="Rate"
@@ -604,7 +607,7 @@ const StockIn = () => {
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                       </td>
-                      <td class="px-6 py-0 w-1/5 border-r border-green-200 dark:border-gray-700">
+                      <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           placeholder="Quantity"
@@ -615,17 +618,18 @@ const StockIn = () => {
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                         <h1 class={`text-black-400 mt-1 font-normal ${product.quantity < parseInt("5") ? "text-red-500" : "text-green-500"}`}>
-                          Present stock: {product.quantity + parseInt("0")}
+                          Present stock: <span class={"font-semibold"}>{product.quantity + parseInt("0")}</span>
                         </h1>
                       </td>
-                      <td class="px-3 py-0 w-1/5 ">
+                      <td class="px-3 py-0 w-2/12 text-center">
                         <button
                           type="button"
                           onClick={() => handleDeleteProductFromList(product)}
                           class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         >
-                          Remove
-                        </button>
+                          {/* Remove  */}
+                          <Trash2 />
+                        </button> 
                       </td>
                     </tr>
                     // </>

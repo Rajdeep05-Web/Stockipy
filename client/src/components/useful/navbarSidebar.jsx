@@ -75,11 +75,11 @@ const NavbarSidebar = ({ children }) => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 ">
       {/* Sidebar */}
       <div
         id="sidebar"
-        className={`fixed z-20 inset-y-0 left-0 w-64 bg-gray-900 transform transition-transform duration-200 ease-in-out ${
+        className={`fixed z-20 inset-y-0 left-0 w-64 bg-gray-900 transform transition-transform duration-200 ease-in-out  ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static lg:w-64`}
       >

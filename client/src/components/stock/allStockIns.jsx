@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
+import { ListCollapse, Download, Copy } from "lucide-react";
+
 import { fetchStockIns } from "../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -7,6 +9,7 @@ import SearchBar from "../useful/searchBar";
 import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
 import { Product } from "../../../../server/src/models/productModel";
+import { set } from "mongoose";
 
 const AllStockIns = () => {
   const contentRef = useRef(null);
@@ -18,12 +21,26 @@ const AllStockIns = () => {
   const [search, setSearch] = useState("");
 
   const [openAccordions, setOpenAccordions] = useState({});
+  const [collapseAll, setCollapseAll] = useState(false);
 
   const toggleAccordion = (id) => {
     setOpenAccordions((prevState) => ({
       ...prevState,
       [id]: !prevState[id],
     }));
+  };
+
+  const collapseAllFunction = () => {
+    setCollapseAll(!collapseAll);
+    if (collapseAll) {
+      let openAccordionsObj = {};
+      stockIns.map((item) => {
+        openAccordionsObj[item._id] = true;
+      });
+      setOpenAccordions(openAccordionsObj);
+    } else {
+      setOpenAccordions({});
+    }
   };
 
   const convertUTC = (dataFromBackend) => {
@@ -34,8 +51,8 @@ const AllStockIns = () => {
     return istDateString;
   };
 
-  const handleCollapse = () => {
-    stockIns.map((item) => toggleAccordion(item._id));
+  const handleDownload = () => {
+    console.log("Download button clicked");
   };
 
   const filteredStockIns = stockIns.filter((item) => {
@@ -60,7 +77,7 @@ const AllStockIns = () => {
         <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
           All Stock-Ins
         </h1>
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-2">
           <SearchBar
             placeholderText={"Search for Stock-ins"}
             setSearch={setSearch}
@@ -68,10 +85,11 @@ const AllStockIns = () => {
           />
           <button
             type="button"
-            onClick={() => handleCollapse()}
-            class="text-white bg-blue-700 mb-4 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-2 py-0 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            onClick={() => collapseAllFunction()}
+            title="Collapse All"
+            class="text-white bg-blue-700 mb-4 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg md:text-sm sm:text-xs sm:w-auto px-2 s:p-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
-            Collapse All
+            <ListCollapse size={34} />
           </button>
         </div>
         {filteredStockIns.reverse().map((item) => (
@@ -127,7 +145,7 @@ const AllStockIns = () => {
                     {item.description}
                   </span>
                 </div>
-                <div className="flex flex-col justify-between items-center gap-2 basis-1/12 w-full">
+                <div className="justify-center items-center m-auto">
                   <svg
                     data-accordion-icon
                     className={`w-3 h-3 ${
@@ -145,79 +163,93 @@ const AllStockIns = () => {
                       d="M9 5 5 1 1 5"
                     />
                   </svg>{" "}
-                  <button
-                    type="button"
-                    onClick={() => handleSubmitStockIn()}
-                    class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                  >
-                    Download
-                  </button>
                 </div>
               </button>
             </h2>
             {openAccordions[item._id] && (
-                <div
-                  className={`p-5 shadow hover:shadow-lg border border-gray-200 bg-slate-100 rounded-b-lg dark:border-gray-700`}
-                  id={`accordion-body-${item._id}`}
-                >
+              <div
+                className={`p-5 shadow hover:shadow-lg border border-gray-200 bg-slate-100 rounded-b-lg dark:border-gray-700`}
+                id={`accordion-body-${item._id}`}
+              >
+                <div className="flex flex-row justify-between">
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
-                  {/* product and vendor details */}
-                  <div className="flex flex-row gap-2 mt-2 mx-0">
-                    <div className="flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
-                      <h6 class="text-lg font-bold dark:text-white">VENDOR</h6>
-                      <hr class="h-px my-1 bg-gray-300 border-0 dark:bg-gray-700"></hr>
-                      <span className="flex basis-1/5 justify-start items-center ">
-                        <h4 className="font-bold text-gray-600">Name:</h4>
-                        &nbsp;
-                        {item.vendor.name || "NA"}
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-center ">
-                        <h4 className="font-bold text-gray-600">Email:</h4>
-                        &nbsp;
-                        {item.vendor.email || "NA"}
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-center ">
-                        <h4 className="font-bold text-gray-600">Phone No:</h4>
-                        &nbsp;
-                        {item.vendor.phone || "NA"}
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-center ">
-                        <h4 className="font-bold text-gray-600">Address:</h4>
-                        &nbsp;
-                        {item.vendor.address || "NA"}
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-center ">
-                        <h4 className="font-bold text-gray-600">GST No:</h4>
-                        &nbsp;
-                        {item.vendor.gstNo || "NA"}
-                      </span>
-                    </div>
-
-                    <div className=" flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
-                      <h6 class="text-lg font-bold dark:text-white">PRODUCT</h6>
-                      <hr class="h-px my-1 bg-gray-300 border-0 dark:bg-gray-700"></hr>
-                      {item.products.map((product) => (
-                        <div className="flex justify-between">
-                          <span className="flex basis-4/5 justify-start items-center ">
-                            <h4 className="font-medium text-gray-600">
-                              {item.products.indexOf(product) + 1}
-                              {")"}
-                              &nbsp;
-                              {product.product.name}
-                            </h4>
-                          </span>
-                          <span className="flex basis-1/5 justify-start items-center ">
-                            <h4 className="font-bold text-gray-600">
-                              {"x "}
-                              {product.quantity}
-                              {product.quantity>1?" pcs":" pc"}
-                            </h4>
-                          </span>
-                        </div>
-                      ))}
-                    </div>
+                  <div 
+                  name="buttons"
+                  className="flex flex-row gap-2"
+                  >
+                  <button
+                    type="button"
+                    onClick={() => handleDownload()}
+                    class="text-white  bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                     <Copy />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDownload()}
+                    class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                  >
+                    <Download />
+                  </button>
                   </div>
                 </div>
+                {/* product and vendor details */}
+                <div className="flex flex-row gap-2 mt-2 mx-0">
+                  <div className="flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+                    <h6 class="text-lg font-bold dark:text-white">VENDOR</h6>
+                    <hr class="h-px my-1 bg-gray-300 border-0 dark:bg-gray-700"></hr>
+                    <span className="flex basis-1/5 justify-start items-start ">
+                      <h4 className="font-bold text-gray-600">Name:</h4>
+                      &nbsp;
+                      {item.vendor.name || "NA"}
+                    </span>
+                    <span className="flex basis-1/5 justify-start items-start ">
+                      <h4 className="font-bold text-gray-600">Email:</h4>
+                      &nbsp;
+                      {item.vendor.email || "NA"}
+                    </span>
+                    <span className="flex basis-1/5 justify-start items-start ">
+                      <h4 className="font-bold text-gray-600">Phone No:</h4>
+                      &nbsp;
+                      {item.vendor.phone || "NA"}
+                    </span>
+                    <span className="flex basis-1/5 justify-start items-start ">
+                      <h4 className="font-bold text-gray-600">Address:</h4>
+                      &nbsp;
+                      {item.vendor.address || "NA"}
+                    </span>
+                    <span className="flex basis-1/5 justify-start items-start">
+                      <h4 className="font-bold text-gray-600">GST No:</h4>
+                      &nbsp;
+                      {item.vendor.gstNo || "NA"}
+                    </span>
+                  </div>
+
+                  <div className=" flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+                    <h6 class="text-lg font-bold dark:text-white">PRODUCT</h6>
+                    <hr class="h-px my-1 bg-gray-300 border-0 dark:bg-gray-700"></hr>
+                    {item.products.map((product) => (
+                      <div className="flex justify-between">
+                        <span className="flex basis-4/5 justify-start items-start ">
+                          <h4 className="font-medium text-gray-600">
+                            {item.products.indexOf(product) + 1}
+                            {")"}
+                            &nbsp;
+                            {product.product.name}
+                          </h4>
+                        </span>
+                        <span className="flex basis-1/5 justify-start items-start ">
+                          <h4 className="font-bold text-gray-600">
+                            {"x "}
+                            {product.quantity}
+                            {product.quantity > 1 ? " pcs" : " pc"}
+                          </h4>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         ))}
