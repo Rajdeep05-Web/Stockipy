@@ -16,8 +16,8 @@ import {
 const AddVendor = () => {
   const dispatch = useDispatch();
   const { vendors, loading } = useSelector((state) => state.vendors);
-  const location = useLocation();
-  const navigate = useNavigate();
+  // const location = useLocation();
+  // const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -28,11 +28,11 @@ const AddVendor = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const [isFromStockIn, setIsFromStockIn] = useState(false);
 
-  useEffect(() => {
-    if (location.state && location.state.isFromStockIn) {
-      setIsFromStockIn(true);
-    }
-  }, [location]);
+  // useEffect(() => {
+  //   if (location.state && location.state.isFromStockIn) {
+  //     setIsFromStockIn(true);
+  //   }
+  // }, [location]);
 
   const nullify = () => {
     setName("");
@@ -55,9 +55,9 @@ const AddVendor = () => {
       setSuccessMsg("Vendor added successfully");
       setTimeout(() => {
         setSuccessMsg("");
-        if (isFromStockIn) {
-          navigate("/stock-in",{state : location.state });
-        }
+        // if (isFromStockIn) {
+        //   navigate("/add-stock-in",{state : location.state });
+        // }
       }, 3000);
       dispatch(fetchVendors());
     } catch (error) {

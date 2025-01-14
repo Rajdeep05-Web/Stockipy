@@ -9,20 +9,30 @@ const productSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    // rate without gst
     rate: {
         type: Number,
         required: true,
         default: 0
     },
-    // productPurchaseRate:{
-    //     type: Number,
-    //     default: 0
-    // },
+    // purchase rate from vendor
+    productPurchaseRate:{
+        type: Number,
+        default: 0
+    },
+    //product mrp
     mrp: {
         type: Number,
         required: true,
         default: 0
     },
+    productStockIns:[
+        { 
+            type : mongoose.Schema.Types.ObjectId,
+            ref: 'StockIn',
+            required: true
+        }
+    ],
     description: {
         type: String,
         default: ""

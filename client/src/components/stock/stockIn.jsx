@@ -9,6 +9,7 @@ import Loading from "../useful/Loading/loading";
 import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
 import ModalAddProduct from "../products/modalAddProduct";
+import ModalAddVendor from "../vendor/modalAddVendor";
 
 import {
   updateVendor,
@@ -25,8 +26,8 @@ const StockIn = () => {
   const { vendors, loading } = useSelector((state) => state.vendors);
   const { products } = useSelector((state) => state.products);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const navigate = useNavigate();
+  // const location = useLocation();
   //vendor
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -44,43 +45,19 @@ const StockIn = () => {
   const [isVendorFormFieldsDisabled, setisVendorFormFieldsDisabled] =
     useState(true);
   const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
+  const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
 
   //product
   const [productSearchInput, setProductSearchInput] = useState("");
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedProductList, setSelectedProductList] = useState([]);
-  const [selectedProductQuantity, setSelectedProductQuantity] = useState(0);
   const [productQuantities, setProductQuantities] = useState({});
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [productPurchaseRate, setProductPurchaseRate] = useState("");
+  const [allProductRates, setAllProductRates] = useState({});
+  const [allProductMRPs, setAllProductMRPs] =  useState({});
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+
 
   //vendor----------------->
-  useEffect(() => {
-    if (location.state && location.state.isFromStockIn) {
-      //if come back to this page, it holds the old state for once
-      const {
-        invNo,
-        totalAmount,
-        description,
-        startDate,
-        vendorSelected,
-        selectedVendorId,
-      } = location.state.stockInState;
-      setInvNo(invNo);
-      setTotalAmount(totalAmount);
-      setDescription(description);
-      setStartDate(startDate);
-      setselectedVendorId(selectedVendorId);
-      if (vendorSelected) {
-        setName(vendorSelected.name);
-        setPhone(vendorSelected.phone);
-        setAddress(vendorSelected.address);
-        setGstNo(vendorSelected.gstNo);
-        setEmail(vendorSelected.email);
-      }
-      navigate(location.pathname, { replace: true, state: null }); //clear the location state if refrsh
-    }
-  }, [location.state]);
 
   //showing selected vendor data in form
   const handleVendorChange = (e) => {
@@ -132,6 +109,19 @@ const StockIn = () => {
   };
 
   //product
+
+  //total amount calculation
+  useEffect(() => {
+    let total = 0;
+    // console.log(selectedProductList);
+    for(const [key, value] of Object.entries(productQuantities)){
+      const rate = allProductRates[key] || 0;
+      total = total + (rate*value);
+    }
+    setTotalAmount(total);
+  },[selectedProductList, allProductRates, allProductMRPs, productQuantities]);
+
+  //product search in the search bar
   const handleProductSearch = (e) => {
     setProductSearchInput(e.target.value);
     const searchTerm = e.target.value;
@@ -148,35 +138,55 @@ const StockIn = () => {
 
     // }
   };
-
+  
+  //product selected from search bar
   const handleProductSelect = (product) => {
     if (!selectedProductList.some((p) => p._id == product._id)) {
       setSelectedProductList([...selectedProductList, product]);
       setProductSearchInput("");
     }
-    // console.log(selectedProductList);
   };
+
+  //product quantity with id in state handled
   const handleProductQuantity = (id, quantity) => {
     productQuantities[id] = quantity;
     setProductQuantities({ ...productQuantities });
     // console.log(productQuantities);
   };
 
+  //all products MRP with id in state handled
+  const handleProductMRP = (id, mrp) => {
+    setAllProductMRPs({...allProductMRPs, [id]: mrp});
+  }
+
+  //all products purchase rate with id in state hndled
+  const handleProductPurcahseRate = (id, rate) => {
+     setAllProductRates({...allProductRates, [id]: rate});
+  }
+  
+    //product deleted from selected list
   const handleDeleteProductFromList = (product) => {
     setSelectedProductList(
       selectedProductList.filter((p) => p._id !== product._id)
     );
     delete productQuantities[product._id];
+    delete allProductRates[product._id];
+    delete allProductMRPs[product._id]
     setProductQuantities({ ...productQuantities });
-    console.log(productQuantities);
+    setAllProductRates({...allProductRates});
+    setAllProductMRPs({...allProductMRPs});
+    // console.log(productQuantities);
   };
-
+  
+  //final submit of stock in
   const handleSubmitStockIn = async () => {
     let products = [];
     for (const [key, value] of Object.entries(productQuantities)) {
       products.push({
         product: key,
         quantity: value,
+        productPurchaseRate: allProductRates[key],
+        mrp: allProductMRPs[key] || -1
       });
     }
     const stockInData = {
@@ -187,6 +197,7 @@ const StockIn = () => {
       description,
       products,
     };
+   
     try {
       await dispatch(addStockIn(stockInData)).unwrap();
       setSuccessMsg("Stock In saved successfully");
@@ -203,7 +214,6 @@ const StockIn = () => {
       setInvNo("");
       setTotalAmount("");
       setDescription("");
-      setProductPurchaseRate("");
       setStartDate(new Date());
     } catch (error) {
       console.log("Failed to add stock in:", error);
@@ -229,12 +239,18 @@ const StockIn = () => {
       {successMsg && <SuccessAlert successMsg={successMsg} />}
       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
       <ModalAddProduct
-        isModalVisible={isModalVisible}
-        setIsModalVisible={setIsModalVisible}
+        isModalVisible={isProductModalVisible}
+        setIsModalVisible={setIsProductModalVisible}
+      />
+      <ModalAddVendor
+        isModalVisible={isVendorModalVisible}
+        setIsModalVisible={setIsVendorModalVisible}
       />
 
       {/* stockIn */}
       <div class="flex flex-col gap-6 h-auto lg:h-screen sm:flex-row">
+
+        {/* vendor */}
         <div class="basis-2/5 bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
           <form class=" max-w-full lg:max-w-sm mx-auto">
             <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
@@ -310,7 +326,7 @@ const StockIn = () => {
                   type="text"
                   id="base-input"
                   onChange={(e) => setTotalAmount(e.target.value)}
-                  value={totalAmount}
+                  value={totalAmount || ""}
                   // placeholder="Amount"
                   required
                   class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -455,22 +471,7 @@ const StockIn = () => {
             <div class="flex justify-end">
               <button
                 type="button"
-                onClick={(e) => {
-                  // setIsFromStockIn_forHistory(true);
-                  navigate("/add-vendor", {
-                    state: {
-                      isFromStockIn: true, // true when btn clicked
-                      stockInState: {
-                        invNo,
-                        totalAmount,
-                        description,
-                        startDate,
-                        vendorSelected,
-                        selectedVendorId,
-                      },
-                    },
-                  });
-                }}
+                onClick={() => setIsVendorModalVisible(!isVendorModalVisible)}
                 class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Vendor not found? Create one
@@ -478,7 +479,8 @@ const StockIn = () => {
             </div>
           </form>
         </div>
-
+        
+        {/* product */}
         <div class="basis-full sm:basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
           <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
             Add Products
@@ -541,7 +543,7 @@ const StockIn = () => {
             <div class=" my-auto">
               <button
                 type="button"
-                onClick={() => setIsModalVisible(!isModalVisible)}
+                onClick={() => setIsProductModalVisible(!isProductModalVisible)}
                 class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-md w-auto mt-4 py-3 px-3 sm:px-5  text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 {/* Add new */}
@@ -569,6 +571,12 @@ const StockIn = () => {
                     class="px-3 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Purchase Rate
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-3 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
+                  >
+                    MRP
                   </th>
                   <th
                     scope="col"
@@ -600,9 +608,21 @@ const StockIn = () => {
                         <input
                           type="text"
                           placeholder="Rate"
-                          value={productPurchaseRate || ""}
+                          required
+                          value={allProductRates[product._id] || ""}
                           onChange={(e) =>
-                            setProductPurchaseRate(e.target.value)
+                          handleProductPurcahseRate(product._id, e.target.value)
+                          }
+                          class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                      </td>
+                      <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
+                        <input
+                          type="text"
+                          placeholder="MRP"
+                          value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp}
+                          onChange={(e) =>
+                            handleProductMRP(product._id, e.target.value )
                           }
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
@@ -618,7 +638,7 @@ const StockIn = () => {
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                         <h1 class={`text-black-400 mt-1 font-normal ${product.quantity < parseInt("5") ? "text-red-500" : "text-green-500"}`}>
-                          Present stock: <span class={"font-semibold"}>{product.quantity + parseInt("0")}</span>
+                          Stock: <span class={"font-semibold"}>{product.quantity + parseInt("0")}</span>
                         </h1>
                       </td>
                       <td class="px-3 py-0 w-2/12 text-center">

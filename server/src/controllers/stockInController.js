@@ -30,13 +30,16 @@ export const addStockIn = async (req, res) => {
         return res.status(400).json({error: "Products are required"});
     }
     if(products.length > 0 && products.some(item => !item.product || !item.quantity)){
-        return res.status(400).json({error: "Product ID or Quantity not provided"});
+        return res.status(400).json({error: "Product or Quantity not provided"});
     }
     if(products.length > 0 && products.some(item => !mongoose.Types.ObjectId.isValid(item.product))){
         return res.status(400).json({error: "Invalid Product ID"});
     }
     if(products.length > 0 && products.some(item => item.quantity <= 0)){
         return res.status(400).json({error: "Quantity must be greater than 0"});
+    }
+    if(products.length > 0 && products.some(item => item.productPurchaseRate==="")){
+        return res.status(400).json({error: "Purchase Price not provided"});
     }
     if(totalAmount && totalAmount <= 0){
         return res.status(400).json({error: "Total Amount must be greater than 0"});
@@ -59,11 +62,14 @@ export const addStockIn = async (req, res) => {
         })
         await newStockIn.save();
 
-        //update product quantity
+        //update product quantity, purchase rate and quantity
         for(const item of products){
             const product = await Product.findById(item.product);
             if(product){
-                product.quantity += parseInt(item.quantity);
+                product.quantity += parseInt(item.quantity); // update quantity
+                product.productPurchaseRate = parseInt(item.productPurchaseRate); // update purchase rate
+                product.mrp = (item.mrp === -1 ? product.mrp : item.mrp ); // update mrp
+                product.productStockIns.push(newStockIn._id); // add stockin id to product
                 await product.save();
             }
         }

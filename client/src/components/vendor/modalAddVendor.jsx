@@ -1,45 +1,48 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addProduct,
-  fetchProducts,
-} from "../../redux/slices/products/productsSlice";
+  addVendor,
+  fetchVendors,
+} from "../../redux/slices/vendor/vendorsSlice";
 
 import Loading from "../useful/Loading/loading";
 import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
 
-const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
+const ModalAddVendor = ({ isModalVisible, setIsModalVisible }) => {
   const dispatch = useDispatch();
-  const { products, loading } = useSelector((state) => state.products);
+  const { vendors, loading } = useSelector((state) => state.vendors);
 
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [rate, setRate] = useState("");
-  const [mrp, setMrp] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [gstNo, setGstNo] = useState("");
+  const [email, setEmail] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
   const nullifyFields = () => {
     setName("");
-    setDescription("");
-    setRate("");
-    setMrp("");
+    setPhone("");
+    setAddress("");
+    setGstNo("");
+    setEmail("");
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newProduct = { name, rate, description, mrp };
+    const vendorData = { name, phone, address, gstNo, email };
     try {
-      await dispatch(addProduct(newProduct)).unwrap();
-      setSuccessMsg("Product added successfully");
+      await dispatch(addVendor(vendorData)).unwrap();
+        nullifyFields();
+        setSuccessMsg("Vendor added successfully");
       setTimeout(() => {
-        setSuccessMsg("");
-        setIsModalVisible(!isModalVisible);
-      }, 3000);
-      dispatch(fetchProducts());
-      nullifyFields();
+          setSuccessMsg("");
+          console.log("Gone",successMsg)
+          setIsModalVisible(!isModalVisible);
+        }, 3000);
+        dispatch(fetchVendors());
     } catch (error) {
-      console.log("Failed to add product:", error);
+      console.log("Failed to add vendor:", error);
       setErrorMsg(error);
       setTimeout(() => {
         setErrorMsg("");
@@ -48,18 +51,19 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
   };
 
   if (loading) return <Loading />;
+
   return (
     <>
       {/* Modal */}
       {isModalVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
-          {successMsg && <SuccessAlert successMsg={successMsg} />}
-          {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
+          <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
+            {successMsg && <SuccessAlert successMsg={successMsg} />}
+            {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 w-full max-w-md">
             {/* Modal header */}
             <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Create New Product
+                Create New Vendor
               </h3>
               <button
                 type="button"
@@ -99,7 +103,7 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
                     type="text"
                     id="name"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="Type product name"
+                    placeholder="Type vendor name"
                     onChange={(e) => setName(e.target.value)}
                     value={name}
                     required
@@ -108,55 +112,71 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
 
                 <div>
                   <label
-                    htmlFor="price"
+                    htmlFor="phone"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Rate (without GST)
+                     Phone no
                   </label>
                   <input
-                    type="number"
+                    type="phone"
                     id="price"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="Enter rate"
-                    onChange={(e) => setRate(parseFloat(e.target.value) || "")}
-                    value={rate}
-                    required
+                    placeholder="Enter phone no"
+                    onChange={(e) => setPhone(e.target.value)}
+                    value={phone}
                   />
                 </div>
 
                 <div>
                   <label
-                    htmlFor="mrp"
+                    htmlFor="email"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    MRP
+                     Email
+                  </label>
+                  <input
+                    type="email"
+                    id="mrp"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Enter email"
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="address"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    Address
+                  </label>
+                  <textarea
+                    id="address"
+                    rows="4"
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Enter vendor address"
+                    onChange={(e) => setAddress(e.target.value)}
+                    value={address}
+                    required
+                  ></textarea>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="gstno"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                     GST No
                   </label>
                   <input
                     type="number"
-                    id="mrp"
+                    id="gstno"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="Enter MRP"
-                    onChange={(e) => setMrp(parseFloat(e.target.value) || "")}
-                    value={mrp}
-                    required
+                    placeholder="Enter GST no"
+                    onChange={(e) => setGstNo(e.target.value)}
+                    value={gstNo}
                   />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="description"
-                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                  >
-                    Description
-                  </label>
-                  <textarea
-                    id="description"
-                    rows="4"
-                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                    placeholder="Write product description here"
-                    onChange={(e) => setDescription(e.target.value)}
-                    value={description}
-                  ></textarea>
                 </div>
               </div>
 
@@ -164,7 +184,7 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
                 type="submit"
                 className="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                Add Product
+                Add Vendor
               </button>
             </form>
           </div>
@@ -174,4 +194,4 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
   );
 };
 
-export default ModalAddProduct;
+export default ModalAddVendor;

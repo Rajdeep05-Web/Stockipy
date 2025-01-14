@@ -9,8 +9,8 @@ export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async
     return data;
 });
 export const fetchCustomer = createAsyncThunk('customers/fetchCustomer', async (id) => {
-    const { data } = await axios.get(`${API_URL}/${id}`);
-    return data;
+    // const { data } = await axios.get(`${API_URL}/${id}`);
+    // return data;
 });
 export const addCustomer = createAsyncThunk('customers/addCustomer', async (customer, {rejectWithValue }) => {//
     try {
