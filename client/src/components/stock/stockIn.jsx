@@ -554,10 +554,10 @@ const StockIn = () => {
           </div>
 
           {/* selected product list */}
-          <div class="mb-5 w-lvw sm:w-full border rounded-lg flex flex-col h-3/5 justify-between overflow-auto dark:border-gray-600">
+          <div class="mb-5 w-full border rounded-lg flex flex-col h-3/5 justify-between overflow-auto dark:border-gray-600">
             {/* <h1>hi</h1> */}
 
-            <table class="w-full text-sm text-left overflow-x rtl:text-right text-gray-500 dark:text-gray-400">
+            <table class="w-full text-sm text-left overflow-x-auto rtl:text-right text-gray-500 dark:text-gray-400">
               <thead class="text-sm text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th

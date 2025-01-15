@@ -133,7 +133,11 @@ const AddProduct = () => {
         </button>
       </form>
       {/** Product List **/}
+      <hr className="my-5 bg-gray-600 border-1 dark:bg-gray-700" />
+      <div class="container mt-5 sm:mt-0">
       <ProductListTable products={products} setErrorMsg={setErrorMsg} setSuccessMsg={setSuccessMsg}/>
+      </div>
+      
       {/** success message **/}
       {successMsg && <SuccessAlert successMsg={successMsg} />}
       {/** Error message **/}

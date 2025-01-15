@@ -160,10 +160,13 @@ const AddVendor = () => {
       </form>
 
       {/** Product List **/}
-      <VendorListTable
-        setSuccessMsg={setSuccessMsg}
-        setErrorMsg={setErrorMsg}
-      />
+      <hr className="my-5 bg-gray-600 border-1 dark:bg-gray-700" />
+      <div class="container mt-5 sm:mt-0">
+        <VendorListTable
+          setSuccessMsg={setSuccessMsg}
+          setErrorMsg={setErrorMsg}
+        />
+      </div>
 
       {/** success message **/}
       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}

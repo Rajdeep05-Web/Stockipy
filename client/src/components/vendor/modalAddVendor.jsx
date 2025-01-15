@@ -27,38 +27,36 @@ const ModalAddVendor = ({ isModalVisible, setIsModalVisible }) => {
     setAddress("");
     setGstNo("");
     setEmail("");
-  };
+  }; 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const vendorData = { name, phone, address, gstNo, email };
     try {
       await dispatch(addVendor(vendorData)).unwrap();
-        nullifyFields();
-        setSuccessMsg("Vendor added successfully");
+      setSuccessMsg("Vendor added successfully");
+      nullifyFields();
       setTimeout(() => {
-          setSuccessMsg("");
-          console.log("Gone",successMsg)
-          setIsModalVisible(!isModalVisible);
-        }, 3000);
-        dispatch(fetchVendors());
+        setSuccessMsg(""); // Clear success message after 3 seconds
+        setIsModalVisible(!isModalVisible); // Close modal
+      }, 3000);
+      dispatch(fetchVendors());
     } catch (error) {
-      console.log("Failed to add vendor:", error);
-      setErrorMsg(error);
+      setErrorMsg(error || "Failed to add vendor");
       setTimeout(() => {
-        setErrorMsg("");
+        setErrorMsg(""); 
       }, 3000);
     }
   };
-
-  if (loading) return <Loading />;
+  
 
   return (
     <>
       {/* Modal */}
       {isModalVisible && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
-            {successMsg && <SuccessAlert successMsg={successMsg} />}
-            {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
+        <div className="fixed inset-0 z-50 flex items-center justify-center w-full h-full bg-gray-800 bg-opacity-50">
+          {loading && <Loading />}
+          {successMsg && <SuccessAlert successMsg={successMsg} />}
+          {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
           <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 w-full max-w-md">
             {/* Modal header */}
             <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
@@ -115,7 +113,7 @@ const ModalAddVendor = ({ isModalVisible, setIsModalVisible }) => {
                     htmlFor="phone"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                     Phone no
+                    Phone no
                   </label>
                   <input
                     type="phone"
@@ -132,7 +130,7 @@ const ModalAddVendor = ({ isModalVisible, setIsModalVisible }) => {
                     htmlFor="email"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                     Email
+                    Email
                   </label>
                   <input
                     type="email"
@@ -167,7 +165,7 @@ const ModalAddVendor = ({ isModalVisible, setIsModalVisible }) => {
                     htmlFor="gstno"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                     GST No
+                    GST No
                   </label>
                   <input
                     type="number"

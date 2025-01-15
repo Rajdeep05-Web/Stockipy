@@ -206,7 +206,7 @@ const NavbarSidebar = ({ children }) => {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6 sm:px-28">
+        <main className="flex-1 w-dvw h-dvh md:w-full bg-gray-50 p-6 sm:px-28">
           {children}
         </main>
       </div>
