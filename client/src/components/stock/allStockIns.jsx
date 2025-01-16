@@ -11,7 +11,9 @@ import {
   FileText,
   BadgePercent,
 } from "lucide-react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
+import { StockInPDF } from "./stockInPdf";
 import { fetchStockIns } from "../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -176,7 +178,13 @@ const AllStockIns = () => {
               </div>
             </button>
 
-            {openAccordions[item._id] && (
+            <div
+              className={`transform transition-all duration-300 ease-in-out origin-top ${
+                openAccordions[item._id]
+                  ? "opacity-100 scale-y-100 max-h-[1000px]"
+                  : "opacity-0 scale-y-0 max-h-0"
+              }`}
+            >
               <div
                 className={`p-5 shadow hover:shadow-lg border border-gray-200 bg-slate-100 rounded-b-lg dark:border-gray-700`}
                 id={`accordion-body-${item._id}`}
@@ -184,20 +192,53 @@ const AllStockIns = () => {
                 <div className="flex flex-row justify-between">
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
                   <div name="buttons" className="flex flex-row gap-2">
-                    <button
+                    {/* <button
                       type="button"
                       onClick={() => handleDownload()}
                       class="text-white  bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
                       <Copy />
-                    </button>
-                    <button
+                    </button> */}
+                    <PDFDownloadLink
+                      document={<StockInPDF data={item} />}
+                      fileName={`stock-in-${item.invoiceNo}.pdf`}
+                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 inline-flex items-center"
+                    >
+                      {({ blob, url, loading, error }) =>
+                        loading ? (
+                          <span className="flex items-center">
+                            <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              />
+                            </svg>
+                            Generating...
+                          </span>
+                        ) : (
+                          <span className="flex items-center">
+                            <Download className="mr-2" size={20} />
+                            Download PDF
+                          </span>
+                        )
+                      }
+                    </PDFDownloadLink>
+                    {/* <button
                       type="button"
                       onClick={() => handleDownload()}
                       class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
                       <Download />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
                 {/* product and vendor details */}
@@ -278,15 +319,18 @@ const AllStockIns = () => {
                         </div>
                       ))}
                     </div>
-                      <div className="flex justify-between order-last mt-auto font-semibold text-gray-900 border-t  pt-2 border-gray-300 dark:border-gray-700 dark:text-gray-100">
-                        <span className="flex basis-[40%] min-w-[150px] items-start">Total Amount</span>
-                        <span className="flex basis-[15%] min-w-[100px] items-start">Rs. {item.totalAmount}</span>
-                      </div>
-
+                    <div className="flex justify-between order-last mt-auto font-semibold text-gray-900 border-t  pt-2 border-gray-300 dark:border-gray-700 dark:text-gray-100">
+                      <span className="flex basis-[40%] min-w-[150px] items-start">
+                        Total Amount
+                      </span>
+                      <span className="flex basis-[15%] min-w-[100px] items-start">
+                        Rs. {item.totalAmount}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         ))}
       </div>

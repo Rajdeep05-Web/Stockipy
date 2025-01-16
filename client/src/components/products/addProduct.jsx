@@ -20,6 +20,7 @@ const AddProduct = () => {
   const [description, setDescription] = useState("");
   const [rate, setRate] = useState('');
   const [mrp, setMrp] = useState('');
+  const [gst, setGst] = useState('');
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -36,7 +37,7 @@ const AddProduct = () => {
 // console.log(typeof rate)
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newProduct = {name, rate, description, mrp};
+    const newProduct = {name, rate, description, mrp, gst};
     try {
       await dispatch(addProduct(newProduct)).unwrap();
       setSuccessMsg("Product added successfully");
@@ -100,7 +101,7 @@ const AddProduct = () => {
             for="base-input"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
-            Rate(without GST)
+            Rate (Included GST)
           </label>
           <input
             type="number"
@@ -122,6 +123,21 @@ const AddProduct = () => {
             id="base-input"
             onChange={(e) => setMrp(parseFloat(e.target.value) || '')}
             value={mrp} required
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
+        <div class="mb-5">
+          <label
+            for="base-input"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            GST Percentage(%) 
+          </label>
+          <input
+            type="number"
+            id="base-input"
+            onChange={(e) => setGst(parseFloat(e.target.value) || '')}
+            value={gst} required
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>

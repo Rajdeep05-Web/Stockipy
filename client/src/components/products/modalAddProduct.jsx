@@ -17,6 +17,7 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
   const [description, setDescription] = useState("");
   const [rate, setRate] = useState("");
   const [mrp, setMrp] = useState("");
+  const [gst, setGst] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -28,7 +29,7 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const newProduct = { name, rate, description, mrp };
+    const newProduct = { name, rate, description, mrp, gst };
     try {
       await dispatch(addProduct(newProduct)).unwrap();
       setSuccessMsg("Product added successfully");
@@ -111,7 +112,7 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
                     htmlFor="price"
                     className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                   >
-                    Rate (without GST)
+                    Rate (Included GST)
                   </label>
                   <input
                     type="number"
@@ -138,6 +139,24 @@ const ModalAddProduct = ({ isModalVisible, setIsModalVisible }) => {
                     placeholder="Enter MRP"
                     onChange={(e) => setMrp(parseFloat(e.target.value) || "")}
                     value={mrp}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="mrp"
+                    className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    GST Percentage(%)
+                  </label>
+                  <input
+                    type="number"
+                    id="mrp"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                    placeholder="Enter MRP"
+                    onChange={(e) => setGst(parseFloat(e.target.value) || "")}
+                    value={gst}
                     required
                   />
                 </div>

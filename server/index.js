@@ -4,6 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 dotenv.config();
 
+import connectDB from './src/DB/index.js';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,9 +19,7 @@ import vendorRouter from './src/routes/vendorRouter.js';
 import stockInRouter from './src/routes/stockInRouter.js';
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error(err));
+connectDB();
 
 // Routes
 app.get('/', (req, res) => {

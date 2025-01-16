@@ -144,10 +144,10 @@ const NavbarSidebar = ({ children }) => {
             onClick={() => toggleDropdown("stock")}
           >
             <Link to="/add-stock-in" className="block py-2 text-gray-400 hover:text-white transition-colors">
-              Stock In
+              Create Stock-In
             </Link>
             <Link to="/stock-ins" className="block py-2 text-gray-400 hover:text-white transition-colors">
-              Stock Ins
+              All Stock-Ins
             </Link>
           </NavItem>
         </nav>

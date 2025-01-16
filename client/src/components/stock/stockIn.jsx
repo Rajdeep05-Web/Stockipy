@@ -580,6 +580,12 @@ const StockIn = () => {
                   </th>
                   <th
                     scope="col"
+                    class="px-3 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
+                  >
+                    Sale Rate (INC. GST)
+                  </th>
+                  <th
+                    scope="col"
                     class="px-6 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Quantity
@@ -625,6 +631,15 @@ const StockIn = () => {
                             handleProductMRP(product._id, e.target.value )
                           }
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        />
+                      </td>
+                      <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
+                        <input
+                          type="text"
+                          disabled
+                          placeholder="Rate"
+                          value={product.rate}
+                          class="bg-gray-200 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                       </td>
                       <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
