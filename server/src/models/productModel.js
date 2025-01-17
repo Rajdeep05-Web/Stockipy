@@ -38,6 +38,11 @@ const productSchema = mongoose.Schema({
         default: ""
       
     },
+    gstPercentage: {
+       type: Number,
+       required: true,
+       default: 18
+    },
     imageUrl: {
         type: String,
      

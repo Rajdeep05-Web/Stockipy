@@ -17,8 +17,9 @@ const UpdateProduct = () => {
   const location = useLocation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [rate, setRate] = useState('');
-  const [mrp, setMrp] = useState('');
+  const [rate, setRate] = useState("");
+  const [mrp, setMrp] = useState("");
+  const [gst, setGst] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -31,12 +32,13 @@ const UpdateProduct = () => {
       setDescription(productToUpdate.description);
       setRate(productToUpdate.rate);
       setMrp(productToUpdate.mrp);
+      setGst(productToUpdate.gstPercentage);
     }
   }, [productToUpdate]); //run only when productToUpdate changes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const updatedProduct = { name, description, rate, mrp };
+    const updatedProduct = { name, description, rate, mrp, gst };
     try {
       await dispatch(updateProduct({ id, product: updatedProduct })).unwrap();
       setSuccessMsg("Product updated successfully");
@@ -74,6 +76,7 @@ const UpdateProduct = () => {
             id="base-input"
             onChange={(e) => setName(e.target.value)}
             value={name}
+            // required
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>
@@ -97,13 +100,14 @@ const UpdateProduct = () => {
             for="base-input"
             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
           >
-            Rate(without GST)
+            Rate (Included GST)
           </label>
           <input
             type="text"
             id="base-input"
-            onChange={(e) => setRate(parseFloat(e.target.value) || '')}
+            onChange={(e) => setRate(parseFloat(e.target.value) || "")}
             value={rate}
+            required
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>
@@ -117,8 +121,25 @@ const UpdateProduct = () => {
           <input
             type="text"
             id="base-input"
-            onChange={(e) => setMrp(parseFloat(e.target.value) || '')}//''
+            onChange={(e) => setMrp(parseFloat(e.target.value) || "")} //''
             value={mrp}
+            required
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          />
+        </div>
+        <div class="mb-5">
+          <label
+            for="base-input"
+            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            GST Percentage(%)
+          </label>
+          <input
+            type="number"
+            id="base-input"
+            onChange={(e) => setGst(parseFloat(e.target.value) || "")}
+            value={gst}
+            required
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           />
         </div>

@@ -615,7 +615,7 @@ const StockIn = () => {
                           type="text"
                           placeholder="Rate"
                           required
-                          value={allProductRates[product._id] || ""}
+                          value={ allProductRates[product._id] !== undefined ? allProductRates[product._id] : product.productPurchaseRate}
                           onChange={(e) =>
                           handleProductPurcahseRate(product._id, e.target.value)
                           }

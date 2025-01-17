@@ -66,6 +66,9 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
                   MRP
                 </th>
                 <th scope="col" class="px-6 py-3">
+                  GST
+                </th>
+                <th scope="col" class="px-6 py-3">
                   Actions
                 </th>
               </tr>
@@ -86,6 +89,7 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
                   <td class="px-6 py-4">{product.quantity}</td>
                   <td class="px-6 py-4">{product.rate}</td>
                   <td class="px-6 py-4">{product.mrp}</td>
+                  <td class="px-6 py-4">{product.gstPercentage}</td>
                   <td class="px-6 py-4">
                     <button
                       type="button"

@@ -24,11 +24,12 @@ export const getProduct = async (req, res) => {
 };
 export const addProduct = async (req, res) => {
   const product = req.body;
+  let gstOk;
   if (!product) {
     return res.status(400).send("Product is required");
   }
-  if(product.name === "" || product.rate === "" || product.mrp === ""){
-    return res.status(400).json({error: "Name, rate, and MRP are required"});
+  if(product.name === "" || product.rate === "" || product.mrp === "" || product.gst===""){
+    return res.status(400).json({error: "Name, rate, MRP and GST are required"});
   }
   //trim the name
   if(product && product.name){
@@ -40,6 +41,14 @@ export const addProduct = async (req, res) => {
   if (product.rate > product.mrp) {
     return res.status(400).json({ error: "Rate cannot be greater than MRP" });
   }
+  if(product.gst == 18 || product.gst == 28){
+     gstOk = true;
+  } else {
+     gstOk = false;
+  }
+  if(!gstOk){
+    return res.status(400).json({error: "GST can be only 18 or 28"})
+  } 
   try {
     // Check if product already exists
     const oldProduct = await Product.find();
@@ -61,37 +70,44 @@ export const addProduct = async (req, res) => {
   }
 };
 export const updateProduct = async (req, res) => {
-  const { name, description, rate, mrp } = req.body;
+  let product = req.body;
+  product = {...product, gstPercentage: product.gst}
   const { id } = req.params;
+  let gstOk;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ error: "Invalid product ID" });
   }
-  if (!name || !rate || !mrp) {
-    return res.status(400).json({ error: "Name, rate, and MRP are required" });
-  }
-  if(name === "" || rate === "" || mrp === ""){
-    return res.status(400).json({error: "Name, rate, and MRP are required"});
+  if (!product.name || !product.rate || !product.mrp || !product.gst) {
+    return res.status(400).json({ error: "Name, rate, MRP and GST are required" });
   }
   //trim the name
-  if(name){
-    name = name.trim();
+  if(product.name){
+    product.name = product.name.trim();
   }
-  if(rate <= 0 || mrp <= 0){
+  if(product.rate <= 0 || product.mrp <= 0){
     return res.status(400).json({error: "Rate and MRP must be greater than 0"});
   }
-  if(rate>mrp){
+  if(product.rate > product.mrp){
     return res.status(400).json({error: "Rate cannot be greater than MRP" });
   }
+  if(product.gst == 18 || product.gst == 28){
+    gstOk = true;
+ } else {
+    gstOk = false;
+ }
+ if(!gstOk){
+   return res.status(400).json({error: "GST can be only 18 or 28"})
+ } 
   try {
     //check if exist
     const products = await Product.find();
     if(products.length > 0){
-        const isProductPresent = products.some((p) => p.name.toLowerCase() === name.toLowerCase() && p._id.toString() !== id);
+        const isProductPresent = products.some((p) => p.name.toLowerCase() === product.name.toLowerCase() && p._id.toString() !== id);
         if(isProductPresent){
             return res.status(400).json({error: "Product already exists"});
         }
     }
-    const updatedProduct = { name, description, rate, mrp };
+    const updatedProduct = product;
     const updateResponse = await Product.findByIdAndUpdate(id, updatedProduct, {
       new: true,
     });

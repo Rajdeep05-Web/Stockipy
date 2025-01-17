@@ -44,9 +44,9 @@ export const addStockIn = async (req, res) => {
     if(totalAmount && totalAmount <= 0){
         return res.status(400).json({error: "Total Amount must be greater than 0"});
     }
-    // if(products.productPurchaseRate > 0 && products.some(item => item.productPurchaseRate <= 0)){
-    //     return res.status(400).json({error: "Purchase Price must be greater than 0"});
-    // }
+    if(products && products.some(item => item.productPurchaseRate <= 0)){
+        return res.status(400).json({error: "Purchase Price must be greater than 0"});
+    }
     //no invalid date
 
 
