@@ -69,7 +69,7 @@
 // }
 
 // export default App;
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
@@ -101,21 +101,31 @@ import { fetchStockIns } from "./redux/slices/stock/stockInSlice";
 
 const App = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { loading: productsLoading } = useSelector((state) => state.products);
   const { loading: customersLoading } = useSelector((state) => state.customers);
+  const { loading: vendorsLoading } = useSelector((state) => state.vendors);
+  const { loading: stockInsLoading } = useSelector((state) => state.stockIns);
 
   useEffect(() => {
-    dispatch(fetchProducts());
-    dispatch(fetchCustomers());
-    dispatch(fetchVendors());
-    dispatch(fetchStockIns());
-  }, [dispatch]);
+    if (location.pathname === "/products") dispatch(fetchProducts());
+    if (location.pathname === "/customers") dispatch(fetchCustomers());
+    if (location.pathname === "/vendors") dispatch(fetchVendors());
+    if (location.pathname === "/stock-ins") dispatch(fetchStockIns());
+  }, [location, dispatch]);
+
+  let isLoading =
+    productsLoading || customersLoading || vendorsLoading || stockInsLoading;
 
   return (
-    <BrowserRouter>
+    <>
+      {/* {isLoading ? (
+        <Loading />
+      ) : ( */}
         <NavbarSidebar>
           <Routes>
             <Route path="/" element={<App1 />} />
+            <Route path="dashboard" element={<App1 />} />
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/edit-product/:id" element={<UpdateProduct />} />
@@ -130,7 +140,8 @@ const App = () => {
             <Route path="/stock-ins" element={<AllStockIns />} />
           </Routes>
         </NavbarSidebar>
-    </BrowserRouter>
+      {/* )} */}
+    </>
   );
 };
 

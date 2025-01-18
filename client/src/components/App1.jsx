@@ -1,7 +1,5 @@
 import { increment, decrement } from "../redux/slices/counter/counterSlice";
 import { useDispatch, useSelector } from "react-redux";
-//comps
-import Comp1 from "./comp";
 
 function App1() {
   const {products, loading} = useSelector((state) => state.products);
@@ -12,8 +10,8 @@ function App1() {
 
   return (
     <>
-      <h1 className="text-3xl font-black underline">Hello world!</h1>
-      <h1>counter is {count}</h1>
+      <h1 className="text-3xl font-black underline">Wecome</h1>
+      {/* <h1>counter is {count}</h1>
       <button onClick={() => Dispatch(increment())}>Increment</button>
       <button onClick={() => Dispatch(decrement())}>Decrement</button>
       <div>
@@ -25,8 +23,7 @@ function App1() {
                     </li>
                 ))}
             </ul>
-        </div>
-      {/* <Comp1 /> */}
+        </div> */}
     </>
   );
 }
