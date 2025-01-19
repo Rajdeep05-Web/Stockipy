@@ -10,6 +10,7 @@ import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
 import ModalAddProduct from "../products/modalAddProduct";
 import ModalAddVendor from "../vendor/modalAddVendor";
+import { FilePicker } from "../useful/filepicker/filePicker";
 
 import {
   updateVendor,
@@ -476,6 +477,15 @@ const StockIn = () => {
               >
                 Vendor not found? Create one
               </button>
+            </div>
+            <label
+                for="file"
+                class="block mt-6 mb-2 text-base font-bold text-gray-900 dark:text-white"
+              >
+                Upload invoice
+              </label>
+            <div class="flex flex-col justify-end" name="file">
+              <FilePicker />
             </div>
           </form>
         </div>
