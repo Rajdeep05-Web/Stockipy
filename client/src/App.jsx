@@ -91,6 +91,7 @@ import UpdateVendor from "./components/vendor/updateVendor";
 import StockIn from "./components/stock/stockIn";
 import AllStockIns from "./components/stock/allStockIns";
 import TestPdf from "./components/useful/pdf/testpdf";
+import { FilePicker } from "./components/useful/filepicker/filePicker";
 // import TooltipButton from "./components/useful/stockIn/tooltip";
 
 // Redux Actions
@@ -136,7 +137,7 @@ const App = () => {
             <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
             <Route path="/vendors" element={<VendorList />} />
             <Route path="/add-stock-in" element={<StockIn />} />
-            <Route path="/test" element={<TestPdf />} />
+            <Route path="/test" element={<FilePicker />} />
             <Route path="/stock-ins" element={<AllStockIns />} />
           </Routes>
         </NavbarSidebar>
