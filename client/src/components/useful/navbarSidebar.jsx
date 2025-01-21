@@ -13,7 +13,7 @@ import {
   Home
 } from "lucide-react";
 
-import UserDropdown from "./UserDropdown";
+import UserDropdown from "./UserDropdown.jsx";
 
 const NavbarSidebar = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,7 +23,6 @@ const NavbarSidebar = ({ children }) => {
     vendors: false,
     stock: false,
   });
-  const [searchQuery, setSearchQuery] = useState("");
   const [notifications] = useState(3); // Example notification count
 
   const toggleDropdown = (key) => {
