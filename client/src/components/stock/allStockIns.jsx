@@ -22,7 +22,6 @@ import SearchBar from "../useful/searchBar";
 import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
 import { Product } from "../../../../server/src/models/productModel";
-import { set } from "mongoose";
 
 const AllStockIns = () => {
   const contentRef = useRef(null);
