@@ -1,16 +1,17 @@
 import React, { useCallback, useState } from 'react';
-import { Upload, X, FileType, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, FileType } from 'lucide-react';
 
 export function FilePicker({ accept = 'both', maxSize = 5 }) {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState('');
   const [fileName, setFileName] = useState('');
+  const [fileURL, setFileURL] = useState(null);
 
   const acceptedTypes = {
     pdf: ['application/pdf'],
     image: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-    both: ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    both: ['application/pdf', 'image/jpeg', 'image/png', 'image/gif', 'image/webp'],
   }[accept];
 
   const validateFile = (file) => {
@@ -30,8 +31,8 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
     if (!validateFile(file)) return;
 
     setFileName(file.name);
-    // onFileSelect(file);
-    console.log(file);
+    setFileURL(URL.createObjectURL(file));
+
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => setPreview(e.target?.result);
@@ -72,6 +73,13 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
     setPreview('');
     setFileName('');
     setError('');
+    setFileURL(null);
+  };
+
+  const openPreview = () => {
+    if (fileURL) {
+      window.open(fileURL, '_blank', 'width=800,height=600');
+    }
   };
 
   return (
@@ -86,12 +94,12 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
         onDrop={handleDrop}
       >
         {!fileName && (
-        <input
-          type="file"
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          accept={acceptedTypes.join(',')}
-          onChange={handleChange}
-        />
+          <input
+            type="file"
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            accept={acceptedTypes.join(',')}
+            onChange={handleChange}
+          />
         )}
 
         {!fileName && (
@@ -132,6 +140,17 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
 
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </div>
+
+      {fileName && (
+        <div className="mt-4 text-center">
+          <button
+            onClick={openPreview}
+            class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Preview File
+          </button>
+        </div>
+      )}
     </div>
   );
 }

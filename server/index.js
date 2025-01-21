@@ -1,11 +1,7 @@
 import express from "express";
-import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
-import cloudinary from "cloudinary";
-import multer from "multer";
-import fs from "fs";
 
 import connectDB from "./src/DB/index.js";
 
@@ -20,6 +16,7 @@ import productRouter from "./src/routes/productRouter.js";
 import customerRouter from "./src/routes/customerRouter.js";
 import vendorRouter from "./src/routes/vendorRouter.js";
 import stockInRouter from "./src/routes/stockInRouter.js";
+import fileuploadrouter from "./src/routes/fileUploadRouter.js";
 
 // MongoDB Connection
 connectDB();
@@ -60,27 +57,10 @@ app.get("/v1/stock-ins/:id", stockInRouter);
 app.post("/v1/stock-ins", stockInRouter);
 app.put("/v1/stock-ins/:id", stockInRouter);
 app.delete("/v1/stock-ins/:id", stockInRouter);
+//stock-in file upload
+app.use("/api", fileuploadrouter);
+app.post("/v1/upload", fileuploadrouter);
 
-//cloudnary
-const upload = multer({ dest: "uploads/" });
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-app.post("/upload", upload.single("image"), async (req, res) => {
-  try {
-    const fileType = req.file.mimetype.startsWith("image") ? "image" : "raw";
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      resource_type: fileType,
-    });
-    fs.unlinkSync(req.file.path); // Delete the file from local storage after upload
-    res.json({ imageUrl: result.secure_url });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Image upload failed" });
-  }
-});
 
 // Start Server
 app.listen(PORT, () =>

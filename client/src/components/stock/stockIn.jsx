@@ -225,11 +225,6 @@ const StockIn = () => {
     }
   };
 
-  // Function to toggle modal visibility
-  const toggleModal = () => {
-    setIsModalVisible(!isModalVisible);
-  };
-
   if (loading) {
     return <Loading />;
   }
