@@ -57,7 +57,7 @@ const productsSlice = createSlice({
         error: null,
         loading: false,
     },
-    reducers: {},
+    reducers: {}, 
     extraReducers: (builder) => { //used for async actions only
         builder
         //handles the action types defined by the `fetchProducts` thunk

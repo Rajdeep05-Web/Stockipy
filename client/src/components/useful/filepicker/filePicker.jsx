@@ -1,5 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Upload, X, FileType } from 'lucide-react';
+import { setFile, clearFile } from '../../../redux/slices/file/fileSlice';
 
 export function FilePicker({ accept = 'both', maxSize = 5 }) {
   const [dragActive, setDragActive] = useState(false);
@@ -29,7 +30,7 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
 
   const handleFile = (file) => {
     if (!validateFile(file)) return;
-
+    console.log(file);
     setFileName(file.name);
     setFileURL(URL.createObjectURL(file));
 
