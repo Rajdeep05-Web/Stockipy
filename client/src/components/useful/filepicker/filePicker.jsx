@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { Upload, X, FileType } from 'lucide-react';
-import { setFile, clearFile } from '../../../redux/slices/file/fileSlice';
+import {useDispatch} from 'react-redux';
 
-export function FilePicker({ accept = 'both', maxSize = 5 }) {
+export function FilePicker({ accept = 'both', maxSize = 5, setFile }) {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState('');
   const [preview, setPreview] = useState('');
@@ -30,9 +30,8 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
 
   const handleFile = (file) => {
     if (!validateFile(file)) return;
-    console.log(file);
     setFileName(file.name);
-    setFileURL(URL.createObjectURL(file));
+    setFileURL(URL.createObjectURL(file)); // Create a URL for the file
 
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
@@ -41,6 +40,7 @@ export function FilePicker({ accept = 'both', maxSize = 5 }) {
     } else {
       setPreview('');
     }
+      setFile({file: file, previewURL: URL.createObjectURL(file)});
   };
 
   const handleDrag = useCallback((e) => {

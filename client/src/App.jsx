@@ -113,6 +113,7 @@ const App = () => {
     if (location.pathname === "/customers") dispatch(fetchCustomers());
     if (location.pathname === "/vendors") dispatch(fetchVendors());
     if (location.pathname === "/stock-ins") dispatch(fetchStockIns());
+    if (location.pathname === "/add-stock-in") dispatch(fetchVendors(), dispatch(fetchProducts()));
   }, [location, dispatch]);
 
   let isLoading =

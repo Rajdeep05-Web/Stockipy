@@ -27,7 +27,7 @@ const stockInSchema = mongoose.Schema({
         type: String,
         default: "",
     },
-    imgUrl:{
+    fileCloudUrl:{
         type: String,
         default: "",
     },
