@@ -40,7 +40,7 @@ export function FilePicker({ accept = 'both', maxSize = 5, setFile }) {
     } else {
       setPreview('');
     }
-      setFile({file: file, previewURL: URL.createObjectURL(file)});
+      setFile(file);
   };
 
   const handleDrag = useCallback((e) => {
@@ -75,6 +75,7 @@ export function FilePicker({ accept = 'both', maxSize = 5, setFile }) {
     setFileName('');
     setError('');
     setFileURL(null);
+    setFile({});
   };
 
   const openPreview = () => {

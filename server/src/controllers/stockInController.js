@@ -4,8 +4,7 @@ import { Product } from "../models/productModel.js";
 import mongoose from "mongoose";
 
 export const addStockIn = async (req, res) => {
-    // console.log(req.body);
-    const {vendor, invNo, date, description, time, products, totalAmount} = req.body;//destructuring the request body
+    const {vendor, invNo, date, description, time, products, totalAmount, fileCloudUrl} = req.body;//destructuring the request body
     if(!vendor || !invNo || !date || !products || !totalAmount){
         return res.status(400).json({error: "All fields are required"});
     }
@@ -59,6 +58,7 @@ export const addStockIn = async (req, res) => {
             time,
             products,
             totalAmount,
+            fileCloudUrl
         })
         await newStockIn.save();
 

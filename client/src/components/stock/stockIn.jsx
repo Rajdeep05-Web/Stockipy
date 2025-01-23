@@ -27,8 +27,6 @@ const StockIn = () => {
   const { vendors, loading } = useSelector((state) => state.vendors);
   const { products } = useSelector((state) => state.products);
 
-  // const navigate = useNavigate();
-  // const location = useLocation();
   //vendor
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -47,6 +45,7 @@ const StockIn = () => {
     useState(true);
   const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
   const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
+  const [file, setFile] = useState({});
 
   //product
   const [productSearchInput, setProductSearchInput] = useState("");
@@ -181,7 +180,10 @@ const StockIn = () => {
   
   //final submit of stock in
   const handleSubmitStockIn = async () => {
+
     let products = [];
+    const stockInFormdata = new FormData();
+
     for (const [key, value] of Object.entries(productQuantities)) {
       products.push({
         product: key,
@@ -190,6 +192,7 @@ const StockIn = () => {
         mrp: allProductMRPs[key] || -1
       });
     }
+
     const stockInData = {
       vendor: vendorSelected._id,
       invNo,
@@ -198,9 +201,9 @@ const StockIn = () => {
       description,
       products,
     };
-   
+
     try {
-      await dispatch(addStockIn(stockInData)).unwrap();
+      await dispatch(addStockIn({stockInData, file})).unwrap();
       setSuccessMsg("Stock In saved successfully");
       setTimeout(() => {
         setSuccessMsg("");
@@ -210,6 +213,7 @@ const StockIn = () => {
       dispatch(fetchStockIns());
       setProductQuantities({});
       setSelectedProductList([]);
+      setFile({}); //reset file state
       setVendorSelected("");
       setselectedVendorId("");
       setInvNo("");
@@ -480,7 +484,7 @@ const StockIn = () => {
                 Upload invoice
               </label>
             <div class="flex flex-col justify-end" name="file">
-              <FilePicker />
+              <FilePicker setFile={setFile} />
             </div>
           </form>
         </div>

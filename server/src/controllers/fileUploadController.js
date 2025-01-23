@@ -4,9 +4,8 @@ import cloudinary from "../configs/cloudnaryConfig.js"
 const fileUploadCloudnary = async (req, res) => {
     try {
         if (!req.file) {
-          return res.status(400).send('No file uploaded');
+          return res.send(false);
         }
-        console.log(req.file);
         // Determine the correct resource type for Cloudinary
         const fileType = req.file.mimetype.startsWith('image') ? 'image' : 'raw';
     

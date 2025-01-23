@@ -4,6 +4,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   file: null,
   previewURL: '',
+  uploadStatus: 'idle', // 'idle' | 'uploading' | 'succeeded' | 'failed'
+  uploadError: null,
 };
 
 const fileSlice = createSlice({
@@ -17,6 +19,8 @@ const fileSlice = createSlice({
     clearFile: (state) => {
       state.file = null;
       state.previewURL = '';
+      state.uploadStatus = 'idle';
+      state.uploadError = null;
     },
   },
 });
