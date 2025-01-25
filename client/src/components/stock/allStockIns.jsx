@@ -9,7 +9,7 @@ import {
   Building2,
   DollarSign,
   FileText,
-  BadgePercent,
+  BadgePercent, Eye
 } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
@@ -63,8 +63,8 @@ const AllStockIns = () => {
     return istDateString;
   };
 
-  const handleDownload = () => {
-    console.log("Download button clicked");
+  const handleOpenInvoice = (url) => {
+    window.open(url, "_blank"); // Open the invoice in a new tab
   };
 
   const filteredStockIns = stockIns.filter((item) => {
@@ -191,13 +191,17 @@ const AllStockIns = () => {
                 <div className="flex flex-row justify-between">
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
                   <div name="buttons" className="flex flex-row gap-2">
-                    {/* <button
+                    {item.fileCloudUrl && (
+
+                      <button
                       type="button"
-                      onClick={() => handleDownload()}
-                      class="text-white  bg-gray-400 hover:bg-gray-500 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                      <Copy />
-                    </button> */}
+                      onClick={() => handleOpenInvoice(item.fileCloudUrl)}
+                      class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300"
+                      >
+                      <Eye className="mr-2" size={20} />
+                      View Invoice
+                    </button>
+                    )}
                     <PDFDownloadLink
                       document={<StockInPDF data={item} />}
                       fileName={`stock-in-${item.invoiceNo}.pdf`}
