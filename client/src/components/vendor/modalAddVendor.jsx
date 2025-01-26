@@ -57,7 +57,7 @@ const ModalAddVendor = ({ isModalVisible, setIsModalVisible }) => {
           {loading && <Loading />}
           {successMsg && <SuccessAlert successMsg={successMsg} />}
           {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
-          <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 w-full max-w-md">
+          <div className="relative bg-white rounded-lg shadow mx-6 dark:bg-gray-700 w-full max-w-md">
             {/* Modal header */}
             <div className="flex items-center justify-between p-4 border-b rounded-t dark:border-gray-600">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">

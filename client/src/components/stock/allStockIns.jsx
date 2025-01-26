@@ -9,7 +9,8 @@ import {
   Building2,
   DollarSign,
   FileText,
-  BadgePercent, Eye
+  BadgePercent,
+  Eye,
 } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
@@ -192,25 +193,27 @@ const AllStockIns = () => {
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
                   <div name="buttons" className="flex flex-row gap-2">
                     {item.fileCloudUrl && (
-
                       <button
-                      type="button"
-                      onClick={() => handleOpenInvoice(item.fileCloudUrl)}
-                      class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300"
+                        type="button"
+                        onClick={() => handleOpenInvoice(item.fileCloudUrl)}
+                        class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
                       >
-                      <Eye className="mr-2" size={20} />
-                      View Invoice
-                    </button>
+                        <Eye className="sm:mr-2" size={20} />
+                        View Invoice
+                      </button>
                     )}
                     <PDFDownloadLink
                       document={<StockInPDF data={item} />}
                       fileName={`stock-in-${item.invoiceNo}.pdf`}
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 inline-flex items-center"
+                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 inline-flex items-center"
                     >
                       {({ blob, url, loading, error }) =>
                         loading ? (
                           <span className="flex items-center">
-                            <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                            <svg
+                              className="animate-spin h-5 w-5 mr-2"
+                              viewBox="0 0 24 24"
+                            >
                               <circle
                                 className="opacity-25"
                                 cx="12"

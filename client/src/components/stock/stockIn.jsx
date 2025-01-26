@@ -361,15 +361,17 @@ const StockIn = () => {
                     Selected Vendor Details
                   </h1>
 
+                   { !isUserWantSubmit && (
                   <div>
                     <button
                       type="button"
                       onClick={handleEditSelectedVendor}
-                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      class={`text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
                     >
                       Edit
                     </button>
                   </div>
+                    )}
                 </div>
                 <div class="mb-5">
                   <label
@@ -385,7 +387,7 @@ const StockIn = () => {
                     value={name || ""}
                     required
                     disabled={isVendorFormFieldsDisabled}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -401,7 +403,7 @@ const StockIn = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     value={phone || ""}
                     disabled={isVendorFormFieldsDisabled}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -417,7 +419,7 @@ const StockIn = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     value={email || ""}
                     disabled={isVendorFormFieldsDisabled}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -434,7 +436,7 @@ const StockIn = () => {
                     required
                     disabled={isVendorFormFieldsDisabled}
                     id="large-input"
-                    class="block w-full p-4 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    class={`block w-full p-4 text-gray-900 border border-gray-300 rounded-lg ${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -450,7 +452,7 @@ const StockIn = () => {
                     onChange={(e) => setGstNo(e.target.value)}
                     value={gstNo || ""}
                     disabled={isVendorFormFieldsDisabled}
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 {/* if user selects to edit and confirm this section shows */}
