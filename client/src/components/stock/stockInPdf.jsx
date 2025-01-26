@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { format } from 'date-fns';
 
 const styles = StyleSheet.create({
@@ -6,30 +6,38 @@ const styles = StyleSheet.create({
     padding: 40,
     fontSize: 12,
     fontFamily: 'Helvetica',
+    backgroundColor: '#ffffff',
   },
   header: {
-    // marginBottom: 10,
-    // borderBottom: '1 solid #333',
-    // paddingBottom: 10,
+    marginBottom: 20,
+    textAlign: 'center',
   },
   title: {
     fontSize: 24,
-    marginBottom: 20,
+    marginBottom: 10,
     color: '#2563eb',
-    textAlign: 'center',
     fontFamily: 'Helvetica-Bold',
+    textTransform: 'uppercase',
+  },
+  subtitle: {
+    fontSize: 12,
+    color: '#64748b',
+    marginBottom: 20,
   },
   invoiceInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
+    padding: 10,
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
   },
   infoGroup: {
     flex: 1,
   },
   infoRow: {
     flexDirection: 'row',
-    marginBottom: 0,
+    marginBottom: 5,
   },
   label: {
     width: 80,
@@ -44,38 +52,38 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     padding: 15,
     backgroundColor: '#f8fafc',
-    borderRadius: 5,
+    borderRadius: 8,
   },
   sectionTitle: {
     fontSize: 16,
-    marginBottom: 2,
+    marginBottom: 10,
     color: '#1e293b',
     fontFamily: 'Helvetica-Bold',
   },
   table: {
-    marginTop: 15,
+    marginTop: 10,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#e2e8f0',
-    padding: 8,
-    marginBottom: 8,
-    borderRadius: 4,
+    backgroundColor: '#E0E0E0', 
+    padding: 10,
+    borderRadius: 6,
+    color: '#ffffff', 
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
-    padding: 8,
+    padding: 10,
   },
-  colProduct: { flex: 2 },
-  colRate: { flex: 1, textAlign: 'right' },
-  colQty: { flex: 1, textAlign: 'right' },
-  colTotal: { flex: 1, textAlign: 'right' },
+  colProduct: { flex: 2, color: '#1e293b' },
+  colRate: { flex: 1, textAlign: 'right', color: '#1e293b' },
+  colQty: { flex: 1, textAlign: 'right', color: '#1e293b' },
+  colTotal: { flex: 1, textAlign: 'right', color: '#1e293b' },
   totalSection: {
     marginTop: 20,
     borderTopWidth: 2,
-    borderTopColor: '#333',
+    borderTopColor: '#2563eb',
     paddingTop: 15,
   },
   totalRow: {
@@ -112,19 +120,19 @@ export const StockInPDF = ({ data }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>STOCK-IN INVOICE</Text>
-        <View style={styles.invoiceInfo}>
-          <View style={styles.infoGroup}>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Invoice No:</Text>
-              <Text style={styles.value}>{data.invoiceNo}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Date:</Text>
-              <Text style={styles.value}>
-                {format(new Date(data.date), 'dd/MM/yyyy')}
-              </Text>
-            </View>
+        <Text style={styles.title}>Stock-In Invoice</Text>
+        <Text style={styles.subtitle}>Generated on {format(new Date(), 'dd/MM/yyyy')}</Text>
+      </View>
+
+      <View style={styles.invoiceInfo}>
+        <View style={styles.infoGroup}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Invoice No:</Text>
+            <Text style={styles.value}>{data.invoiceNo}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Date:</Text>
+            <Text style={styles.value}>{format(new Date(data.date), 'dd/MM/yyyy')}</Text>
           </View>
         </View>
       </View>

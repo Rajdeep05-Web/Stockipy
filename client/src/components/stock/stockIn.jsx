@@ -112,14 +112,17 @@ const StockIn = () => {
 
   //total amount calculation
   useEffect(() => {
+    calculateAmountTotal();
+  },[selectedProductList, allProductRates, allProductMRPs, productQuantities]);
+  
+  const calculateAmountTotal = () => {
     let total = 0;
-    // console.log(selectedProductList);
     for(const [key, value] of Object.entries(productQuantities)){
       const rate = allProductRates[key] || 0;
       total = total + (rate*value);
     }
     setTotalAmount(total);
-  },[selectedProductList, allProductRates, allProductMRPs, productQuantities]);
+  }
 
   //product search in the search bar
   const handleProductSearch = (e) => {
@@ -149,9 +152,8 @@ const StockIn = () => {
 
   //product quantity with id in state handled
   const handleProductQuantity = (id, quantity) => {
-    productQuantities[id] = quantity;
-    setProductQuantities({ ...productQuantities });
-    // console.log(productQuantities);
+    setProductQuantities({ ...productQuantities, [id]: quantity });
+    calculateAmountTotal();
   };
 
   //all products MRP with id in state handled
@@ -624,7 +626,7 @@ const StockIn = () => {
                           type="text"
                           placeholder="Rate"
                           required
-                          value={ allProductRates[product._id] !== undefined ? allProductRates[product._id] : product.productPurchaseRate}
+                          value={ allProductRates[product._id] !== undefined ? allProductRates[product._id] : product.productPurchaseRate && handleProductPurcahseRate(product._id, product.productPurchaseRate)}
                           onChange={(e) =>
                           handleProductPurcahseRate(product._id, e.target.value)
                           }

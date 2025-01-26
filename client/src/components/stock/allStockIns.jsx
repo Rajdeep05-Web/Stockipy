@@ -297,7 +297,7 @@ const AllStockIns = () => {
                     <div className="">
                       {item.products.map((product) => (
                         <div
-                          key={product.product.id} // Add a key for performance
+                          key={product.product._id} // Add a key for performance
                           className="flex justify-between text-sm sm:text-base dark:border-gray-700"
                         >
                           <span className="flex basis-[40%] min-w-[150px] items-start">
