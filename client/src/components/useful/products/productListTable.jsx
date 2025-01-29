@@ -35,7 +35,10 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
   };
 
   const handleEdit = (product) => {
-    navigate(`/edit-product/${product._id}`, { state: { product } });
+    const userResponse = window.confirm(`Do you want to edit ${product.name}?`);
+    if(userResponse){
+      navigate(`/edit-product/${product._id}`, { state: { product } });
+    }
   };
 
   return (

@@ -193,6 +193,7 @@ const AllStockIns = () => {
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
                   <div name="buttons" className="flex flex-row gap-2">
                     {item.fileCloudUrl && (
+                      // View the invoice uploaded during stock-In (In a new tab)
                       <button
                         type="button"
                         onClick={() => handleOpenInvoice(item.fileCloudUrl)}
@@ -202,6 +203,7 @@ const AllStockIns = () => {
                         View Invoice
                       </button>
                     )}
+                    {/* Download stock In details as invoice PDF */}
                     <PDFDownloadLink
                       document={<StockInPDF data={item} />}
                       fileName={`stock-in-${item.invoiceNo}.pdf`}

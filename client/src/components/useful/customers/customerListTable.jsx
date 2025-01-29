@@ -15,7 +15,10 @@ const CustomerListTable = ({ customers = [], setSuccessMsg, setErrorMsg }) => {
   const filteredCustomers = customers.filter((customer) => customer.name.toLowerCase().includes(search.toLowerCase()));
 
   const handleEdit = (customer) => {
-    navigate(`/edit-customer/${customer._id}`, { state: { customer } });
+    const userResponse = window.confirm(`Are you want to edit ${customer.name}?`);
+    if(userResponse){
+      navigate(`/edit-customer/${customer._id}`, { state: { customer } });
+    } 
   };
 
   const handleDelete = async (customer) => {

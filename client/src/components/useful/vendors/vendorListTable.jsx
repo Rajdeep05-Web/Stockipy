@@ -20,7 +20,10 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
   });
 
   const handleEdit = (vendor) => {
-    navigate(`/edit-vendor/${vendor._id}`, { state: { vendor } });
+    const userResponse = window.confirm(`Are you sure you want to edit ${vendor.name}?`);
+    if(userResponse){
+      navigate(`/edit-vendor/${vendor._id}`, { state: { vendor } });
+    }
   };
 
   const handleDelete = async (vendor) => {
