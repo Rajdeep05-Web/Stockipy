@@ -88,8 +88,9 @@ import CustomerList from "./components/customer/customerList";
 import AddVendor from "./components/vendor/addvendor";
 import VendorList from "./components/vendor/vendorList";
 import UpdateVendor from "./components/vendor/updateVendor";
-import StockIn from "./components/stock/stockIn";
+import AddStockIn from "./components/stock/addStockIn";
 import AllStockIns from "./components/stock/allStockIns";
+import UpdateStockIn from "./components/stock/updateStockIn";
 import TestPdf from "./components/useful/pdf/testpdf";
 import { FilePicker } from "./components/useful/filepicker/filePicker";
 // import TooltipButton from "./components/useful/stockIn/tooltip";
@@ -137,9 +138,10 @@ const App = () => {
             <Route path="/add-vendor" element={<AddVendor />} />
             <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
             <Route path="/vendors" element={<VendorList />} />
-            <Route path="/add-stock-in" element={<StockIn />} />
-            <Route path="/test" element={<FilePicker />} />
+            <Route path="/add-stock-in" element={<AddStockIn />} />
             <Route path="/stock-ins" element={<AllStockIns />} />
+            <Route path="stock-in/edit/:id" element={<UpdateStockIn />} />
+            <Route path="/test" element={<FilePicker />} />
           </Routes>
         </NavbarSidebar>
       {/* )} */}

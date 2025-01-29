@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation, data } from "react-router";
 import DatePicker from "react-datepicker";
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Frown } from 'lucide-react';
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from 'react-router';
 
 import Loading from "../useful/Loading/loading";
 import SuccessAlert from "../useful/alerts/successAlert";
@@ -11,7 +11,7 @@ import ErrorAlert from "../useful/alerts/errorAlert";
 import ModalAddProduct from "../products/modalAddProduct";
 import ModalAddVendor from "../vendor/modalAddVendor";
 import { FilePicker } from "../useful/filepicker/filePicker";
-
+// redux dispatch api calls
 import {
   updateVendor,
   fetchVendors,
@@ -22,222 +22,236 @@ import {
 } from "../../redux/slices/stock/stockInSlice";
 import { fetchProducts } from "../../redux/slices/products/productsSlice";
 
-const StockIn = () => {
-  const dispatch = useDispatch();
-  const { vendors, loading } = useSelector((state) => state.vendors);
-  const { products } = useSelector((state) => state.products);
+const UpdateStockIn = () => {
+    const dispatch = useDispatch();
+    const { vendors, loading } = useSelector((state) => state.vendors);
+    const { products } = useSelector((state) => state.products);
+    const { stockIns } = useSelector((state) => state.stockIns);
+  
+    //vendor
+    const [successMsg, setSuccessMsg] = useState("");
+    const [errorMsg, setErrorMsg] = useState("");
+    const [startDate, setStartDate] = useState(new Date());
+    const [invNo, setInvNo] = useState("");
+    const [totalAmount, setTotalAmount] = useState("");
+    const [description, setDescription] = useState("");
+    const [name, setName] = useState("");
+    const [phone, setPhone] = useState("");
+    const [address, setAddress] = useState("");
+    const [gstNo, setGstNo] = useState("");
+    const [email, setEmail] = useState("");
+    const [selectedVendorId, setselectedVendorId] = useState("");
+    const [vendorSelected, setVendorSelected] = useState("");
+    const [isVendorFormFieldsDisabled, setisVendorFormFieldsDisabled] =
+      useState(true);
+    const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
+    const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
+    const [file, setFile] = useState({});
+  
+    //product
+    const [productSearchInput, setProductSearchInput] = useState("");
+    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [selectedProductList, setSelectedProductList] = useState([]);
+    const [productQuantities, setProductQuantities] = useState({});
+    const [allProductRates, setAllProductRates] = useState({});
+    const [allProductMRPs, setAllProductMRPs] =  useState({});
+    const [isProductModalVisible, setIsProductModalVisible] = useState(false);
 
-  //vendor
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
-  const [invNo, setInvNo] = useState("");
-  const [totalAmount, setTotalAmount] = useState("");
-  const [description, setDescription] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [gstNo, setGstNo] = useState("");
-  const [email, setEmail] = useState("");
-  const [selectedVendorId, setselectedVendorId] = useState("");
-  const [vendorSelected, setVendorSelected] = useState("");
-  const [isVendorFormFieldsDisabled, setisVendorFormFieldsDisabled] =
-    useState(true);
-  const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
-  const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
-  const [file, setFile] = useState({});
+    //stockIn
+    const { id } = useParams();
+    const [oldStockIn, setOldStockIn] = useState({});
 
-  //product
-  const [productSearchInput, setProductSearchInput] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [selectedProductList, setSelectedProductList] = useState([]);
-  const [productQuantities, setProductQuantities] = useState({});
-  const [allProductRates, setAllProductRates] = useState({});
-  const [allProductMRPs, setAllProductMRPs] =  useState({});
-  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+    //stockIn -------------->
+    useEffect(()=>{
+        const stockInState = stockIns.find((stockIn) => stockIn._id === id);
+        setOldStockIn(stockInState);
+        populateOldStockInData();
+    },[ stockIns, id ]);
 
+    const populateOldStockInData = () => {
+        setselectedVendorId(oldStockIn.vendor);
+    }
 
-  //vendor----------------->
-
-  //showing selected vendor data in form
-  const handleVendorChange = (e) => {
-    // e.preventDefault();
-    // console.log(selectedVendorId);
-    setselectedVendorId(e.target.value);
-    if (e.target.value) {
-      const vendor = vendors.find((vendor) => vendor._id === e.target.value);
-      if (vendor) {
-        setName(vendor.name);
-        setPhone(vendor.phone);
-        setAddress(vendor.address);
-        setGstNo(vendor.gstNo);
-        setEmail(vendor.email);
-        setVendorSelected(vendor);
+    console.log(oldStockIn)
+  
+    //vendor----------------->
+  
+    //showing selected vendor data in form
+    const handleVendorChange = (e) => {
+      setselectedVendorId(e.target.value);
+      if (e.target.value) {
+        const vendor = vendors.find((vendor) => vendor._id === e.target.value);
+        if (vendor) {
+          setName(vendor.name);
+          setPhone(vendor.phone);
+          setAddress(vendor.address);
+          setGstNo(vendor.gstNo);
+          setEmail(vendor.email);
+          setVendorSelected(vendor);
+        }
       }
-    }
-  };
-
-  //vendor edit functions
-  const handleEditSelectedVendor = () => {
-    const userResponse = window.confirm("Do you want to edit vendor?");
-    if (userResponse) {
-      alert("Now you can edit vendor details");
-      setisVendorFormFieldsDisabled(false);
-      setIsUserWantSubmit(true);
-    }
-  };
-  const handleVendorUpdateSubmit = () => {
-    const newVendor = { name, phone, address, gstNo, email };
-    try {
-      dispatch(
-        updateVendor({ id: selectedVendorId, vendor: newVendor })
-      ).unwrap();
-      setSuccessMsg("Vendor Updated successfully");
-      setTimeout(() => {
-        setSuccessMsg("");
-      }, 3000);
-      setisVendorFormFieldsDisabled(true);
-      setIsUserWantSubmit(false);
-      dispatch(fetchVendors());
-    } catch (error) {
-      console.log("Failed to update vendor:", error);
-      setErrorMsg(error);
-      setTimeout(() => {
-        setErrorMsg("");
-      }, 3000);
-    }
-  };
-
-  //product
-
-  //total amount calculation
-  useEffect(() => {
-    calculateAmountTotal();
-  },[selectedProductList, allProductRates, allProductMRPs, productQuantities]);
-  
-  const calculateAmountTotal = () => {
-    let total = 0;
-    for(const [key, value] of Object.entries(productQuantities)){
-      const rate = allProductRates[key] || 0;
-      total = total + (rate*value);
-    }
-    setTotalAmount(total);
-  }
-
-  //product search in the search bar
-  const handleProductSearch = (e) => {
-    setProductSearchInput(e.target.value);
-    const searchTerm = e.target.value;
-    const filteredProducts = products.filter(
-      (p) =>
-        p.name
-          .toLowerCase()
-          .replace(/\s+/g, "")
-          .includes(searchTerm.toLowerCase().trim().replace(/\s+/g, "")) //check both after to lowercase and no white spaces
-    );
-    setFilteredProducts(filteredProducts);
-    // if(filteredProducts.length > 0){
-    //   console.log("product match", filteredProducts.length)
-
-    // }
-  };
-  
-  //product selected from search bar
-  const handleProductSelect = (product) => {
-    if (!selectedProductList.some((p) => p._id == product._id)) {
-      setSelectedProductList([...selectedProductList, product]);
-      setProductSearchInput("");
-    }
-  };
-
-  //product quantity with id in state handled
-  const handleProductQuantity = (id, quantity) => {
-    setProductQuantities({ ...productQuantities, [id]: quantity });
-    calculateAmountTotal();
-  };
-
-  //all products MRP with id in state handled
-  const handleProductMRP = (id, mrp) => {
-    setAllProductMRPs({...allProductMRPs, [id]: mrp});
-  }
-
-  //all products purchase rate with id in state hndled
-  const handleProductPurcahseRate = (id, rate) => {
-     setAllProductRates({...allProductRates, [id]: rate});
-  }
-  
-    //product deleted from selected list
-  const handleDeleteProductFromList = (product) => {
-    setSelectedProductList(
-      selectedProductList.filter((p) => p._id !== product._id)
-    );
-    delete productQuantities[product._id];
-    delete allProductRates[product._id];
-    delete allProductMRPs[product._id]
-    setProductQuantities({ ...productQuantities });
-    setAllProductRates({...allProductRates});
-    setAllProductMRPs({...allProductMRPs});
-    // console.log(productQuantities);
-  };
-  
-  //final submit of stock in
-  const handleSubmitStockIn = async () => {
-
-    let products = [];
-    const stockInFormdata = new FormData();
-
-    for (const [key, value] of Object.entries(productQuantities)) {
-      products.push({
-        product: key,
-        quantity: value,
-        productPurchaseRate: allProductRates[key],
-        mrp: allProductMRPs[key] || -1
-      });
-    }
-
-    const stockInData = {
-      vendor: vendorSelected._id,
-      invNo,
-      date: startDate,
-      totalAmount,
-      description,
-      products,
     };
-
-    try {
-      await dispatch(addStockIn({stockInData, file})).unwrap();
-      setSuccessMsg("Stock In saved successfully");
-      setTimeout(() => {
-        setSuccessMsg("");
-      }, 3000);
-      dispatch(fetchProducts());
-      dispatch(fetchVendors());
-      dispatch(fetchStockIns());
-      setProductQuantities({});
-      setSelectedProductList([]);
-      setFile({}); //reset file state
-      setVendorSelected("");
-      setselectedVendorId("");
-      setInvNo("");
-      setTotalAmount("");
-      setDescription("");
-      setStartDate(new Date());
-    } catch (error) {
-      console.log("Failed to add stock in:", error);
-      setErrorMsg(error);
-      setTimeout(() => {
-        setErrorMsg("");
-      }, 3000);
+  
+    //vendor edit functions
+    const handleEditSelectedVendor = () => {
+      const userResponse = window.confirm("Do you want to edit vendor?");
+      if (userResponse) {
+        alert("Now you can edit vendor details");
+        setisVendorFormFieldsDisabled(false);
+        setIsUserWantSubmit(true);
+      }
+    };
+    const handleVendorUpdateSubmit = () => {
+      const newVendor = { name, phone, address, gstNo, email };
+      try {
+        dispatch(
+          updateVendor({ id: selectedVendorId, vendor: newVendor })
+        ).unwrap();
+        setSuccessMsg("Vendor Updated successfully");
+        setTimeout(() => {
+          setSuccessMsg("");
+        }, 3000);
+        setisVendorFormFieldsDisabled(true);
+        setIsUserWantSubmit(false);
+        dispatch(fetchVendors());
+      } catch (error) {
+        console.log("Failed to update vendor:", error);
+        setErrorMsg(error);
+        setTimeout(() => {
+          setErrorMsg("");
+        }, 3000);
+      }
+    };
+  
+    //product
+  
+    //total amount calculation
+    useEffect(() => {
+      calculateAmountTotal();
+    },[selectedProductList, allProductRates, allProductMRPs, productQuantities]);
+    
+    const calculateAmountTotal = () => {
+      let total = 0;
+      for(const [key, value] of Object.entries(productQuantities)){
+        const rate = allProductRates[key] || 0;
+        total = total + (rate*value);
+      }
+      setTotalAmount(total);
     }
-  };
-
-  if (loading) {
-    return <Loading />;
-  }
-
-  return (
-    <>
-      {/* {alarts} */}
+  
+    //product search in the search bar
+    const handleProductSearch = (e) => {
+      setProductSearchInput(e.target.value);
+      const searchTerm = e.target.value;
+      const filteredProducts = products.filter(
+        (p) =>
+          p.name
+            .toLowerCase()
+            .replace(/\s+/g, "")
+            .includes(searchTerm.toLowerCase().trim().replace(/\s+/g, "")) //check both after to lowercase and no white spaces
+      );
+      setFilteredProducts(filteredProducts);
+      // if(filteredProducts.length > 0){
+      //   console.log("product match", filteredProducts.length)
+  
+      // }
+    };
+    
+    //product selected from search bar
+    const handleProductSelect = (product) => {
+      if (!selectedProductList.some((p) => p._id == product._id)) {
+        setSelectedProductList([...selectedProductList, product]);
+        setProductSearchInput("");
+      }
+    };
+  
+    //product quantity with id in state handled
+    const handleProductQuantity = (id, quantity) => {
+      setProductQuantities({ ...productQuantities, [id]: quantity });
+      calculateAmountTotal();
+    };
+  
+    //all products MRP with id in state handled
+    const handleProductMRP = (id, mrp) => {
+      setAllProductMRPs({...allProductMRPs, [id]: mrp});
+    }
+  
+    //all products purchase rate with id in state hndled
+    const handleProductPurcahseRate = (id, rate) => {
+       setAllProductRates({...allProductRates, [id]: rate});
+    }
+    
+      //product deleted from selected list
+    const handleDeleteProductFromList = (product) => {
+      setSelectedProductList(
+        selectedProductList.filter((p) => p._id !== product._id)
+      );
+      delete productQuantities[product._id];
+      delete allProductRates[product._id];
+      delete allProductMRPs[product._id]
+      setProductQuantities({ ...productQuantities });
+      setAllProductRates({...allProductRates});
+      setAllProductMRPs({...allProductMRPs});
+      // console.log(productQuantities);
+    };
+    
+    //final submit of stock in
+    const handleSubmitStockIn = async () => {
+  
+      let products = [];
+      const stockInFormdata = new FormData();
+  
+      for (const [key, value] of Object.entries(productQuantities)) {
+        products.push({
+          product: key,
+          quantity: value,
+          productPurchaseRate: allProductRates[key],
+          mrp: allProductMRPs[key] || -1
+        });
+      }
+  
+      const stockInData = {
+        vendor: vendorSelected._id,
+        invNo,
+        date: startDate,
+        totalAmount,
+        description,
+        products,
+      };
+  
+      try {
+        await dispatch(addStockIn({stockInData, file})).unwrap();
+        setSuccessMsg("Stock In saved successfully");
+        setTimeout(() => {
+          setSuccessMsg("");
+        }, 3000);
+        dispatch(fetchProducts());
+        dispatch(fetchVendors());
+        dispatch(fetchStockIns());
+        setProductQuantities({});
+        setSelectedProductList([]);
+        setFile({}); //reset file state
+        setVendorSelected("");
+        setselectedVendorId("");
+        setInvNo("");
+        setTotalAmount("");
+        setDescription("");
+        setStartDate(new Date());
+      } catch (error) {
+        console.log("Failed to add stock in:", error);
+        setErrorMsg(error);
+        setTimeout(() => {
+          setErrorMsg("");
+        }, 3000);
+      }
+    };
+  
+    if (loading) {
+      return <Loading />;
+    }
+    return (
+        <>
+              {/* {alarts} */}
       {successMsg && <SuccessAlert successMsg={successMsg} />}
       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
       <ModalAddProduct
@@ -256,7 +270,7 @@ const StockIn = () => {
         <div class="basis-2/5 bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
           <form class=" max-w-full lg:max-w-sm mx-auto">
             <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
-              Add Vendor Details
+              Update Vendor Details
             </h1>
             <div class="mb-5">
               <label
@@ -496,7 +510,7 @@ const StockIn = () => {
         {/* product */}
         <div class="basis-full sm:basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
           <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
-            Add Products
+            Update Products
           </h1>
           {/* search and search result dropdown component */}
           <div className="flex flex-row justify-between">
@@ -697,8 +711,8 @@ const StockIn = () => {
           </div>
         </div>
       </div>
-    </>
-  );
-};
+        </>
+    )
+}
 
-export default StockIn;
+export default UpdateStockIn;

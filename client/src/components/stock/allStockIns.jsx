@@ -11,7 +11,9 @@ import {
   FileText,
   BadgePercent,
   Eye,
+  Edit,
 } from "lucide-react";
+import {useNavigate} from "react-router";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { StockInPDF } from "./stockInPdf";
@@ -27,6 +29,7 @@ import { Product } from "../../../../server/src/models/productModel";
 const AllStockIns = () => {
   const contentRef = useRef(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { stockIns, loading, error } = useSelector((state) => state.stockIns);
 
   const [successMsg, setSuccessMsg] = useState("");
@@ -67,6 +70,13 @@ const AllStockIns = () => {
   const handleOpenInvoice = (url) => {
     window.open(url, "_blank"); // Open the invoice in a new tab
   };
+
+  const handleEditStockIn = (stockIn) => {
+    const userResponse = window.confirm(`Are you sure you want to edit stock-in with invoice no. ${stockIn.invoiceNo}?`);
+    if(userResponse){
+      navigate(`/stock-in/edit/${stockIn._id}`);
+    }
+  }
 
   const filteredStockIns = stockIns.filter((item) => {
     const searchLower = search.toLowerCase().trim();
@@ -192,6 +202,14 @@ const AllStockIns = () => {
                 <div className="flex flex-row justify-between">
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
                   <div name="buttons" className="flex flex-row gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleEditStockIn(item)}
+                      class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
+                    >
+                      <Edit className="sm:mr-2" size={20} />
+                      Edit
+                    </button>
                     {item.fileCloudUrl && (
                       // View the invoice uploaded during stock-In (In a new tab)
                       <button
