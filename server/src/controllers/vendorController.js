@@ -52,10 +52,18 @@ export const addVendor = async (req, res) => {
             const isVendorPresent = existingVendors.some((v) =>
                 vendor.name.toLowerCase() === v.name.toLowerCase()
             )
+
+            // Check if phone number already exists
+            const isPhoneNoPresent = existingVendors.some((v)=>
+                vendor.phone == v.phone);
             if(isVendorPresent){
                 return res.status(400).json({error: 'Vendor already exists'});
             }
+            if(isPhoneNoPresent){
+                return res.status(400).json({error: 'Phone number already exists'});
+            }
         }
+        // If not present, add vendor
         const newVendor = new Vendor(vendor);
         await newVendor.save();
         const vendors = await Vendor.find();
