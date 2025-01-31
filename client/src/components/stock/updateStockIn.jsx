@@ -66,14 +66,17 @@ const UpdateStockIn = () => {
         const stockInState = stockIns.find((stockIn) => stockIn._id === id);
         setOldStockIn(stockInState);
         populateOldStockInData();
-    },[ stockIns, id ]);
+    },[id]);
 
     const populateOldStockInData = () => {
-        setselectedVendorId(oldStockIn.vendor);
+        // setselectedVendorId(oldStockIn.vendor);
+        
+            console.log("Old S",oldStockIn);
+            console.log("V",vendors)
+            console.log("P",products)
+            console.log("S",stockIns)
+          
     }
-
-    console.log(oldStockIn)
-  
     //vendor----------------->
   
     //showing selected vendor data in form
