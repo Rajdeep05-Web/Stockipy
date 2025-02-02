@@ -23,238 +23,263 @@ import {
 import { fetchProducts } from "../../redux/slices/products/productsSlice";
 
 const UpdateStockIn = () => {
-    const dispatch = useDispatch();
-    const { vendors, loading } = useSelector((state) => state.vendors);
-    const { products } = useSelector((state) => state.products);
-    const { stockIns } = useSelector((state) => state.stockIns);
-  
-    //vendor
-    const [successMsg, setSuccessMsg] = useState("");
-    const [errorMsg, setErrorMsg] = useState("");
-    const [startDate, setStartDate] = useState(new Date());
-    const [invNo, setInvNo] = useState("");
-    const [totalAmount, setTotalAmount] = useState("");
-    const [description, setDescription] = useState("");
-    const [name, setName] = useState("");
-    const [phone, setPhone] = useState("");
-    const [address, setAddress] = useState("");
-    const [gstNo, setGstNo] = useState("");
-    const [email, setEmail] = useState("");
-    const [selectedVendorId, setselectedVendorId] = useState("");
-    const [vendorSelected, setVendorSelected] = useState("");
-    const [isVendorFormFieldsDisabled, setisVendorFormFieldsDisabled] =
-      useState(true);
-    const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
-    const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
-    const [file, setFile] = useState({});
-  
-    //product
-    const [productSearchInput, setProductSearchInput] = useState("");
-    const [filteredProducts, setFilteredProducts] = useState([]);
-    const [selectedProductList, setSelectedProductList] = useState([]);
-    const [productQuantities, setProductQuantities] = useState({});
-    const [allProductRates, setAllProductRates] = useState({});
-    const [allProductMRPs, setAllProductMRPs] =  useState({});
-    const [isProductModalVisible, setIsProductModalVisible] = useState(false);
+  const dispatch = useDispatch();
+  const { vendors, loading:vendorsLoading } = useSelector((state) => state.vendors);
+  const { products, loading:productsLoading } = useSelector((state) => state.products);
+  const { stockIns, loading:stockInsLoading } = useSelector((state) => state.stockIns);
 
-    //stockIn
-    const { id } = useParams();
-    const [oldStockIn, setOldStockIn] = useState({});
+  //vendor
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [invNo, setInvNo] = useState("");
+  const [totalAmount, setTotalAmount] = useState("");
+  const [description, setDescription] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [gstNo, setGstNo] = useState("");
+  const [email, setEmail] = useState("");
+  const [selectedVendorId, setselectedVendorId] = useState("");
+  const [vendorSelected, setVendorSelected] = useState("");
+  const [isVendorFormFieldsDisabled, setisVendorFormFieldsDisabled] =
+    useState(true);
+  const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
+  const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
+  const [file, setFile] = useState({});
+  const [fileUrl, setFileUrl] = useState("");
+  const [filepickerEnabled, setFilepickerEnabled] = useState(false);
 
-    //stockIn -------------->
-    useEffect(()=>{
-        const stockInState = stockIns.find((stockIn) => stockIn._id === id);
-        setOldStockIn(stockInState);
-        populateOldStockInData();
-    },[id]);
+  //product
+  const [productSearchInput, setProductSearchInput] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [selectedProductList, setSelectedProductList] = useState([]);
+  const [productQuantities, setProductQuantities] = useState({});
+  const [allProductRates, setAllProductRates] = useState({});
+  const [allProductMRPs, setAllProductMRPs] = useState({});
+  const [isProductModalVisible, setIsProductModalVisible] = useState(false);
 
-    const populateOldStockInData = () => {
-        // setselectedVendorId(oldStockIn.vendor);
-        
-            console.log("Old S",oldStockIn);
-            console.log("V",vendors)
-            console.log("P",products)
-            console.log("S",stockIns)
-          
+  //stockIn
+  const { id } = useParams();
+  const [oldStockIn, setOldStockIn] = useState({});
+
+  //stockIn -------------->
+
+  //this will work when the user is redirected into this update page
+  useEffect(() => {
+    const stockInState = stockIns.find((stockIn) => stockIn._id === id);
+    setOldStockIn(stockInState);
+    //old vendor populate onto page
+    if (stockInState?.vendor) {
+      setselectedVendorId(stockInState.vendor._id);
+      setName(stockInState.vendor.name);
+      setPhone(stockInState.vendor.phone);
+      setAddress(stockInState.vendor.address);
+      setGstNo(stockInState.vendor.gstNo);
+      setEmail(stockInState.vendor.email);
+      setVendorSelected(stockInState.vendor);
     }
-    //vendor----------------->
-  
-    //showing selected vendor data in form
-    const handleVendorChange = (e) => {
-      setselectedVendorId(e.target.value);
-      if (e.target.value) {
-        const vendor = vendors.find((vendor) => vendor._id === e.target.value);
-        if (vendor) {
-          setName(vendor.name);
-          setPhone(vendor.phone);
-          setAddress(vendor.address);
-          setGstNo(vendor.gstNo);
-          setEmail(vendor.email);
-          setVendorSelected(vendor);
-        }
-      }
-    };
-  
-    //vendor edit functions
-    const handleEditSelectedVendor = () => {
-      const userResponse = window.confirm("Do you want to edit vendor?");
-      if (userResponse) {
-        alert("Now you can edit vendor details");
-        setisVendorFormFieldsDisabled(false);
-        setIsUserWantSubmit(true);
-      }
-    };
-    const handleVendorUpdateSubmit = () => {
-      const newVendor = { name, phone, address, gstNo, email };
-      try {
-        dispatch(
-          updateVendor({ id: selectedVendorId, vendor: newVendor })
-        ).unwrap();
-        setSuccessMsg("Vendor Updated successfully");
-        setTimeout(() => {
-          setSuccessMsg("");
-        }, 3000);
-        setisVendorFormFieldsDisabled(true);
-        setIsUserWantSubmit(false);
-        dispatch(fetchVendors());
-      } catch (error) {
-        console.log("Failed to update vendor:", error);
-        setErrorMsg(error);
-        setTimeout(() => {
-          setErrorMsg("");
-        }, 3000);
-      }
-    };
-  
-    //product
-  
-    //total amount calculation
-    useEffect(() => {
-      calculateAmountTotal();
-    },[selectedProductList, allProductRates, allProductMRPs, productQuantities]);
-    
-    const calculateAmountTotal = () => {
-      let total = 0;
-      for(const [key, value] of Object.entries(productQuantities)){
-        const rate = allProductRates[key] || 0;
-        total = total + (rate*value);
-      }
-      setTotalAmount(total);
+    //old invoice date amount and description populate onto page
+    if (stockInState) {
+      setInvNo(stockInState?.invoiceNo);
+      setStartDate(new Date(stockInState?.date));
+      setTotalAmount(stockInState?.totalAmount);
+      setDescription(stockInState?.description);
     }
-  
-    //product search in the search bar
-    const handleProductSearch = (e) => {
-      setProductSearchInput(e.target.value);
-      const searchTerm = e.target.value;
-      const filteredProducts = products.filter(
-        (p) =>
-          p.name
-            .toLowerCase()
-            .replace(/\s+/g, "")
-            .includes(searchTerm.toLowerCase().trim().replace(/\s+/g, "")) //check both after to lowercase and no white spaces
-      );
-      setFilteredProducts(filteredProducts);
-      // if(filteredProducts.length > 0){
-      //   console.log("product match", filteredProducts.length)
-  
-      // }
-    };
-    
-    //product selected from search bar
-    const handleProductSelect = (product) => {
-      if (!selectedProductList.some((p) => p._id == product._id)) {
-        setSelectedProductList([...selectedProductList, product]);
-        setProductSearchInput("");
+    //old file populate onto page
+    setFileUrl(stockInState?.fileCloudUrl);
+    populateOldStockInData();
+  }, [id, stockIns, dispatch]);
+
+  const populateOldStockInData = () => {
+    // console.log("V",vendors)
+    // console.log("P",products)
+    console.log("S", oldStockIn)
+  }
+
+  //vendor----------------->
+
+  //showing selected vendor data in form
+  const handleVendorChange = (e) => {
+    setselectedVendorId(e.target.value);
+    if (e.target.value) {
+      const vendor = vendors.find((vendor) => vendor._id === e.target.value);
+      if (vendor) {
+        setName(vendor.name);
+        setPhone(vendor.phone);
+        setAddress(vendor.address);
+        setGstNo(vendor.gstNo);
+        setEmail(vendor.email);
+        setVendorSelected(vendor);
       }
-    };
-  
-    //product quantity with id in state handled
-    const handleProductQuantity = (id, quantity) => {
-      setProductQuantities({ ...productQuantities, [id]: quantity });
-      calculateAmountTotal();
-    };
-  
-    //all products MRP with id in state handled
-    const handleProductMRP = (id, mrp) => {
-      setAllProductMRPs({...allProductMRPs, [id]: mrp});
     }
-  
-    //all products purchase rate with id in state hndled
-    const handleProductPurcahseRate = (id, rate) => {
-       setAllProductRates({...allProductRates, [id]: rate});
+  };
+
+  //vendor edit functions
+  const handleEditSelectedVendor = () => {
+    const userResponse = window.confirm("Do you want to edit vendor?");
+    if (userResponse) {
+      alert("Now you can edit vendor details");
+      setisVendorFormFieldsDisabled(false);
+      setIsUserWantSubmit(true);
     }
-    
-      //product deleted from selected list
-    const handleDeleteProductFromList = (product) => {
-      setSelectedProductList(
-        selectedProductList.filter((p) => p._id !== product._id)
-      );
-      delete productQuantities[product._id];
-      delete allProductRates[product._id];
-      delete allProductMRPs[product._id]
-      setProductQuantities({ ...productQuantities });
-      setAllProductRates({...allProductRates});
-      setAllProductMRPs({...allProductMRPs});
-      // console.log(productQuantities);
-    };
-    
-    //final submit of stock in
-    const handleSubmitStockIn = async () => {
-  
-      let products = [];
-      const stockInFormdata = new FormData();
-  
-      for (const [key, value] of Object.entries(productQuantities)) {
-        products.push({
-          product: key,
-          quantity: value,
-          productPurchaseRate: allProductRates[key],
-          mrp: allProductMRPs[key] || -1
-        });
-      }
-  
-      const stockInData = {
-        vendor: vendorSelected._id,
-        invNo,
-        date: startDate,
-        totalAmount,
-        description,
-        products,
-      };
-  
-      try {
-        await dispatch(addStockIn({stockInData, file})).unwrap();
-        setSuccessMsg("Stock In saved successfully");
-        setTimeout(() => {
-          setSuccessMsg("");
-        }, 3000);
-        dispatch(fetchProducts());
-        dispatch(fetchVendors());
-        dispatch(fetchStockIns());
-        setProductQuantities({});
-        setSelectedProductList([]);
-        setFile({}); //reset file state
-        setVendorSelected("");
-        setselectedVendorId("");
-        setInvNo("");
-        setTotalAmount("");
-        setDescription("");
-        setStartDate(new Date());
-      } catch (error) {
-        console.log("Failed to add stock in:", error);
-        setErrorMsg(error);
-        setTimeout(() => {
-          setErrorMsg("");
-        }, 3000);
-      }
-    };
-  
-    if (loading) {
-      return <Loading />;
+  };
+  const handleVendorUpdateSubmit = () => {
+    const newVendor = { name, phone, address, gstNo, email };
+    try {
+      dispatch(
+        updateVendor({ id: selectedVendorId, vendor: newVendor })
+      ).unwrap();
+      setSuccessMsg("Vendor Updated successfully");
+      setTimeout(() => {
+        setSuccessMsg("");
+      }, 3000);
+      setisVendorFormFieldsDisabled(true);
+      setIsUserWantSubmit(false);
+      dispatch(fetchVendors());
+    } catch (error) {
+      console.log("Failed to update vendor:", error);
+      setErrorMsg(error);
+      setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
     }
-    return (
-        <>
-              {/* {alarts} */}
+  };
+
+  const handleUpdateFileUrlButton = () => {
+    setFilepickerEnabled(true);
+  }
+
+  //product
+
+  //total amount calculation
+  useEffect(() => {
+    calculateAmountTotal();
+  }, [selectedProductList, allProductRates, allProductMRPs, productQuantities]);
+
+  const calculateAmountTotal = () => {
+    let total = 0;
+    for (const [key, value] of Object.entries(productQuantities)) {
+      const rate = allProductRates[key] || 0;
+      total = total + (rate * value);
+    }
+    setTotalAmount(total);
+  }
+
+  //product search in the search bar
+  const handleProductSearch = (e) => {
+    setProductSearchInput(e.target.value);
+    const searchTerm = e.target.value;
+    const filteredProducts = products.filter(
+      (p) =>
+        p.name
+          .toLowerCase()
+          .replace(/\s+/g, "")
+          .includes(searchTerm.toLowerCase().trim().replace(/\s+/g, "")) //check both after to lowercase and no white spaces
+    );
+    setFilteredProducts(filteredProducts);
+    // if(filteredProducts.length > 0){
+    //   console.log("product match", filteredProducts.length)
+
+    // }
+  };
+
+  //product selected from search bar
+  const handleProductSelect = (product) => {
+    if (!selectedProductList.some((p) => p._id == product._id)) {
+      setSelectedProductList([...selectedProductList, product]);
+      setProductSearchInput("");
+    }
+  };
+
+  //product quantity with id in state handled
+  const handleProductQuantity = (id, quantity) => {
+    setProductQuantities({ ...productQuantities, [id]: quantity });
+    calculateAmountTotal();
+  };
+
+  //all products MRP with id in state handled
+  const handleProductMRP = (id, mrp) => {
+    setAllProductMRPs({ ...allProductMRPs, [id]: mrp });
+  }
+
+  //all products purchase rate with id in state hndled
+  const handleProductPurcahseRate = (id, rate) => {
+    setAllProductRates({ ...allProductRates, [id]: rate });
+  }
+
+  //product deleted from selected list
+  const handleDeleteProductFromList = (product) => {
+    setSelectedProductList(
+      selectedProductList.filter((p) => p._id !== product._id)
+    );
+    delete productQuantities[product._id];
+    delete allProductRates[product._id];
+    delete allProductMRPs[product._id]
+    setProductQuantities({ ...productQuantities });
+    setAllProductRates({ ...allProductRates });
+    setAllProductMRPs({ ...allProductMRPs });
+    // console.log(productQuantities);
+  };
+
+  //final submit of stock in
+  const handleSubmitStockIn = async () => {
+
+    let products = [];
+    const stockInFormdata = new FormData();
+
+    for (const [key, value] of Object.entries(productQuantities)) {
+      products.push({
+        product: key,
+        quantity: value,
+        productPurchaseRate: allProductRates[key],
+        mrp: allProductMRPs[key] || -1
+      });
+    }
+
+    const stockInData = {
+      vendor: vendorSelected._id,
+      invNo,
+      date: startDate,
+      totalAmount,
+      description,
+      products,
+    };
+
+    try {
+      await dispatch(addStockIn({ stockInData, file })).unwrap();
+      setSuccessMsg("Stock In saved successfully");
+      setTimeout(() => {
+        setSuccessMsg("");
+      }, 3000);
+      dispatch(fetchProducts());
+      dispatch(fetchVendors());
+      dispatch(fetchStockIns());
+      setProductQuantities({});
+      setSelectedProductList([]);
+      setFile({}); //reset file state
+      setVendorSelected("");
+      setselectedVendorId("");
+      setInvNo("");
+      setTotalAmount("");
+      setDescription("");
+      setStartDate(new Date());
+    } catch (error) {
+      console.log("Failed to add stock in:", error);
+      setErrorMsg(error);
+      setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
+    }
+  };
+
+  if (productsLoading || vendorsLoading || stockInsLoading) {
+    return <Loading />;
+  }
+  
+  return (
+    <>
+      {/* {alarts} */}
       {successMsg && <SuccessAlert successMsg={successMsg} />}
       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
       <ModalAddProduct
@@ -378,17 +403,17 @@ const UpdateStockIn = () => {
                     Selected Vendor Details
                   </h1>
 
-                   { !isUserWantSubmit && (
-                  <div>
-                    <button
-                      type="button"
-                      onClick={handleEditSelectedVendor}
-                      class={`text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
-                    >
-                      Edit
-                    </button>
-                  </div>
-                    )}
+                  {!isUserWantSubmit && (
+                    <div>
+                      <button
+                        type="button"
+                        onClick={handleEditSelectedVendor}
+                        class={`text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800`}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  )}
                 </div>
                 <div class="mb-5">
                   <label
@@ -404,7 +429,7 @@ const UpdateStockIn = () => {
                     value={name || ""}
                     required
                     disabled={isVendorFormFieldsDisabled}
-                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -420,7 +445,7 @@ const UpdateStockIn = () => {
                     onChange={(e) => setPhone(e.target.value)}
                     value={phone || ""}
                     disabled={isVendorFormFieldsDisabled}
-                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -436,7 +461,7 @@ const UpdateStockIn = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     value={email || ""}
                     disabled={isVendorFormFieldsDisabled}
-                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -453,7 +478,7 @@ const UpdateStockIn = () => {
                     required
                     disabled={isVendorFormFieldsDisabled}
                     id="large-input"
-                    class={`block w-full p-4 text-gray-900 border border-gray-300 rounded-lg ${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    class={`block w-full p-4 text-gray-900 border border-gray-300 rounded-lg ${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} text-base focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 <div class="mb-5">
@@ -469,7 +494,7 @@ const UpdateStockIn = () => {
                     onChange={(e) => setGstNo(e.target.value)}
                     value={gstNo || ""}
                     disabled={isVendorFormFieldsDisabled}
-                    class={`${isUserWantSubmit?"bg-gray-50":"bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
                 {/* if user selects to edit and confirm this section shows */}
@@ -499,17 +524,47 @@ const UpdateStockIn = () => {
               </button>
             </div>
             <label
-                for="file"
-                class="block mt-6 mb-2 text-base font-bold text-gray-900 dark:text-white"
-              >
-                Upload invoice
-              </label>
+              for="file"
+              class="block mt-6 mb-2 text-base font-bold text-gray-900 dark:text-white"
+            >
+              Upload invoice
+            </label>
+            {/* file upload component */}
             <div class="flex flex-col justify-end" name="file">
-              <FilePicker setFile={setFile} />
+              {fileUrl ? 
+              // if file url present from then show view file and update file btn
+              <>
+              {filepickerEnabled ? (<>
+                <FilePicker setFile={setFile} />
+                <button
+                type="button"
+                onClick={() => setFilepickerEnabled(false)}
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Cancel
+              </button>
+              </>) : (<>
+              {/* view old uploaded file btn and update file btn */}
+              <button
+                type="button"
+                onClick={() => window.open(fileUrl)}
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                View file
+              </button>
+              {/* when user want to update the old file this button will be shown */}
+              <button
+                type="button"
+                onClick={() => (setFilepickerEnabled(true))}
+                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              >
+                Update file
+              </button>
+              </>)}</> : (<FilePicker setFile={setFile} />)}
             </div>
           </form>
         </div>
-        
+
         {/* product */}
         <div class="basis-full sm:basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
           <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
@@ -645,9 +700,9 @@ const UpdateStockIn = () => {
                           type="text"
                           placeholder="Rate"
                           required
-                          value={ allProductRates[product._id] !== undefined ? allProductRates[product._id] : product.productPurchaseRate && handleProductPurcahseRate(product._id, product.productPurchaseRate)}
+                          value={allProductRates[product._id] !== undefined ? allProductRates[product._id] : product.productPurchaseRate && handleProductPurcahseRate(product._id, product.productPurchaseRate)}
                           onChange={(e) =>
-                          handleProductPurcahseRate(product._id, e.target.value)
+                            handleProductPurcahseRate(product._id, e.target.value)
                           }
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
@@ -658,7 +713,7 @@ const UpdateStockIn = () => {
                           placeholder="MRP"
                           value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp}
                           onChange={(e) =>
-                            handleProductMRP(product._id, e.target.value )
+                            handleProductMRP(product._id, e.target.value)
                           }
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
@@ -694,7 +749,7 @@ const UpdateStockIn = () => {
                         >
                           {/* Remove  */}
                           <Trash2 />
-                        </button> 
+                        </button>
                       </td>
                     </tr>
                     // </>
@@ -714,8 +769,8 @@ const UpdateStockIn = () => {
           </div>
         </div>
       </div>
-        </>
-    )
+    </>
+  )
 }
 
 export default UpdateStockIn;

@@ -43,7 +43,11 @@ const App = () => {
     if (location.pathname === "/customers") dispatch(fetchCustomers());
     if (location.pathname === "/vendors") dispatch(fetchVendors());
     if (location.pathname === "/stock-ins") dispatch(fetchStockIns());
-    if (location.pathname === "/add-stock-in") dispatch(fetchVendors(), dispatch(fetchProducts()));
+    if (location.pathname === "/add-stock-in" || location.pathname.includes("/stock-in/edit/")) {
+      dispatch(fetchProducts());
+      dispatch(fetchVendors());
+      dispatch(fetchStockIns());
+    }
   }, [location, dispatch]);
 
   let isLoading =
