@@ -21,6 +21,7 @@ import {
   fetchStockIns,
 } from "../../redux/slices/stock/stockInSlice";
 import { fetchProducts } from "../../redux/slices/products/productsSlice";
+import { Product } from "../../../../server/src/models/productModel";
 
 const UpdateStockIn = () => {
   const dispatch = useDispatch();
@@ -88,8 +89,24 @@ const UpdateStockIn = () => {
     }
     //old file populate onto page
     setFileUrl(stockInState?.fileCloudUrl);
+    //old products populate onto page
+    if(stockInState.products.length > 0){
+      let oldproducts = [];
+      stockInState.products.forEach(element => {
+        oldproducts.push({
+          name:element.product.name,
+          quantity:element.quantity.toString(),
+          _id:element.product._id,
+          rate:1000,
+          productPurchaseRate:element.productPurchaseRate,
+          mrp:element.mrp
+          });
+        // setProductQuantities({ ...productQuantities, [element.product._id]: element.quantity});
+      });
+      setSelectedProductList(oldproducts);
+    }
     populateOldStockInData();
-  }, [id, stockIns, dispatch]);
+  }, [id, stockIns, dispatch, vendors, products]);
 
   const populateOldStockInData = () => {
     // console.log("V",vendors)
@@ -146,10 +163,6 @@ const UpdateStockIn = () => {
     }
   };
 
-  const handleUpdateFileUrlButton = () => {
-    setFilepickerEnabled(true);
-  }
-
   //product
 
   //total amount calculation
@@ -194,6 +207,7 @@ const UpdateStockIn = () => {
 
   //product quantity with id in state handled
   const handleProductQuantity = (id, quantity) => {
+    console.log("id", id, "quantity", quantity);
     setProductQuantities({ ...productQuantities, [id]: quantity });
     calculateAmountTotal();
   };
