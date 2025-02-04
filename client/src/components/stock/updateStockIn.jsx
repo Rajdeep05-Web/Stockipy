@@ -25,9 +25,9 @@ import { Product } from "../../../../server/src/models/productModel";
 
 const UpdateStockIn = () => {
   const dispatch = useDispatch();
-  const { vendors, loading:vendorsLoading } = useSelector((state) => state.vendors);
-  const { products, loading:productsLoading } = useSelector((state) => state.products);
-  const { stockIns, loading:stockInsLoading } = useSelector((state) => state.stockIns);
+  const { vendors, loading: vendorsLoading } = useSelector((state) => state.vendors);
+  const { products, loading: productsLoading } = useSelector((state) => state.products);
+  const { stockIns, loading: stockInsLoading } = useSelector((state) => state.stockIns);
 
   //vendor
   const [successMsg, setSuccessMsg] = useState("");
@@ -90,18 +90,21 @@ const UpdateStockIn = () => {
     //old file populate onto page
     setFileUrl(stockInState?.fileCloudUrl);
     //old products populate onto page
-    if(stockInState.products.length > 0){
+    if (stockInState?.products.length > 0) {
       let oldproducts = [];
       stockInState.products.forEach(element => {
         oldproducts.push({
-          name:element.product.name,
-          quantity:element.quantity.toString(),
-          _id:element.product._id,
-          rate:1000,
-          productPurchaseRate:element.productPurchaseRate,
-          mrp:element.mrp
-          });
-        // setProductQuantities({ ...productQuantities, [element.product._id]: element.quantity});
+          name: element.product.name,
+          quantity: element.quantity,//stock-in quantity
+          liveQuantity: element.product.quantity,//productlive quantity
+          _id: element.product._id,
+          rate: element.product.rate,
+          productPurchaseRate: element.productPurchaseRate,
+          mrp: element.product.mrp,
+          isUpdateProductType: true
+        });
+        productQuantities[element.product._id] = element.quantity;
+        setProductQuantities(productQuantities);
       });
       setSelectedProductList(oldproducts);
     }
@@ -112,6 +115,7 @@ const UpdateStockIn = () => {
     // console.log("V",vendors)
     // console.log("P",products)
     console.log("S", oldStockIn)
+    // console.log(productQuantities)
   }
 
   //vendor----------------->
@@ -133,14 +137,14 @@ const UpdateStockIn = () => {
   };
 
   //vendor edit functions
-  const handleEditSelectedVendor = () => {
-    const userResponse = window.confirm("Do you want to edit vendor?");
-    if (userResponse) {
-      alert("Now you can edit vendor details");
-      setisVendorFormFieldsDisabled(false);
-      setIsUserWantSubmit(true);
-    }
-  };
+  // const handleEditSelectedVendor = () => {
+  //   const userResponse = window.confirm("Do you want to edit vendor?");
+  //   if (userResponse) {
+  //     alert("Now you can edit vendor details");
+  //     setisVendorFormFieldsDisabled(false);
+  //     setIsUserWantSubmit(true);
+  //   }
+  // };
   const handleVendorUpdateSubmit = () => {
     const newVendor = { name, phone, address, gstNo, email };
     try {
@@ -290,7 +294,7 @@ const UpdateStockIn = () => {
   if (productsLoading || vendorsLoading || stockInsLoading) {
     return <Loading />;
   }
-  
+
   return (
     <>
       {/* {alarts} */}
@@ -417,7 +421,7 @@ const UpdateStockIn = () => {
                     Selected Vendor Details
                   </h1>
 
-                  {!isUserWantSubmit && (
+                  {/* {!isUserWantSubmit && (
                     <div>
                       <button
                         type="button"
@@ -427,7 +431,7 @@ const UpdateStockIn = () => {
                         Edit
                       </button>
                     </div>
-                  )}
+                  )} */}
                 </div>
                 <div class="mb-5">
                   <label
@@ -545,36 +549,36 @@ const UpdateStockIn = () => {
             </label>
             {/* file upload component */}
             <div class="flex flex-col justify-end" name="file">
-              {fileUrl ? 
-              // if file url present from then show view file and update file btn
-              <>
-              {filepickerEnabled ? (<>
-                <FilePicker setFile={setFile} />
-                <button
-                type="button"
-                onClick={() => setFilepickerEnabled(false)}
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Cancel
-              </button>
-              </>) : (<>
-              {/* view old uploaded file btn and update file btn */}
-              <button
-                type="button"
-                onClick={() => window.open(fileUrl)}
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                View file
-              </button>
-              {/* when user want to update the old file this button will be shown */}
-              <button
-                type="button"
-                onClick={() => (setFilepickerEnabled(true))}
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Update file
-              </button>
-              </>)}</> : (<FilePicker setFile={setFile} />)}
+              {fileUrl ?
+                // if file url present from then show view file and update file btn
+                <>
+                  {filepickerEnabled ? (<>
+                    <FilePicker setFile={setFile} />
+                    <button
+                      type="button"
+                      onClick={() => setFilepickerEnabled(false)}
+                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                      Cancel
+                    </button>
+                  </>) : (<>
+                    {/* view old uploaded file btn and update file btn */}
+                    <button
+                      type="button"
+                      onClick={() => window.open(fileUrl)}
+                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                      View file
+                    </button>
+                    {/* when user want to update the old file this button will be shown */}
+                    <button
+                      type="button"
+                      onClick={() => (setFilepickerEnabled(true))}
+                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                      Update file
+                    </button>
+                  </>)}</> : (<FilePicker setFile={setFile} />)}
             </div>
           </form>
         </div>
@@ -752,7 +756,15 @@ const UpdateStockIn = () => {
                           class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                         <h1 class={`text-black-400 mt-1 font-normal ${product.quantity < parseInt("5") ? "text-red-500" : "text-green-500"}`}>
-                          Stock: <span class={"font-semibold"}>{product.quantity + parseInt("0")}</span>
+                          Stock: <span class={"font-semibold"}>
+                            {product.isUpdateProductType ?
+                              //if a update type product
+                              ((product.liveQuantity - product.quantity) + parseInt("0"))
+                              :
+                              // if a new added product in list
+                              product.quantity + parseInt("0")
+                            }
+                          </span>
                         </h1>
                       </td>
                       <td class="px-3 py-0 w-2/12 text-center">
@@ -778,7 +790,7 @@ const UpdateStockIn = () => {
               onClick={() => handleSubmitStockIn()}
               class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              Save
+              Update
             </button>
           </div>
         </div>
