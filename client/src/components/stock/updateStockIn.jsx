@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import { Trash2, Plus, Frown } from 'lucide-react';
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from 'react-router';
+import { Navigate, useParams } from 'react-router';
 
 import Loading from "../useful/Loading/loading";
 import SuccessAlert from "../useful/alerts/successAlert";
@@ -17,7 +17,7 @@ import {
   fetchVendors,
 } from "../../redux/slices/vendor/vendorsSlice";
 import {
-  addStockIn,
+  updateStockIn,
   fetchStockIns,
 } from "../../redux/slices/stock/stockInSlice";
 import { fetchProducts } from "../../redux/slices/products/productsSlice";
@@ -108,15 +108,7 @@ const UpdateStockIn = () => {
       });
       setSelectedProductList(oldproducts);
     }
-    populateOldStockInData();
   }, [id, stockIns, dispatch, vendors, products]);
-
-  const populateOldStockInData = () => {
-    // console.log("V",vendors)
-    // console.log("P",products)
-    console.log("S", oldStockIn)
-    // console.log(productQuantities)
-  }
 
   //vendor----------------->
 
@@ -211,7 +203,7 @@ const UpdateStockIn = () => {
 
   //product quantity with id in state handled
   const handleProductQuantity = (id, quantity) => {
-    console.log("id", id, "quantity", quantity);
+    // console.log("id", id, "quantity", quantity);
     setProductQuantities({ ...productQuantities, [id]: quantity });
     calculateAmountTotal();
   };
@@ -244,7 +236,6 @@ const UpdateStockIn = () => {
   const handleUpdateStockIn = async () => {
 
     let products = [];
-    const stockInFormdata = new FormData();
 
     for (const [key, value] of Object.entries(productQuantities)) {
       products.push({
@@ -263,25 +254,20 @@ const UpdateStockIn = () => {
       description,
       products,
     };
+    // console.log("stockInData", stockInData);
+    // console.log("file", file);
 
     try {
-      await dispatch(addStockIn({ stockInData, file })).unwrap();
-      setSuccessMsg("Stock In saved successfully");
+      await dispatch(updateStockIn({id, stockInData, file })).unwrap();
+      setSuccessMsg("Stock In updated successfully");
       setTimeout(() => {
         setSuccessMsg("");
       }, 3000);
       dispatch(fetchProducts());
       dispatch(fetchVendors());
       dispatch(fetchStockIns());
-      setProductQuantities({});
-      setSelectedProductList([]);
-      setFile({}); //reset file state
-      setVendorSelected("");
-      setselectedVendorId("");
-      setInvNo("");
-      setTotalAmount("");
-      setDescription("");
-      setStartDate(new Date());
+      dispatch(fetchStockIns());
+      Navigate("/stock-ins");
     } catch (error) {
       console.log("Failed to add stock in:", error);
       setErrorMsg(error);
@@ -556,7 +542,10 @@ const UpdateStockIn = () => {
                     <FilePicker setFile={setFile} />
                     <button
                       type="button"
-                      onClick={() => setFilepickerEnabled(false)}
+                      onClick={() => {
+                        setFilepickerEnabled(false);
+                        setFile({});
+                      }}
                       class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 mb-2 mt-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
                       Cancel

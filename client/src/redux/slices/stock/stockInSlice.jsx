@@ -56,9 +56,26 @@ export const addStockIn = createAsyncThunk(
 
 export const updateStockIn = createAsyncThunk(
   "stockIn/updateStockIn",
-  async ({ id, stockInUpdateData }, { rejectWithValue }) => {
+  async (stockInUpdateData, { rejectWithValue }) => {
+    const { file, stockInData, id } = stockInUpdateData;
+    let formData = null;
+    if(file){
+      formData = new FormData();
+      formData.append("invoice", file);
+    }
     try {
-      const { data } = axios.put(`${API_URL}/${id}`, stockInUpdateData);
+      const fileUploadResponse = file
+        ? await axios.post(API_URL_FILE_UPLOAD, formData, {
+            //for the form data to be sent as a file
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+        : "";
+        if (fileUploadResponse) {
+          stockInData.fileCloudUrl = fileUploadResponse.data.fileUrl;
+        }
+      const { data } = await axios.put(`${API_URL}/${id}`, {stockInData});
       return data;
     } catch (error) {
       rejectWithValue(error?.response?.data.error || error.message);

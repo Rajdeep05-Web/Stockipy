@@ -105,7 +105,8 @@ export const getStockInById = async (req, res) => {
 }
 
 export const updateStockIn = async (req, res) => {
-
+ console.log(req.body);
+ return res.status(200).json({message: "Update StockIn"});
 }
 
 export const deleteStockIn = async (req, res) => {
