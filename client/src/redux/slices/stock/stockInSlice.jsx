@@ -75,10 +75,11 @@ export const updateStockIn = createAsyncThunk(
         if (fileUploadResponse) {
           stockInData.fileCloudUrl = fileUploadResponse.data.fileUrl;
         }
-      const { data } = await axios.put(`${API_URL}/${id}`, {stockInData});
+      const { data } = await axios.put(`${API_URL}/${id}`, stockInData);
       return data;
     } catch (error) {
-      rejectWithValue(error?.response?.data.error || error.message);
+      console.log(error);
+      return rejectWithValue(error?.response?.data.error || error.message);
     }
   }
 );
@@ -90,7 +91,7 @@ export const deleteStockIn = createAsyncThunk(
       const { deleteedData } = axios.delete(`${API_URL}/${id}`);
       return deleteedData;
     } catch (error) {
-      rejectWithValue(error?.response?.data.error || error.message);
+      return rejectWithValue(error?.response?.data.error || error.message);
     }
   }
 );
@@ -160,17 +161,18 @@ const stockInSlice = createSlice({
       .addCase(updateStockIn.fulfilled, (state, action) => {
         state.loading = false;
         state.status = "succeeded";
-        const index = state.stockIns.findIndex(
-          (stockIn) => stockIn._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.stockIns[index] = action.payload;
-        }
-      })
-      .addCase(updateStockIn.rejected, (state, action) => {
-        state.status = "failed";
-        action.loading = false;
-        state.error = action.payload;
+        console.log(action.payload)
+        // const index = state.stockIns.findIndex(
+          //   (stockIn) => stockIn._id === action.payload._id
+          // );
+          // if (index !== -1) {
+            //   state.stockIns[index] = action.payload;
+            // }
+          })
+          .addCase(updateStockIn.rejected, (state, action) => {
+            state.status = "failed";
+            state.loading = false;
+            state.error = action.payload;
       })
 
       .addCase(deleteStockIn.pending, () => {})

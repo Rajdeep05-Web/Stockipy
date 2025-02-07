@@ -278,6 +278,7 @@ const UpdateStockIn = () => {
   };
 
   if (productsLoading || vendorsLoading || stockInsLoading) {
+    // console.log(vendorsLoading,productsLoading,stockInsLoading )
     return <Loading />;
   }
 

@@ -105,8 +105,72 @@ export const getStockInById = async (req, res) => {
 }
 
 export const updateStockIn = async (req, res) => {
- console.log(req.body);
- return res.status(200).json({message: "Update StockIn"});
+    const id = req.params.id;
+    const {vendor, invNo, date, description, products, totalAmount, fileCloudUrl} = req.body;
+    console.log(vendor, invNo, date, description, products, totalAmount, fileCloudUrl);
+    if(!vendor || !invNo || !date || !products || !totalAmount){
+        return res.status(400).json({error: "All fields are required"});
+    }
+    //no invalid vendor id
+    if(!mongoose.Types.ObjectId.isValid(vendor)){
+        return res.status(400).json({error: "Invalid Vendor ID"});
+    }
+    if(!date){
+        return res.status(400).json({error: "Date is required"});
+    }
+    //Important
+    const invoiceNo = (invNo).replace(/\s+/g, '').toUpperCase();//remove white spaces
+    const utcDate = new Date(date);
+
+    //no neggative or 0 quantity
+    //no invalid product id
+    if(products.length === 0){
+        return res.status(400).json({error: "Products are required"});
+    }
+    if(products.length > 0 && products.some(item => !item.product || !item.quantity)){
+        return res.status(400).json({error: "Product or Quantity not provided"});
+    }
+    if(products.length > 0 && products.some(item => !mongoose.Types.ObjectId.isValid(item.product))){
+        return res.status(400).json({error: "Invalid Product ID"});
+    }
+    if(products.length > 0 && products.some(item => item.quantity <= 0)){
+        return res.status(400).json({error: "Quantity must be greater than 0"});
+    }
+    if(products.length > 0 && products.some(item => item.productPurchaseRate==="")){
+        return res.status(400).json({error: "Purchase Price not provided"});
+    }
+    if(totalAmount && totalAmount <= 0){
+        return res.status(400).json({error: "Total Amount must be greater than 0"});
+    }
+    if(products && products.some(item => item.productPurchaseRate <= 0)){
+        return res.status(400).json({error: "Purchase Price must be greater than 0"});
+    }
+    //no invalid date
+    try {
+        const stockInDataFromDB = await StockIn.findById(id);
+        // console.log(stockInDataFromDB);
+
+        const newStockInDataToSave = new StockIn({
+            vendor,
+            invoiceNo,
+            date:utcDate,
+            description,
+            totalAmount,
+            fileCloudUrl,
+            products
+        });
+       const updatedData = await StockIn.findByIdAndUpdate(id, newStockInDataToSave, {
+        new: true,
+       });
+       console.log(updatedData);
+
+
+        return res.status(200).json({"Backend":stockInDataFromDB});
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({error: error.message});
+}
+
 }
 
 export const deleteStockIn = async (req, res) => {
