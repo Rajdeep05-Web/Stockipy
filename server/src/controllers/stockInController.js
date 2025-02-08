@@ -149,20 +149,43 @@ export const updateStockIn = async (req, res) => {
     try {
         const stockInDataFromDB = await StockIn.findById(id);
         // console.log(stockInDataFromDB);
+        //compare the old and new data and update the product quantity, purchase rate and quantity
+        //invoce 
+        if(stockInDataFromDB.invoiceNo !== invoiceNo){
 
-        const newStockInDataToSave = new StockIn({
-            vendor,
-            invoiceNo,
-            date:utcDate,
-            description,
-            totalAmount,
-            fileCloudUrl,
-            products
-        });
-       const updatedData = await StockIn.findByIdAndUpdate(id, newStockInDataToSave, {
-        new: true,
-       });
-       console.log(updatedData);
+        } 
+        //date
+        if(stockInDataFromDB.date !== date){
+
+        }
+        //description
+        if(stockInDataFromDB.description !== description){
+
+        }
+        //vendor
+        //products
+        //totalAmount
+        //fileCloudUrl
+        if(stockInDataFromDB.fileCloudUrl !== fileCloudUrl){
+
+        }
+        
+        
+
+
+    //     const newStockInDataToSave = new StockIn({
+    //         vendor,
+    //         invoiceNo,
+    //         date:utcDate,
+    //         description,
+    //         totalAmount,
+    //         fileCloudUrl,
+    //         products
+    //     });
+    //    const updatedData = await StockIn.findByIdAndUpdate(id, newStockInDataToSave, {
+    //     new: true,
+    //    });
+    //    console.log(updatedData);
 
 
         return res.status(200).json({"Backend":stockInDataFromDB});
