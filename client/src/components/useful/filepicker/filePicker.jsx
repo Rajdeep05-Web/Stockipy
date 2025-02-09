@@ -75,7 +75,7 @@ export function FilePicker({ accept = 'both', maxSize = 5, setFile }) {
     setFileName('');
     setError('');
     setFileURL(null);
-    setFile({});
+    setFile(null);
   };
 
   const openPreview = (e) => {

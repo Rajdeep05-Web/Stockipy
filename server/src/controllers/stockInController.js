@@ -106,8 +106,8 @@ export const getStockInById = async (req, res) => {
 
 export const updateStockIn = async (req, res) => {
     const id = req.params.id;
-    const {vendor, invNo, date, description, products, totalAmount, fileCloudUrl} = req.body;
-    console.log(vendor, invNo, date, description, products, totalAmount, fileCloudUrl);
+    const {vendor, invNo, date, description, products, totalAmount, fileCloudUrl, isFileUpdated} = req.body;
+    // console.log(vendor, invNo, date, description, products, totalAmount, fileCloudUrl);
     if(!vendor || !invNo || !date || !products || !totalAmount){
         return res.status(400).json({error: "All fields are required"});
     }
@@ -145,34 +145,69 @@ export const updateStockIn = async (req, res) => {
     if(products && products.some(item => item.productPurchaseRate <= 0)){
         return res.status(400).json({error: "Purchase Price must be greater than 0"});
     }
-    //no invalid date
+
     try {
+        const newStockInDataToSave = {};
+
+        //check if the stockin is present or not in the db
         const stockInDataFromDB = await StockIn.findById(id);
-        // console.log(stockInDataFromDB);
-        //compare the old and new data and update the product quantity, purchase rate and quantity
+        //if not present send error
+        if(!stockInDataFromDB){
+            return res.status(404).json({error : "Stock In not found to update"});
+        }
+
+        //compare the old and new data and update the old data with new data
         //invoce 
         if(stockInDataFromDB.invoiceNo !== invoiceNo){
-
+           // checking if the invNo present in db with other id
+           const invExists = await StockIn.findOne({invoiceNo});
+           if(invExists){
+            //if present send error
+            return res.status(400).json({error: "Invoice No already exists"});
+           } else {
+            //if not present update the invoice no
+            newStockInDataToSave.invoiceNo = invoiceNo;
+           }
         } 
         //date
         if(stockInDataFromDB.date !== date){
-
+            // if date is changed update the date
+            newStockInDataToSave.date = utcDate;
         }
         //description
         if(stockInDataFromDB.description !== description){
-
+          //if description is changed update the description
+            newStockInDataToSave.description = description;
         }
         //vendor
+        if(stockInDataFromDB.vendor !== vendor){
+            //if vendor is changed update the vendor
+            newStockInDataToSave.vendor = vendor;
+        }
         //products
+        //if products are changed or even unchanged, update the products, rest calculations after saving
         //totalAmount
+        if(stockInDataFromDB.totalAmount !== totalAmount){   
+            //checking if the total amount is correct or not
+            let totalAmountCalculated = 0;
+            products.forEach(element => {
+                totalAmountCalculated += element.quantity * element.productPurchaseRate;
+            });
+            if(totalAmountCalculated !== totalAmount){
+                return res.status(400).json({error: "Total Amount is incorrect"});
+            }
+            //if total amount is changed update the total amount
+            newStockInDataToSave.totalAmount = totalAmount;
+        }
         //fileCloudUrl
-        if(stockInDataFromDB.fileCloudUrl !== fileCloudUrl){
-
+        if((stockInDataFromDB.fileCloudUrl !== fileCloudUrl) && isFileUpdated){
+            //when isFileUpdated is true, update the fileCloudUrl
+            newStockInDataToSave.fileCloudUrl = fileCloudUrl;
         }
         
         
 
-
+    console.log(newStockInDataToSave);
     //     const newStockInDataToSave = new StockIn({
     //         vendor,
     //         invoiceNo,
