@@ -168,26 +168,19 @@ export const updateStockIn = async (req, res) => {
             //if not present update the invoice no
             newStockInDataToSave.invoiceNo = invoiceNo;
            }
-        } 
+        } else {
+            //if invoice no is same, no need to update
+            newStockInDataToSave.invoiceNo = invoiceNo;
+        }
         //date
-        if(stockInDataFromDB.date !== date){
-            // if date is changed update the date
-            newStockInDataToSave.date = utcDate;
-        }
+        newStockInDataToSave.date = utcDate;
         //description
-        if(stockInDataFromDB.description !== description){
-          //if description is changed update the description
-            newStockInDataToSave.description = description;
-        }
+        newStockInDataToSave.description = description;
         //vendor
-        if(stockInDataFromDB.vendor !== vendor){
-            //if vendor is changed update the vendor
-            newStockInDataToSave.vendor = vendor;
-        }
+        newStockInDataToSave.vendor = vendor;
         //products
-        //if products are changed or even unchanged, update the products, rest calculations after saving
+        newStockInDataToSave.products = products;
         //totalAmount
-        if(stockInDataFromDB.totalAmount !== totalAmount){   
             //checking if the total amount is correct or not
             let totalAmountCalculated = 0;
             products.forEach(element => {
@@ -198,29 +191,49 @@ export const updateStockIn = async (req, res) => {
             }
             //if total amount is changed update the total amount
             newStockInDataToSave.totalAmount = totalAmount;
-        }
         //fileCloudUrl
         if((stockInDataFromDB.fileCloudUrl !== fileCloudUrl) && isFileUpdated){
             //when isFileUpdated is true, update the fileCloudUrl
             newStockInDataToSave.fileCloudUrl = fileCloudUrl;
+        } else {
+            newStockInDataToSave.fileCloudUrl = stockInDataFromDB.fileCloudUrl;
         }
-        
-        
 
-    console.log(newStockInDataToSave);
-    //     const newStockInDataToSave = new StockIn({
-    //         vendor,
-    //         invoiceNo,
-    //         date:utcDate,
-    //         description,
-    //         totalAmount,
-    //         fileCloudUrl,
-    //         products
-    //     });
-    //    const updatedData = await StockIn.findByIdAndUpdate(id, newStockInDataToSave, {
+    // console.log(newStockInDataToSave);
+       
+    // //saving the updated data
+    //    const savedStockInData = await StockIn.findByIdAndUpdate(id, newStockInDataToSave, {
     //     new: true,
     //    });
-    //    console.log(updatedData);
+    //    console.log(savedStockInData);
+
+    //    //update vendor stock in details if vendor is changed
+    //    if(stockInDataFromDB.vendor != vendor){
+    //     const oldVendor = await Vendor.findById(stockInDataFromDB.vendor);
+    //     //if the vendor is updated then delete the stockin id from old vendor stockin data
+    //     oldVendor.stockIns = oldVendor.stockIns.filter(item => item != id);
+    //     await oldVendor.save();
+    //     //add the stockin id to the new vendor
+    //     const newVendor = await Vendor.findById(vendor);
+    //     newVendor.stockIns.push(id);
+    //     await newVendor.save();
+    //    }
+
+       //update product quantity, purchase rate and quantity if they are changed
+       //first check if the products are changed or not
+       const oldDBproducts = JSON.stringify(stockInDataFromDB.products.map((item) => ({
+        product: item.product,
+        quantity: item.quantity,
+        productPurchaseRate: item.productPurchaseRate,
+        mrp: item.mrp,
+       })));
+       const newProducts = JSON.stringify(products);
+       //if producs are changed then update the product details
+       if(oldDBproducts !== newProducts){
+        for(const newProduct of products){
+
+        }
+       }
 
 
         return res.status(200).json({"Backend":stockInDataFromDB});
