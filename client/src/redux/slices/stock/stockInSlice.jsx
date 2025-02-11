@@ -29,22 +29,24 @@ export const addStockIn = createAsyncThunk(
   "stockIn/addStockIn",
   async (stockInDataAll, { rejectWithValue }) => {
     const { stockInData, file } = stockInDataAll;
-    let formData; //for the file to be sent as form data to the server
-    if (file) {
-      formData = new FormData();
-      formData.append("invoice", file);
-    }
     try {
-      const fileUploadResponse = file
+      if (file) {
+        //for the file to be sent as form data to the server
+        let formData = new FormData();
+        formData.append("invoice", file);
+        const fileUploadResponse = file
         ? await axios.post(API_URL_FILE_UPLOAD, formData, {
-            //for the form data to be sent as a file
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
+          //for the form data to be sent as a file
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         : "";
-      if (fileUploadResponse) {
-        stockInData.fileCloudUrl = fileUploadResponse.data.fileUrl;
+        if (fileUploadResponse) {
+          stockInData.fileCloudUrl = fileUploadResponse.data.fileUrl;
+        }
+      } else {
+        stockInData.fileCloudUrl = "";
       }
       const { data } = await axios.post(`${API_URL}`, stockInData);
       return data;
@@ -58,23 +60,25 @@ export const updateStockIn = createAsyncThunk(
   "stockIn/updateStockIn",
   async (stockInUpdateData, { rejectWithValue }) => {
     const { file, stockInData, id } = stockInUpdateData;
-    let formData = null;
-    if(file){
-      formData = new FormData();
-      formData.append("invoice", file);
-    }
     try {
-      const fileUploadResponse = file
+      if(file){
+        let formData = null;
+        formData = new FormData();
+        formData.append("invoice", file);
+        const fileUploadResponse = file
         ? await axios.post(API_URL_FILE_UPLOAD, formData, {
-            //for the form data to be sent as a file
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
+          //for the form data to be sent as a file
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
         : "";
         if (fileUploadResponse) {
           stockInData.fileCloudUrl = fileUploadResponse.data.fileUrl;
-        }
+        } 
+      } else {
+        stockInData.fileCloudUrl = "";
+      }
       const { data } = await axios.put(`${API_URL}/${id}`, stockInData);
       return data;
     } catch (error) {
@@ -161,15 +165,14 @@ const stockInSlice = createSlice({
       .addCase(updateStockIn.fulfilled, (state, action) => {
         state.loading = false;
         state.status = "succeeded";
-        console.log(action.payload)
-        // const index = state.stockIns.findIndex(
-          //   (stockIn) => stockIn._id === action.payload._id
-          // );
-          // if (index !== -1) {
-            //   state.stockIns[index] = action.payload;
-            // }
-          })
-          .addCase(updateStockIn.rejected, (state, action) => {
+        const index = state.stockIns.findIndex(
+            (stockIn) => stockIn._id == action.payload._id
+          );
+          if (index != -1) {
+              state.stockIns[index] = action.payload;
+          }
+        })
+        .addCase(updateStockIn.rejected, (state, action) => {
             state.status = "failed";
             state.loading = false;
             state.error = action.payload;

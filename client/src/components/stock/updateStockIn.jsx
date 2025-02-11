@@ -3,7 +3,7 @@ import DatePicker from "react-datepicker";
 import { Trash2, Plus, Frown } from 'lucide-react';
 import "react-datepicker/dist/react-datepicker.css";
 import { useDispatch, useSelector } from "react-redux";
-import { Navigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import Loading from "../useful/Loading/loading";
 import SuccessAlert from "../useful/alerts/successAlert";
@@ -64,6 +64,7 @@ const UpdateStockIn = () => {
   //stockIn
   const { id } = useParams();
   const [oldStockIn, setOldStockIn] = useState({});
+  const navigate = useNavigate();
 
   //stockIn -------------->
 
@@ -263,12 +264,12 @@ const UpdateStockIn = () => {
       setSuccessMsg("Stock In updated successfully");
       setTimeout(() => {
         setSuccessMsg("");
+        navigate("/stock-ins");
       }, 3000);
       dispatch(fetchProducts());
       dispatch(fetchVendors());
       dispatch(fetchStockIns());
       dispatch(fetchStockIns());
-      Navigate("/stock-ins");
     } catch (error) {
       console.log("Failed to add stock in:", error);
       setErrorMsg(error);
