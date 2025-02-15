@@ -101,7 +101,17 @@ export const getStockIns = async (req, res) => {
 }
 
 export const getStockInById = async (req, res) => {
-
+    const id = req.params.id;
+    if(!id){
+        return res.status(400).json({error: "ID is required"});
+    }
+    try {
+        const stockIn = await StockIn.findById(id).populate("vendor").populate("products.product");//populate the vendor and product fields
+        return res.status(200).json(stockIn);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({error: error.message});
+    }
 }
 
 export const updateStockIn = async (req, res) => {
@@ -287,5 +297,41 @@ export const updateStockIn = async (req, res) => {
 }
 
 export const deleteStockIn = async (req, res) => {
+    const id = req.params.id;
+    try {
+        //check if the stockin is present or not in the db
+        const stockInData = await StockIn.findById(id);
+        //if not present send error
+        if(!stockInData){
+            return res.status(404).json({error: "Stock In not found"});
+        }
+        //delete the stockin from the db
+        const deletedStockIn = await StockIn.findByIdAndDelete(id);
+        if(deleteStockIn){
+            //delete the stockin id from vendor stockin data
+            const vendor = await Vendor.findById(stockInData.vendor);
+            vendor.stockIns = vendor.stockIns.filter(stockInId => stockInId != id);
+            await vendor.save();
 
+            //delete the product quantity and stockin id from product
+            for(const P of stockInData.products){
+                //perform the reverse operation of stockIn
+                //first find the product
+                const product = await Product.findById(P.product);
+                //update the quantity
+                product.quantity -= parseInt(P.quantity);
+                //update the stockiN array of this product
+                product.productStockIns = product.productStockIns.filter(
+                    stockInId => stockInId != id
+                );
+                //save the product
+                await product.save();           
+            }
+            return res.status(200).json({message: "Stock In deleted successfully"});
+        }
+        
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({error: error.message});
+    }
 }

@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { act } from "react";
+import { extractPublicId } from 'cloudinary-build-url';
 
 const API_URL =
   // "http://192.168.29.163:5000/api/v1/stock-ins" ||
   "http://localhost:5000/api/v1/stock-ins";
-const API_URL_FILE_UPLOAD = "http://localhost:5000/api/v1/file/upload";
+const API_URL_FILE = "http://localhost:5000/api/v1/file";
+
 
 //Async Actions for product api calls
 export const fetchStockIns = createAsyncThunk(
@@ -30,12 +32,13 @@ export const addStockIn = createAsyncThunk(
   async (stockInDataAll, { rejectWithValue }) => {
     const { stockInData, file } = stockInDataAll;
     try {
+      //if file is selected
       if (file) {
         //for the file to be sent as form data to the server
         let formData = new FormData();
         formData.append("invoice", file);
         const fileUploadResponse = file
-        ? await axios.post(API_URL_FILE_UPLOAD, formData, {
+        ? await axios.post(API_URL_FILE, formData, {
           //for the form data to be sent as a file
           headers: {
             "Content-Type": "multipart/form-data",
@@ -66,7 +69,7 @@ export const updateStockIn = createAsyncThunk(
         formData = new FormData();
         formData.append("invoice", file);
         const fileUploadResponse = file
-        ? await axios.post(API_URL_FILE_UPLOAD, formData, {
+        ? await axios.post(API_URL_FILE, formData, {
           //for the form data to be sent as a file
           headers: {
             "Content-Type": "multipart/form-data",
@@ -74,9 +77,26 @@ export const updateStockIn = createAsyncThunk(
         })
         : "";
         if (fileUploadResponse) {
+          //if isFileUpdated true and file is selected -> delete the previous file from cloudinary and update with new file
+          const res = await axios.get(`${API_URL}/${id}`);
+          let fileCloudUrl = res.data.fileCloudUrl;
+          if(fileCloudUrl != ""){
+            const public_id = extractPublicId(fileCloudUrl);
+            await axios.delete(`${API_URL_FILE}/${public_id}`);
+          }
           stockInData.fileCloudUrl = fileUploadResponse.data.fileUrl;
         } 
       } else {
+        //if isFileUpdated true and no file is selected -> delete the file from cloudinary(user want to clear the file from db)
+        if(stockInData.isFileUpdated){
+          const res = await axios.get(`${API_URL}/${id}`);
+          let fileCloudUrl = res.data.fileCloudUrl;
+          if(fileCloudUrl != ""){
+            const public_id = extractPublicId(fileCloudUrl);
+            await axios.delete(`${API_URL_FILE}/${public_id}`);
+          }
+        }  
+        //if isFileUpdated false and no file is selected -> keep the previous state for file
         stockInData.fileCloudUrl = "";
       }
       const { data } = await axios.put(`${API_URL}/${id}`, stockInData);
@@ -92,7 +112,7 @@ export const deleteStockIn = createAsyncThunk(
   "stockIn/deleteStockIn",
   async ({ id }, { rejectWithValue }) => {
     try {
-      const { deleteedData } = axios.delete(`${API_URL}/${id}`);
+      const { deleteedData } = await axios.delete(`${API_URL}/${id}`);
       return deleteedData;
     } catch (error) {
       return rejectWithValue(error?.response?.data.error || error.message);

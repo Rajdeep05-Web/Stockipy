@@ -2,14 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import {
   ListCollapse,
   Download,
-  Copy,
-  ChevronDown,
-  Calendar,
-  Receipt,
-  Building2,
-  DollarSign,
-  FileText,
-  BadgePercent,
+  Trash,
   Eye,
   Edit,
 } from "lucide-react";
@@ -17,14 +10,13 @@ import {useNavigate} from "react-router";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
 import { StockInPDF } from "./stockInPdf";
-import { fetchStockIns } from "../../redux/slices/stock/stockInSlice";
+import { fetchStockIns, deleteStockIn } from "../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import Loading from "../useful/Loading/loading";
 import SearchBar from "../useful/searchBar";
 import SuccessAlert from "../useful/alerts/successAlert";
 import ErrorAlert from "../useful/alerts/errorAlert";
-import { Product } from "../../../../server/src/models/productModel";
 
 const AllStockIns = () => {
   const contentRef = useRef(null);
@@ -75,6 +67,19 @@ const AllStockIns = () => {
     const userResponse = window.confirm(`Are you sure you want to edit stock-in with invoice no. ${stockIn.invoiceNo}?`);
     if(userResponse){
       navigate(`/stock-in/edit/${stockIn._id}`);
+    }
+  }
+
+  const handleDeleteStockIn = async (stockIn) => {
+    const userResponse = window.confirm(`Are you sure you want to delete stock-in with invoice no. ${stockIn.invoiceNo}?`);
+    if(userResponse){
+      // Delete the stock-in
+      await dispatch(deleteStockIn({id: stockIn._id})).unwrap();
+      dispatch(fetchStockIns());
+      setSuccessMsg(`Stock-in with invoice no. ${stockIn.invoiceNo} deleted successfully`);
+      setTimeout(() => {
+        setSuccessMsg("");
+      }, 3000);
     }
   }
 
@@ -202,14 +207,6 @@ const AllStockIns = () => {
                 <div className="flex flex-row justify-between">
                   <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
                   <div name="buttons" className="flex flex-row gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleEditStockIn(item)}
-                      class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
-                    >
-                      <Edit className="sm:mr-2" size={20} />
-                      Edit
-                    </button>
                     {item.fileCloudUrl && (
                       // View the invoice uploaded during stock-In (In a new tab)
                       <button
@@ -253,18 +250,27 @@ const AllStockIns = () => {
                         ) : (
                           <span className="flex items-center">
                             <Download className="mr-2" size={20} />
-                            Download PDF
+                            Download as PDF
                           </span>
                         )
                       }
                     </PDFDownloadLink>
-                    {/* <button
+                    <button
                       type="button"
-                      onClick={() => handleDownload()}
-                      class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full sm:text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      onClick={() => handleEditStockIn(item)}
+                      class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
                     >
-                      <Download />
-                    </button> */}
+                      <Edit className="sm:mr-2" size={20} />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteStockIn(item)}
+                      class="flex text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 transition-all duration-300 items-center"
+                    >
+                      <Trash className="sm:mr-2" size={20} />
+                      Delete
+                    </button>
                   </div>
                 </div>
                 {/* product and vendor details */}

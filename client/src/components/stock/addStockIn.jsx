@@ -45,7 +45,7 @@ const AddStockIn = () => {
     useState(true);
   const [isUserWantSubmit, setIsUserWantSubmit] = useState(false);
   const [isVendorModalVisible, setIsVendorModalVisible] = useState(false);
-  const [file, setFile] = useState({});
+  const [file, setFile] = useState(null);
 
   //product
   const [productSearchInput, setProductSearchInput] = useState("");
@@ -215,7 +215,7 @@ const AddStockIn = () => {
       dispatch(fetchStockIns());
       setProductQuantities({});
       setSelectedProductList([]);
-      setFile({}); //reset file state
+      setFile(null); //reset file state
       setVendorSelected("");
       setselectedVendorId("");
       setInvNo("");

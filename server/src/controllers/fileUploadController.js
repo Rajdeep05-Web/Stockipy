@@ -30,16 +30,16 @@ export const fileUploadCloudnary = async (req, res) => {
 
 export const fileDeleteCloudnary = async (req, res) => {
     try {
-        const { public_id } = req.body;
-        console.log("public_id",public_id)
+        const { public_id } = req.params;
+        // console.log("public_id",public_id)
         if (!public_id) {
-          return res.status(400).json({ success: false, message: 'Public ID required' });
+          return res.status(400).json({ message: 'Public ID required' });
         }
     
         // Delete file from Cloudinary
         await cloudinary.uploader.destroy(public_id);
     
-        res.json({ success: true, message: 'File deleted successfully' });
+        return res.status(200).json({ message: 'File deleted successfully' });
       } catch (error) {
         console.error('Delete Error:', error);
         res.status(500).json({ success: false, message: 'File delete failed' });

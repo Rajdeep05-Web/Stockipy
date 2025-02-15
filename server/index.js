@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+// app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 
 import productRouter from "./src/routes/productRouter.js";
@@ -61,8 +61,8 @@ app.put("/v1/stock-ins/:id", stockInRouter);
 app.delete("/v1/stock-ins/:id", stockInRouter);
 //stock-in file upload
 app.use("/api", fileuploadrouter);
-app.post("/v1/file/upload", fileuploadrouter);
-app.delete("/v1/file/delete", fileuploadrouter);
+app.post("/v1/file", fileuploadrouter);
+app.delete("/v1/file/:public_id", fileuploadrouter);
 
 
 // Start Server

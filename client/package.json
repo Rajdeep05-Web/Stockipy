@@ -13,6 +13,7 @@
     "@react-pdf/renderer": "^4.1.6",
     "@reduxjs/toolkit": "^2.3.0",
     "axios": "^1.7.8",
+    "cloudinary-build-url": "^0.2.4",
     "file-saver": "^2.0.5",
     "flowbite-react": "^0.10.2",
     "lucide-react": "^0.471.0",
