@@ -5,7 +5,7 @@ import { act } from "react";
 const API_URL =
   // "http://192.168.29.163:5000/api/v1/stock-ins" ||
   "http://localhost:5000/api/v1/stock-ins";
-const API_URL_FILE_UPLOAD = "http://localhost:5000/api/v1/upload";
+const API_URL_FILE_UPLOAD = "http://localhost:5000/api/v1/file/upload";
 
 //Async Actions for product api calls
 export const fetchStockIns = createAsyncThunk(

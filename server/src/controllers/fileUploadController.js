@@ -1,10 +1,10 @@
 import fs from "fs";
 import cloudinary from "../configs/cloudnaryConfig.js"
 
-const fileUploadCloudnary = async (req, res) => {
+export const fileUploadCloudnary = async (req, res) => {
     try {
         if (!req.file) {
-          return res.send(false);
+          return res.status(400).json({ success: false, message: 'No file uploaded' });
         }
         // Determine the correct resource type for Cloudinary
         const fileType = req.file.mimetype.startsWith('image') ? 'image' : 'raw';
@@ -28,4 +28,20 @@ const fileUploadCloudnary = async (req, res) => {
       }
 }
 
-export default fileUploadCloudnary;
+export const fileDeleteCloudnary = async (req, res) => {
+    try {
+        const { public_id } = req.body;
+        console.log("public_id",public_id)
+        if (!public_id) {
+          return res.status(400).json({ success: false, message: 'Public ID required' });
+        }
+    
+        // Delete file from Cloudinary
+        await cloudinary.uploader.destroy(public_id);
+    
+        res.json({ success: true, message: 'File deleted successfully' });
+      } catch (error) {
+        console.error('Delete Error:', error);
+        res.status(500).json({ success: false, message: 'File delete failed' });
+      }
+}

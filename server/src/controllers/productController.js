@@ -41,11 +41,13 @@ export const addProduct = async (req, res) => {
   if (product.rate > product.mrp) {
     return res.status(400).json({ error: "Rate cannot be greater than MRP" });
   }
-  if(product.gst == 18 || product.gst == 28){
+  if(product.gst && (product.gst == 18 || product.gst == 28)){
      gstOk = true;
+     product.gstPercentage = product.gst;
   } else {
      gstOk = false;
   }
+  console.log(product.gst);
   if(!gstOk){
     return res.status(400).json({error: "GST can be only 18 or 28"})
   } 
