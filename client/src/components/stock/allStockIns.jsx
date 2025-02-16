@@ -30,7 +30,13 @@ const AllStockIns = () => {
 
   const [openAccordions, setOpenAccordions] = useState({});
   const [collapseAll, setCollapseAll] = useState(false);
-
+ 
+  useEffect(() => {
+    if(stockIns.length == Object.entries(openAccordions).length){
+      setCollapseAll(true);
+    }
+  }, [stockIns, openAccordions]);
+  
   const toggleAccordion = (id) => {
     setOpenAccordions((prevState) => ({
       ...prevState,
@@ -40,7 +46,7 @@ const AllStockIns = () => {
 
   const collapseAllFunction = () => {
     setCollapseAll(!collapseAll);
-    if (collapseAll) {
+    if (!collapseAll) {
       let openAccordionsObj = {};
       stockIns.map((item) => {
         openAccordionsObj[item._id] = true;
