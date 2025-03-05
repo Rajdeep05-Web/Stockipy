@@ -1,13 +1,12 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
-import { PDFViewer } from "@react-pdf/renderer";
 
 // Components
 import NavbarSidebar from "./components/useful/navbarSidebar";
 import Loading from "./components/useful/Loading/loading";
-import App1 from "./components/App1";
+import Dashboard from "./components/dashboard";
 import AddProduct from "./components/products/addProduct";
 import ProductList from "./components/products/productList";
 import UpdateProduct from "./components/products/updateProduct";
@@ -20,9 +19,7 @@ import UpdateVendor from "./components/vendor/updateVendor";
 import AddStockIn from "./components/stock/addStockIn";
 import AllStockIns from "./components/stock/allStockIns";
 import UpdateStockIn from "./components/stock/updateStockIn";
-import TestPdf from "./components/useful/pdf/testpdf";
-import { FilePicker } from "./components/useful/filepicker/filePicker";
-// import TooltipButton from "./components/useful/stockIn/tooltip";
+import AuthForm from "./components/user/auth";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -33,12 +30,14 @@ import { fetchStockIns } from "./redux/slices/stock/stockInSlice";
 const App = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const [userLoggedIn, setUserLoggedIn] = useState(!!localStorage.getItem("token"));
   const { loading: productsLoading } = useSelector((state) => state.products);
   const { loading: customersLoading } = useSelector((state) => state.customers);
   const { loading: vendorsLoading } = useSelector((state) => state.vendors);
   const { loading: stockInsLoading } = useSelector((state) => state.stockIns);
 
   useEffect(() => {
+    (localStorage.getItem("token")) ? setUserLoggedIn(true) : setUserLoggedIn(false);
     if (location.pathname === "/products") dispatch(fetchProducts());
     if (location.pathname === "/customers") dispatch(fetchCustomers());
     if (location.pathname === "/vendors") dispatch(fetchVendors());
@@ -50,34 +49,35 @@ const App = () => {
     }
   }, [location, dispatch]);
 
-  let isLoading =
-    productsLoading || customersLoading || vendorsLoading || stockInsLoading;
-
+  let isLoading = productsLoading || customersLoading || vendorsLoading || stockInsLoading;
+  
   return (
-    <>
-      {/* {isLoading ? (
-        <Loading />
-      ) : ( */}
-        <NavbarSidebar>
-          <Routes>
-            <Route path="/" element={<App1 />} />
-            <Route path="dashboard" element={<App1 />} />
-            <Route path="/add-product" element={<AddProduct />} />
-            <Route path="/products" element={<ProductList />} />
-            <Route path="/edit-product/:id" element={<UpdateProduct />} />
-            <Route path="/add-customer" element={<AddCustomer />} />
-            <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
-            <Route path="/customers" element={<CustomerList />} />
-            <Route path="/add-vendor" element={<AddVendor />} />
-            <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
-            <Route path="/vendors" element={<VendorList />} />
-            <Route path="/add-stock-in" element={<AddStockIn />} />
-            <Route path="/stock-ins" element={<AllStockIns />} />
-            <Route path="stock-in/edit/:id" element={<UpdateStockIn />} />
-            <Route path="/test" element={<FilePicker />} />
-          </Routes>
-        </NavbarSidebar>
-      {/* )} */}
+    <>  
+    {!userLoggedIn ?
+      (<Routes>
+        <Route path="/" element={<AuthForm />} />
+        <Route path="*" element={<Navigate to="/" />} />//redirect to login page when no route matches inside this block
+      </Routes>)
+      :
+      (<NavbarSidebar>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/edit-product/:id" element={<UpdateProduct />} />
+          <Route path="/add-customer" element={<AddCustomer />} />
+          <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
+          <Route path="/customers" element={<CustomerList />} />
+          <Route path="/add-vendor" element={<AddVendor />} />
+          <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
+          <Route path="/vendors" element={<VendorList />} />
+          <Route path="/add-stock-in" element={<AddStockIn />} />
+          <Route path="/stock-ins" element={<AllStockIns />} />
+          <Route path="stock-in/edit/:id" element={<UpdateStockIn />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />//redirect to dashboard when no route matches inside this block
+        </Routes>
+      </NavbarSidebar>)
+    }
     </>
   );
 };

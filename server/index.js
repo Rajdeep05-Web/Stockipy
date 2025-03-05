@@ -19,6 +19,7 @@ import customerRouter from "./src/routes/customerRouter.js";
 import vendorRouter from "./src/routes/vendorRouter.js";
 import stockInRouter from "./src/routes/stockInRouter.js";
 import fileuploadrouter from "./src/routes/fileUploadRouter.js";
+import authRouter from "./src/routes/authRouter.js";
 
 // MongoDB Connection
 connectDB();
@@ -27,6 +28,12 @@ connectDB();
 app.get("/", (req, res) => {
   res.send("Welcome to Stockipy API");
 });
+
+//for auth routing
+app.use("/api", authRouter);
+app.post("/v1/auth/signup", authRouter);
+app.post("/v1/auth/login", authRouter);
+app.delete("/v1/auth/logout", authRouter);
 
 //for products routing
 app.use("/api", productRouter);
