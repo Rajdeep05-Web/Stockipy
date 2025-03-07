@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
@@ -20,6 +20,7 @@ import AddStockIn from "./components/stock/addStockIn";
 import AllStockIns from "./components/stock/allStockIns";
 import UpdateStockIn from "./components/stock/updateStockIn";
 import AuthForm from "./components/user/auth";
+import Layout from "./components/useful/layout";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -38,9 +39,9 @@ const App = () => {
 
   useEffect(() => {
     (localStorage.getItem("token")) ? setUserLoggedIn(true) : setUserLoggedIn(false);
-    if (location.pathname === "/products") dispatch(fetchProducts());
-    if (location.pathname === "/customers") dispatch(fetchCustomers());
-    if (location.pathname === "/vendors") dispatch(fetchVendors());
+    if (location.pathname === "/products" || location.pathname === "/add-product") dispatch(fetchProducts());
+    if (location.pathname === "/customers" || location.pathname === "/add-customer") dispatch(fetchCustomers());
+    if (location.pathname === "/vendors" || location.pathname === "/add-vendor") dispatch(fetchVendors());
     if (location.pathname === "/stock-ins") dispatch(fetchStockIns());
     if (location.pathname === "/add-stock-in" || location.pathname.includes("/stock-in/edit/")) {
       dispatch(fetchProducts());
@@ -52,32 +53,35 @@ const App = () => {
   let isLoading = productsLoading || customersLoading || vendorsLoading || stockInsLoading;
   
   return (
-    <>  
-    {!userLoggedIn ?
-      (<Routes>
-        <Route path="/" element={<AuthForm />} />
-        <Route path="*" element={<Navigate to="/" />} />//redirect to login page when no route matches inside this block
-      </Routes>)
-      :
-      (<NavbarSidebar>
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/add-product" element={<AddProduct />} />
-          <Route path="/products" element={<ProductList />} />
-          <Route path="/edit-product/:id" element={<UpdateProduct />} />
-          <Route path="/add-customer" element={<AddCustomer />} />
-          <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
-          <Route path="/customers" element={<CustomerList />} />
-          <Route path="/add-vendor" element={<AddVendor />} />
-          <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
-          <Route path="/vendors" element={<VendorList />} />
-          <Route path="/add-stock-in" element={<AddStockIn />} />
-          <Route path="/stock-ins" element={<AllStockIns />} />
-          <Route path="stock-in/edit/:id" element={<UpdateStockIn />} />
-          <Route path="*" element={<Navigate to="/dashboard" />} />//redirect to dashboard when no route matches inside this block
-        </Routes>
-      </NavbarSidebar>)
-    }
+    <> 
+      <Routes>
+
+        {!userLoggedIn && <Route path="/auth" element={<AuthForm />} />}
+
+        {!userLoggedIn && <Route path="*" element={<Navigate to="/auth" />} />}
+      
+        {userLoggedIn && <Route path="*" element={<Navigate to="/dashboard" />} />}
+
+        {/* Protected Routes inside Layout */}
+        {userLoggedIn && (
+          <Route element={<Layout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/products" element={<ProductList />} />
+            <Route path="/edit-product/:id" element={<UpdateProduct />} />
+            <Route path="/add-customer" element={<AddCustomer />} />
+            <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
+            <Route path="/customers" element={<CustomerList />} />
+            <Route path="/add-vendor" element={<AddVendor />} />
+            <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
+            <Route path="/vendors" element={<VendorList />} />
+            <Route path="/add-stock-in" element={<AddStockIn />} />
+            <Route path="/stock-ins" element={<AllStockIns />} />
+            <Route path="/stock-in/edit/:id" element={<UpdateStockIn />} />
+          </Route>
+        )}
+
+          </Routes> 
     </>
   );
 };
