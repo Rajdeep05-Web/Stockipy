@@ -5,6 +5,8 @@ import { createUser, loginUser, logOutUser } from '../../redux/slices/auth/authS
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 
+import Loading from '../useful/Loading/loading';
+
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +24,7 @@ export default function AuthForm() {
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
-      navigate(0);
+      navigate("/dashboard");
     }
   }, []);
 
@@ -35,12 +37,18 @@ export default function AuthForm() {
         password,
     }
   try {
-    (!isLogin) ? dispatch(createUser(user)).unwrap() : dispatch(loginUser(user)).unwrap();
+    if (!isLogin) {
+      await dispatch(createUser(user)).unwrap(); // Ensure user is created first
+    }
+    await dispatch(loginUser(user)).unwrap(); // Then log in the user
     setLoading(false);
     setSuccessMessage(`User ${(isLogin?"logged in":"signed up")} successfully`);
-    navigate(0);
+    setName('');
+    setEmail('');
+    setPassword('');
+    navigate("/dashboard");
   } catch (error) {
-    setError(error.message);
+    setError(error || error.message); 
     setLoading(false);
   }
   };
@@ -48,7 +56,7 @@ export default function AuthForm() {
   const handleGoogleLogin = async () => {
     try {
         localStorage.setItem('token', 'google_token');
-        navigate('/dashboard');
+        navigate(0);
       
     } catch (err) {
      
@@ -62,6 +70,9 @@ export default function AuthForm() {
      
     }
   };
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -136,7 +147,7 @@ export default function AuthForm() {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete='on'>
             {!isLogin && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -148,11 +159,13 @@ export default function AuthForm() {
                   </div>
                   <input
                     type="text"
+                    name="name" 
                     required
+                    autoComplete="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="John Doe"
+                    placeholder="Enter name"
                   />
                 </div>
               </div>
@@ -168,7 +181,9 @@ export default function AuthForm() {
                 </div>
                 <input
                   type="email"
+                  name="email"
                   required
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -187,11 +202,13 @@ export default function AuthForm() {
                 </div>
                 <input
                   type={showPassword ? 'text' : 'password'}
+                  name="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="••••••••"
+                  autoComplete={!isLogin ? "new-password" : "current-password"}
                 />
                 <button
                   type="button"
