@@ -2,6 +2,7 @@ import { response } from 'express';
 import {User} from '../models/userModel.js';
 import jwt from 'jsonwebtoken'; // to generate signed token
 import bcrypt from 'bcryptjs'; // to hash password
+import mongoose from 'mongoose'; // to check object id
 
 const createAccessToken = async (user) => {
     return jwt.sign({userId:user._id}, process.env.JWT_SECRET, {expiresIn: process.env.ACCESS_TOKEN_LIFE })  
@@ -9,7 +10,7 @@ const createAccessToken = async (user) => {
 
 const generateRefreshToken = async (user) => {
     const refreshToken = jwt.sign({ id: user.id, email: user.email }, process.env.REFRESH_SECRET, {
-      expiresIn: process.env.REFRESH_TOKEN_LIFE,
+      expiresIn: `${process.env.REFRESH_TOKEN_LIFE}d`,
     });
     return refreshToken;
   };
@@ -40,24 +41,44 @@ export const signUpUser = async (req, res) => {
 export const logInUser = async (req, res) => {
     try {
        const {email, password} = req.body;
+       //check if email and password are provided
+       if(!email || !password){
+           return res.status(400).json({ error: "Please fill all the fields" });   
+       } 
+       //check if user exists in db
        const existUser = await User.findOne({email:{ $eq : email}});
        if(!existUser){
            return res.status(400).json({ error: "User not found" });
         }
+        //check if password is correct
         const ismatchPassword = await bcrypt.compare(password, existUser.password);
         if(!ismatchPassword){
             return res.status(400).json({ error: "Invalid credentials" });
         }
         //access token for api calls
         const accessToken = await createAccessToken(existUser);
+
         //refresh token for login logout
         const refreshToken = await generateRefreshToken(existUser);
+
         //save refresh token in db
         existUser.isVerified = true;
         existUser.refreshToken = refreshToken;
-        existUser.refreshTokenExpire = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+        existUser.refreshTokenExpire = new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000));
+
+        //save user in db
         await existUser.save();
-        return res.status(201).json({user:{email:existUser.email, name:existUser.name}, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
+
+        //send refresh token in cookie for security
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true, //cookie is not accessible via client side js (XSS attacks)
+            secure : false, //cookie is only sent over https (secure connection)
+            maxAge: parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000, //cookie expire
+            sameSite: "lax",//cookie is only sent to the same origin as the domain in the address bar
+            path: '/', // Accessible across all routes
+        })
+        //send res body with access token and user details
+        return res.status(201).json({user:{_id:existUser._id, email:existUser.email, name:existUser.name}, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -65,10 +86,64 @@ export const logInUser = async (req, res) => {
 };
 export const logOutUser = async (req, res) => {
     try {
-       
-        return res.status(201).json(response);
+        const {id} = req.params;
+        const {email} = req.body;
+        console.log(id, email);
+          if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Invalid User ID" });
+          }
+          const ifExist = await User.findById(id);
+          if(!ifExist){
+            return res.status(400).json({ error: "User not found" });
+          }
+          const user = await User.findOne({email: { $eq: email }});
+            if(!user){
+                return res.status(400).json({ error: "User not found" });
+            }
+            //remove refresh token and set isverified:false from db
+            user.refreshToken = "";
+            user.refreshTokenExpire = "";
+            user.isVerified = false;
+
+            //save user in db
+            await user.save();
+
+            //clear cookie
+            // res.clearCookie("refreshToken");
+
+          return res.status(200).json({ message: "User Logedout successfully" });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
     }
+};
+
+export const reGenerateAccessToken = async (req, res) => {
+  try {
+     const refreshToken = req.cookies.refreshToken;
+     console.log("Cookie in regenerate controller",refreshToken);
+     if(!refreshToken){
+         console.log(refreshToken);
+        return res.status(400).json({ error: "Unauthorized: No token provided" });
+     }
+     //verify refresh token
+     const decode = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+     
+     //check if user exists in db
+        const user = await User.findOne({email:{ $eq : decode.email}});
+        if(!user){
+            return res.status(401).json({ error: "User not found" });
+        }
+        //check if refresh token is valid
+        if(user.refreshToken !== refreshToken){
+            return res.status(401).json({ error: "Unauthorized: Invalid token" });
+        }
+        //generate new access token
+        const accessToken = await createAccessToken(user);
+        //send res body with access token and user details
+        return res.status(201).json({user:{email:user.email, name:user.name}, token:accessToken, isAuthenticated:user.isVerified, message : "Token refreshed successfully"});
+  } catch (error) {
+    console.log(error);
+    return res.status(403).json({ error: "Refresh token expired. Please log in again." });
+  }
 };

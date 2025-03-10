@@ -6,7 +6,7 @@ export const fetchCustomers = async (req, res) => {
         if (!customers) {
             return res.status(404).json({ error: 'No customers found' });
         }
-        return res.status(201).json(customers);
+        return res.status(200).json(customers);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -49,15 +49,17 @@ export const addCustomer = async (req, res) => {
             const isPresent = existingCustomers.some((c) =>
                 customer.name.toLowerCase() === c.name.toLowerCase()
             );
-            const isPhoneNoPresent = existingCustomers.some((c) =>
-                c.phone == customer.phone
-            );
             if (isPresent) {
                 return res.status(400).json({ error: 'Customer already exists' });
             }
-            //check if phone number already exists
-            if (isPhoneNoPresent) {
-                return res.status(400).json({ error: 'Phone number already exists' });
+            if (customer.phone) {
+                const isPhoneNoPresent = existingCustomers.some((c) =>
+                    c.phone === customer.phone
+                );
+                //check if phone number already exists
+                if (isPhoneNoPresent) {
+                    return res.status(400).json({ error: 'Phone number already exists' });
+                }
             }
         }
         //if not present, add customer

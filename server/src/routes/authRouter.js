@@ -1,9 +1,10 @@
 import Router from 'express';
-import { logInUser, logOutUser, signUpUser } from '../controllers/authController.js';
+import { logInUser, logOutUser, signUpUser, reGenerateAccessToken } from '../controllers/authController.js';
 
 const authRouter = Router();
 authRouter.post('/v1/auth/signup', signUpUser);
 authRouter.post('/v1/auth/login', logInUser);
-authRouter.delete('/v1/auth/logout', logOutUser);
+authRouter.post("/v1/auth/regenerate-access-token", reGenerateAccessToken);
+authRouter.put('/v1/auth/logout/:id', logOutUser);
 
 export default authRouter;

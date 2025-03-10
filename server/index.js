@@ -1,4 +1,5 @@
 import express from "express";
+import cookieParser from 'cookie-parser';
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
@@ -9,17 +10,26 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+app.use(cors({
+  origin: "http://localhost:5173", // Allow requests from frontend
+  credentials: true, // Allow cookies/auth headers
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-
+// Routes
 import productRouter from "./src/routes/productRouter.js";
 import customerRouter from "./src/routes/customerRouter.js";
 import vendorRouter from "./src/routes/vendorRouter.js";
 import stockInRouter from "./src/routes/stockInRouter.js";
 import fileuploadrouter from "./src/routes/fileUploadRouter.js";
 import authRouter from "./src/routes/authRouter.js";
+
+// Middleware
+import authTokenVerifyMiddleware from "./src/middlewares/authTokenVerifyMiddleware.js";
 
 // MongoDB Connection
 connectDB();
@@ -29,11 +39,15 @@ app.get("/", (req, res) => {
   res.send("Welcome to Stockipy API");
 });
 
+//middleware
+app.use(authTokenVerifyMiddleware);
+
 //for auth routing
 app.use("/api", authRouter);
 app.post("/v1/auth/signup", authRouter);
 app.post("/v1/auth/login", authRouter);
-app.delete("/v1/auth/logout", authRouter);
+app.post("/v1/auth/regenerate-access-token", authRouter);
+app.put("/v1/auth/logout/:id", authRouter);
 
 //for products routing
 app.use("/api", productRouter);
