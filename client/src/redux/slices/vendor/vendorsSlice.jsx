@@ -1,16 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import API from "../../../api/api.js";
 
 const API_URL =
 // 'http://192.168.29.163:5000/api/v1/vendors' ||
- "http://localhost:5000/api/v1/vendors";
+ "/api/v1/vendors";
 
 //thunks makes the api call and returns the response data
 export const fetchVendors = createAsyncThunk(
   "vendors/fetchVendors",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(API_URL);
+      const { data } = await API.get(API_URL);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
@@ -21,7 +21,7 @@ export const fetchVendor = createAsyncThunk(
   "vendors/fetchVendor",
   async (id, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(`${API_URL}/${id}`);
+      const { data } = await API.get(`${API_URL}/${id}`);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
@@ -32,7 +32,7 @@ export const addVendor = createAsyncThunk(
   "vendors/addVendor",
   async (vendor, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(API_URL, vendor);
+      const { data } = await API.post(API_URL, vendor);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
@@ -43,7 +43,7 @@ export const updateVendor = createAsyncThunk(
   "vendors/updateVendor",
   async ({ id, vendor }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.put(`${API_URL}/${id}`, vendor);
+      const { data } = await API.put(`${API_URL}/${id}`, vendor);
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
@@ -54,7 +54,7 @@ export const deleteVendor = createAsyncThunk(
   "vendors/deleteVendor",
   async (vendor, { rejectWithValue }) => {
     try {
-      await axios.delete(`${API_URL}/${vendor._id}`);
+      await API.delete(`${API_URL}/${vendor._id}`);
       return vendor._id;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);

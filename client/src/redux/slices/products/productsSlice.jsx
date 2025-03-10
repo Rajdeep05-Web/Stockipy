@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import API from "../../../api/api.js";
 
 const API_URL =
 //  'http://192.168.29.163:5000/api/v1/products' ||
-  'http://localhost:5000/api/v1/products';
+  '/api/v1/products';
 
 //productsSlice - contains the state and reducers for products
 
@@ -11,7 +11,7 @@ const API_URL =
 export const fetchProducts = createAsyncThunk('products/fetchProducts', //name of the action
 async (_, {rejectWithValue}) => {
     try {
-        const { data } = await axios.get(API_URL);
+        const { data } = await API.get(API_URL);
         return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
@@ -19,7 +19,7 @@ async (_, {rejectWithValue}) => {
 });
 export const fetchProduct = createAsyncThunk('products/fetchProduct', async (id,{rejectWithValue}) => {
     try {
-        const {data} = await axios.get(`${API_URL}/${id}`);
+        const {data} = await API.get(`${API_URL}/${id}`);
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
@@ -27,7 +27,7 @@ export const fetchProduct = createAsyncThunk('products/fetchProduct', async (id,
 });
 export const addProduct = createAsyncThunk('products/addProduct', async (product,{rejectWithValue}) => {
     try {
-       const {data}  = await axios.post(API_URL, product);
+       const {data}  = await API.post(API_URL, product);
        return data; 
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
@@ -35,7 +35,7 @@ export const addProduct = createAsyncThunk('products/addProduct', async (product
 }); 
 export const updateProduct = createAsyncThunk('products/updateProduct', async ({ id, product }, {rejectWithValue}) => {
     try {
-        const {data} = await axios.put(`${API_URL}/${id}`, product);
+        const {data} = await API.put(`${API_URL}/${id}`, product);
         return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
@@ -43,7 +43,7 @@ export const updateProduct = createAsyncThunk('products/updateProduct', async ({
 });
 export const deleteProduct = createAsyncThunk('products/deleteProducts', async (product, {rejectWithValue}) => {
     try {
-        await axios.delete(`${API_URL}/${product._id}`);
+        await API.delete(`${API_URL}/${product._id}`);
         return product._id;
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);

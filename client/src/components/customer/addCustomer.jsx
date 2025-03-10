@@ -1,4 +1,4 @@
-import react, { useState } from "react";
+import react, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 //comps
@@ -21,6 +21,15 @@ const AddCustomer = () => {
   const [email, setEmail] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [token, setToken] = useState("");
+
+   useEffect(() => {
+      if (localStorage.getItem('token')) {
+        setToken(localStorage.getItem('token'));
+      } else {
+        history.push('/login');
+      }
+    }, [setToken, history]);
 
   const nullifyFields = () => {
     setAddress("");
@@ -34,7 +43,7 @@ const AddCustomer = () => {
     e.preventDefault();
     const newCustomer = { name, phone, address, gstNo, email };
     try {
-      await dispatch(addCustomer(newCustomer)).unwrap();
+      await dispatch(addCustomer({ newCustomer, token })).unwrap();
       nullifyFields();
       setSuccessMsg('Customer added successfully');
       setTimeout(() => { setSuccessMsg("") }, 3000);

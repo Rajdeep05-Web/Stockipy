@@ -1,7 +1,30 @@
 import React, { useState } from "react";
+import {useDispatch} from "react-redux";
+import {useNavigate} from "react-router-dom";
+import { logOutUser } from "../../redux/slices/auth/authSlice";
+
+import Loading from '../useful/Loading/loading';
 
 const UserDropdown = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      await dispatch(logOutUser(userData)).unwrap();
+      setLoading(false);
+      navigate("/login");
+    } catch (error) {
+      console.error("Failed to logout", error);
+    }
+  }
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="flex items-center">
@@ -71,6 +94,7 @@ const UserDropdown = () => {
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                   role="menuitem"
+                  onClick={handleLogout}
                 >
                   Sign out
                 </a>

@@ -1,22 +1,35 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import API from "../../../api/api.js";
+import {jwtDecode}  from "jwt-decode";
 
-const API_URL = 
-// 'http://192.168.29.163:5000/api/v1/customers' || 
-"http://localhost:5000/api/v1/customers";
 
-export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async () => {
-    const  {data}  = await axios.get(API_URL);
-    // console.log(data);
-    return data;
+const API_URL = "/api/v1/customers";
+
+export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async (_, {rejectWithValue}) => {
+    try {
+        const  {data}  = await API.get(API_URL);
+        return data;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.error || error.message);
+    }
 });
 export const fetchCustomer = createAsyncThunk('customers/fetchCustomer', async (id) => {
-    // const { data } = await axios.get(`${API_URL}/${id}`);
-    // return data;
+    const { data } = await API.get(`${API_URL}/${id}`);
+    return data;
 });
-export const addCustomer = createAsyncThunk('customers/addCustomer', async (customer, {rejectWithValue }) => {//
+export const addCustomer = createAsyncThunk('customers/addCustomer', async (clentData, {rejectWithValue }) => {
     try {
-        const { data } = await axios.post(`${API_URL}`, customer);
+        console.log("Step 1 ");
+
+        const customer = clentData.newCustomer;
+        // const accessToken = clentData.token;
+
+        //readable token expire time in ist
+        // const decoded = jwtDecode(accessToken);
+        // const exp = new Date(decoded.exp * 1000).toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
+        // console.log("Token expire time: ", exp);
+
+        const { data } = await API.post(`${API_URL}`, customer);
         return data;
         
     } catch (error) {
@@ -26,14 +39,14 @@ export const addCustomer = createAsyncThunk('customers/addCustomer', async (cust
 });
 export const updateCustomer = createAsyncThunk('customers/updateCustomer', async ({ id, customer }, {rejectWithValue}) => {
     try {
-        const { data } = await axios.put(`${API_URL}/${id}`, customer);
+        const { data } = await API.put(`${API_URL}/${id}`, customer);
         return data;  
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
     }
 });
 export const deleteCustomer = createAsyncThunk('customers/deleteCustomer', async (customer) => {
-    await axios.delete(`${API_URL}/${customer._id}`);
+    await API.delete(`${API_URL}/${customer._id}`);
     return customer._id;
 });
 

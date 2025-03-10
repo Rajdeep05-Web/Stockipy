@@ -1,35 +1,40 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { act } from "react";
+import API from "../../../api/api.js";
 
 const API_URL_AUTH = "http://localhost:5000/api/v1/auth";
 
+//async thunk to create a new user
 export const createUser = createAsyncThunk("user/signup", async (user, { rejectWithValue }) => {
   try {
-    const {data} = await axios.post(`${API_URL_AUTH}/signup`, user);
+    const {data} = await API.post(`${API_URL_AUTH}/signup`, user);
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
   }
 });
 
+//async thunk to login a user
 export const loginUser = createAsyncThunk("user/login", async (user, { rejectWithValue }) => {
   try {
-    const {data} = await axios.post(`${API_URL_AUTH}/login`, user);
+    const {data} = await API.post(`${API_URL_AUTH}/login`, user);
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
   }
 });
 
+//async thunk to logout a user
 export const logOutUser = createAsyncThunk("user/Logout", async (userData, { rejectWithValue }) => {
   try {
-    const {data} = await axios.delete(`${API_URL_AUTH}/logout`, userData);
+    const {data} = await API.put(`${API_URL_AUTH}/logout/${userData._id}`, userData);
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
   }
 });
+
+
+
 
 const initialState = {
   user: JSON.parse(localStorage.getItem('user')) || null,
@@ -43,15 +48,28 @@ const initialState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
+
+  //reducers for synchronous actions
   reducers: {
+    //resets the auth state
       resetAuthState: (state) => {
       state.user = null;
       state.loading = false;
       state.error = null;
       localStorage.removeItem('user');
       localStorage.removeItem('token');
+    },
+
+    //stores the new access token in the Redux store
+    updateAccessToken : (state, action) => {
+      // state.loading = false;
+      // state.user = action.payload.user;
+      state.token = action.payload;
+      localStorage.setItem("token", action.payload); //unsafe for now
     }
   },
+
+  //extraReducers for async actions
   extraReducers: (builder) => {
     // Extra reducers go here
     builder.
@@ -109,4 +127,5 @@ const authSlice = createSlice({
   }
 });
 
-export default authSlice.reducer;
+export const { resetAuthState, updateAccessToken } = authSlice.actions; //exports the actions
+export default authSlice.reducer; //exports the reducer async thunk functions

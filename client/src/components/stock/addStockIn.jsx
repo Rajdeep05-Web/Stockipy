@@ -24,8 +24,9 @@ import { fetchProducts } from "../../redux/slices/products/productsSlice";
 
 const AddStockIn = () => {
   const dispatch = useDispatch();
-  const { vendors, loading } = useSelector((state) => state.vendors);
-  const { products } = useSelector((state) => state.products);
+  const { vendors, loading: vendorsLoading } = useSelector((state) => state.vendors);
+  const { products, loading: productsLoading } = useSelector((state) => state.products);
+  const { stockIns, loading: stockInsLoading } = useSelector((state) => state.stockIns);
 
   //vendor
   const [successMsg, setSuccessMsg] = useState("");
@@ -231,7 +232,7 @@ const AddStockIn = () => {
     }
   };
 
-  if (loading) {
+  if (vendorsLoading || productsLoading || stockInsLoading) {
     return <Loading />;
   }
 
