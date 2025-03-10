@@ -20,7 +20,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
-// Routes
+//import Routes
 import productRouter from "./src/routes/productRouter.js";
 import customerRouter from "./src/routes/customerRouter.js";
 import vendorRouter from "./src/routes/vendorRouter.js";
@@ -28,7 +28,7 @@ import stockInRouter from "./src/routes/stockInRouter.js";
 import fileuploadrouter from "./src/routes/fileUploadRouter.js";
 import authRouter from "./src/routes/authRouter.js";
 
-// Middleware
+//import Middleware
 import authTokenVerifyMiddleware from "./src/middlewares/authTokenVerifyMiddleware.js";
 
 // MongoDB Connection
@@ -39,8 +39,6 @@ app.get("/", (req, res) => {
   res.send("Welcome to Stockipy API");
 });
 
-//middleware
-app.use(authTokenVerifyMiddleware);
 
 //for auth routing
 app.use("/api", authRouter);
@@ -49,6 +47,10 @@ app.post("/v1/auth/login", authRouter);
 app.post("/v1/auth/regenerate-access-token", authRouter);
 app.put("/v1/auth/logout/:id", authRouter);
 
+//middleware
+app.use(authTokenVerifyMiddleware);
+
+//protected routes
 //for products routing
 app.use("/api", productRouter);
 app.get("/v1/products", productRouter);
