@@ -10,7 +10,7 @@ const createAccessToken = async (user) => {
 
 const generateRefreshToken = async (user) => {
     const refreshToken = jwt.sign({ id: user.id, email: user.email }, process.env.REFRESH_SECRET, {
-      expiresIn: `${process.env.REFRESH_TOKEN_LIFE}d`,
+      expiresIn: `${process.env.REFRESH_TOKEN_LIFE}m`,
     });
     return refreshToken;
   };
@@ -73,7 +73,7 @@ export const logInUser = async (req, res) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true, //cookie is not accessible via client side js (XSS attacks)
             secure : false, //cookie is only sent over https (secure connection)
-            maxAge: parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000, //cookie expire
+            maxAge: parseInt(process.env.REFRESH_TOKEN_LIFE)* 60 * 1000, //cookie expire
             sameSite: "lax",//cookie is only sent to the same origin as the domain in the address bar
             path: '/', // Accessible across all routes
         })
@@ -109,7 +109,11 @@ export const logOutUser = async (req, res) => {
             await user.save();
 
             //clear cookie
-            // res.clearCookie("refreshToken");
+          res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "lax",
+          });
 
           return res.status(200).json({ message: "User Logedout successfully" });
     } catch (error) {
@@ -121,7 +125,7 @@ export const logOutUser = async (req, res) => {
 export const reGenerateAccessToken = async (req, res) => {
   try {
      const refreshToken = req.cookies.refreshToken;
-     console.log("Cookie in regenerate controller",refreshToken);
+    //  console.log("Cookie in regenerate controller",refreshToken);
      if(!refreshToken){
          console.log(refreshToken);
         return res.status(400).json({ error: "Unauthorized: No token provided" });

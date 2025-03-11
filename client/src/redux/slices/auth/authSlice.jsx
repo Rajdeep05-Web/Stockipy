@@ -51,6 +51,16 @@ const authSlice = createSlice({
 
   //reducers for synchronous actions
   reducers: {
+    //populate user data into local storage and Redux store on successful login
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.isAuthenticated = true;
+      state.loading = false;
+      state.error = null;
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem("token", action.payload.token);
+    },
+    
     //resets the auth state
       resetAuthState: (state) => {
       state.user = null;
@@ -60,12 +70,11 @@ const authSlice = createSlice({
       localStorage.removeItem('token');
     },
 
-    //stores the new access token in the Redux store
+    //stores the new access token in the Redux store and local storage
     updateAccessToken : (state, action) => {
       // state.loading = false;
       // state.user = action.payload.user;
       state.token = action.payload;
-      localStorage.setItem("token", action.payload); //unsafe for now
     }
   },
 
@@ -116,8 +125,6 @@ const authSlice = createSlice({
       state.token = null;
       state.message = action.payload.message;
       state.isAuthenticated = false;
-      localStorage.removeItem("user");
-      localStorage.removeItem("token");
     })  
     .addCase(logOutUser.rejected, (state, action) => {
       state.loading = false;

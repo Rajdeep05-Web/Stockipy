@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { resetAuthState, updateAccessToken } from '../redux/slices/auth/authSlice';
+import {logOutUser} from '../redux/slices/auth/authSlice';
 
 
 const API = axios.create({
@@ -23,40 +25,52 @@ API.interceptors.request.use(
 );
 
 // Add an interceptor to refresh token on 401 errors
-API.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Prevent infinite loops
+export const setupResponseInterceptor = (store) => {
+  API.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true; // Prevent infinite loops
 
-      try {
-        // Request a new access token using the refresh token
-        console.log("JWT access token expired. Trying to refresh...");
+        try {
+          // Request a new access token using the refresh token
+          console.log("JWT access token expired. Trying to refresh...");
 
-        //print token from cookie
-        const refreshResponse = await API.post("/api/v1/auth/regenerate-access-token");
-        console.log("New access token:", refreshResponse.data.accessToken);
+          //print token from cookie
+          const refreshResponse = await API.post("/api/v1/auth/regenerate-access-token");
+          console.log("New access token:", refreshResponse.data.accessToken);
 
-        // const refreshResponse = await axios.post("http://localhost:5000/api/v1/auth/regenerate-access-token", {}, { withCredentials: true });
-        console.log("New access token:", refreshResponse.data.accessToken);
+          // const refreshResponse = await axios.post("http://localhost:5000/api/v1/auth/regenerate-access-token", {}, { withCredentials: true });
+          // console.log("New access token:", refreshResponse.data.accessToken);
 
-        const newAccessToken = refreshResponse.data.token;
-        // Dispatch Redux action to update token in state (if using Redux)
-        // useDispatch(updateAccessToken(newAccessToken)) // Update token in Redux store
+          const newAccessToken = refreshResponse.data.token;
 
-        // Update Axios headers for retrying the original request
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          //remove old token from local storage
+          localStorage.removeItem("token");
 
-        return axios(originalRequest); // Retry the failed request
-      } catch (refreshError) {
-        console.error("Refresh token expired. Logging out...");
-        // useDispatch(logOutUser()) // Dispatch logout action
+          // Dispatch Redux action to update token in state
+          store.dispatch(updateAccessToken(newAccessToken))
+
+          //update token in local storage
+          localStorage.setItem("token", newAccessToken);
+
+          // Update Axios headers for retrying the original request
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+          return axios(originalRequest); // Retry the failed request
+        } catch (refreshError) {
+          console.error("Refresh token expired. Logging out...");
+          const userData = JSON.parse(localStorage.getItem('user'));
+          store.dispatch(logOutUser(userData)) // Dispatch logout action for server db cleanup
+          store.dispatch(resetAuthState()); // Dispatch reset auth state action for client cleanup
+          window.location.href = '/auth'; // Redirect to login
+        }
       }
-    }
 
-    return Promise.reject(error);
-  }
-)
+      return Promise.reject(error);
+    }
+  )
+};
 
 export default API;
