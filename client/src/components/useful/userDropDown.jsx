@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import { logOutUser } from "../../redux/slices/auth/authSlice";
+import { logOutUser, resetAuthState } from "../../redux/slices/auth/authSlice";
 
 import Loading from '../useful/Loading/loading';
 
@@ -15,8 +15,9 @@ const UserDropdown = () => {
     setLoading(true);
     try {
       const userData = JSON.parse(localStorage.getItem('user'));
-      await dispatch(logOutUser(userData)).unwrap();
+      await dispatch(logOutUser(userData)).unwrap(); //logouts from db
       setLoading(false);
+      dispatch(resetAuthState()); //deletes user from local storage
       navigate("/login");
     } catch (error) {
       console.error("Failed to logout", error);

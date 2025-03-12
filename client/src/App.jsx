@@ -27,6 +27,7 @@ import { fetchProducts } from "./redux/slices/products/productsSlice";
 import { fetchCustomers } from "./redux/slices/customers/customersSlice";
 import { fetchVendors } from "./redux/slices/vendor/vendorsSlice";
 import { fetchStockIns } from "./redux/slices/stock/stockInSlice";
+import { Contact, Cookie } from "lucide-react";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -38,7 +39,11 @@ const App = () => {
   const { loading: stockInsLoading } = useSelector((state) => state.stockIns);
 
   useEffect(() => {
+    console.log("Use eff")
+    //check if user is logged in or expired
     (localStorage.getItem("token")) ? setUserLoggedIn(true) : setUserLoggedIn(false);
+
+    //on load fetch all data based on url
     if (location.pathname === "/products" || location.pathname === "/add-product") dispatch(fetchProducts());
     if (location.pathname === "/customers" || location.pathname === "/add-customer") dispatch(fetchCustomers());
     if (location.pathname === "/vendors" || location.pathname === "/add-vendor") dispatch(fetchVendors());

@@ -39,7 +39,6 @@ export const setupResponseInterceptor = (store) => {
 
           //print token from cookie
           const refreshResponse = await API.post("/api/v1/auth/regenerate-access-token");
-          console.log("New access token:", refreshResponse.data.accessToken);
 
           // const refreshResponse = await axios.post("http://localhost:5000/api/v1/auth/regenerate-access-token", {}, { withCredentials: true });
           // console.log("New access token:", refreshResponse.data.accessToken);

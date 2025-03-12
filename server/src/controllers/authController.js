@@ -14,6 +14,9 @@ const generateRefreshToken = async (user) => {
     });
     return refreshToken;
   };
+  const getTokenExpireTime = (token) => {
+
+  }
   
 export const signUpUser = async (req, res) => {
     try {
@@ -88,7 +91,6 @@ export const logOutUser = async (req, res) => {
     try {
         const {id} = req.params;
         const {email} = req.body;
-        console.log(id, email);
           if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ error: "Invalid User ID" });
           }
@@ -127,7 +129,6 @@ export const reGenerateAccessToken = async (req, res) => {
      const refreshToken = req.cookies.refreshToken;
     //  console.log("Cookie in regenerate controller",refreshToken);
      if(!refreshToken){
-         console.log(refreshToken);
         return res.status(400).json({ error: "Unauthorized: No token provided" });
      }
      //verify refresh token
@@ -151,3 +152,22 @@ export const reGenerateAccessToken = async (req, res) => {
     return res.status(403).json({ error: "Refresh token expired. Please log in again." });
   }
 };
+
+export const verifyUser = async (req, res) => {
+    const refreshToken = req.cookies.refreshToken;
+    try {
+    if(!refreshToken){
+        return res.status(400).json({ error: "Unauthorized: No token provided" });
+    }
+    const decode = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    
+    return res.status(201).json({message: "User is verified"});
+        
+    } catch (error) {
+        console.log(error);
+        if(error.message == "jwt expired"){
+            return res.status(401).json({error : "Session expired, log in again" || error.message})
+        }
+        return res.status(403).json({error: error.message || "Error during User Verification"});
+    }
+}
