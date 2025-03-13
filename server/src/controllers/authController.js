@@ -155,11 +155,18 @@ export const reGenerateAccessToken = async (req, res) => {
 
 export const verifyUser = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
+    const accessToken = req.headers.authorization?.split(" ")[1];
     try {
     if(!refreshToken){
         return res.status(400).json({ error: "Unauthorized: No token provided" });
     }
-    const decode = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+    const refreshDecode = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+
+    const accessDecode = jwt.verify(accessToken, process.env.JWT_SECRET);
+
+    if(refreshDecode.userId != accessDecode.id){
+        return res.status(401).json({error : "Unauthorized token provided"});
+    }
     
     return res.status(201).json({message: "User is verified"});
         

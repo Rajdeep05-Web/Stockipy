@@ -33,6 +33,16 @@ export const logOutUser = createAsyncThunk("user/Logout", async (userData, { rej
   }
 });
 
+//verify user
+export const verifyUserOnPageLoad = createAsyncThunk("user/Verify", async (_, { rejectWithValue }) => {
+  try {
+    const {data} = await API.post(`${API_URL_AUTH}/verify-user`, {});
+    return data;
+  } catch (error) {
+    return rejectWithValue(error?.response?.data.error || error.message);
+  }
+});
+
 
 
 
@@ -66,6 +76,7 @@ const authSlice = createSlice({
       state.user = null;
       state.loading = false;
       state.error = null;
+      state.isAuthenticated = false;
       localStorage.removeItem('user');
       localStorage.removeItem('token');
     },
@@ -82,6 +93,7 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     // Extra reducers go here
     builder.
+
     addCase(createUser.pending, (state) => {
       state.loading = true;
       state.message = null;
@@ -97,6 +109,7 @@ const authSlice = createSlice({
       state.error = action.payload;
       state.message = action.payload.error;
     })
+    
     .addCase(loginUser.pending, (state) => {
       state.loading = true;
       state.message = null;
@@ -114,6 +127,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = action.payload; 
     })
+
     .addCase(logOutUser.pending, (state) => {
       state.loading = true;
       state.message = null;
@@ -130,6 +144,25 @@ const authSlice = createSlice({
       state.error = action.payload;
       state.message = null;
     })
+
+    .addCase(verifyUserOnPageLoad.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(verifyUserOnPageLoad.fulfilled, (state, action) => {
+      state.loading = false;
+      state.message = action.payload;
+      state.isAuthenticated = true;
+    })
+    .addCase(verifyUserOnPageLoad.rejected, (state, action) => {
+      state.loading = false;
+       state.error = action.payload.error;
+       state.user = null;
+       state.token = null;
+       state.isAuthenticated = false;
+       localStorage.removeItem('user');
+       localStorage.removeItem('token');
+    })
+
   }
 });
 

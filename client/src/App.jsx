@@ -39,7 +39,6 @@ const App = () => {
   const { loading: stockInsLoading } = useSelector((state) => state.stockIns);
 
   useEffect(() => {
-    console.log("Use eff")
     //check if user is logged in or expired
     (localStorage.getItem("token")) ? setUserLoggedIn(true) : setUserLoggedIn(false);
 

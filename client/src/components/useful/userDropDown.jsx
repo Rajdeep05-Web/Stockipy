@@ -23,9 +23,9 @@ const UserDropdown = () => {
       console.error("Failed to logout", error);
     }
   }
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
   return (
     <div className="flex items-center">
