@@ -1,15 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import { logOutUser, resetAuthState } from "../../redux/slices/auth/authSlice";
 
 import Loading from '../useful/Loading/loading';
+import { Coins } from "lucide-react";
 
 const UserDropdown = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+   const user = JSON.parse(localStorage.getItem("user"));
+   setUserEmail(user.email);
+   setUserName(user.name);
+  }, [])
 
   const handleLogout = async () => {
     setLoading(true);
@@ -53,13 +62,13 @@ const UserDropdown = () => {
           >
             <div className="px-4 py-3" role="none">
               <p className="text-sm text-gray-900 dark:text-white" role="none">
-                Neil Sims
+               {userName}
               </p>
               <p
                 className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
                 role="none"
               >
-                neil.sims@flowbite.com
+                {userEmail}
               </p>
             </div>
             <ul className="py-1" role="none">
@@ -69,25 +78,7 @@ const UserDropdown = () => {
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                   role="menuitem"
                 >
-                  Dashboard
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                  role="menuitem"
-                >
                   Settings
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
-                  role="menuitem"
-                >
-                  Earnings
                 </a>
               </li>
               <li>

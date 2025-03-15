@@ -40,7 +40,7 @@ const App = () => {
 
   useEffect(() => {
     //check if user is logged in or expired
-    (localStorage.getItem("token")) ? setUserLoggedIn(true) : setUserLoggedIn(false);
+    (localStorage.getItem("token") && localStorage.getItem("user")) ? setUserLoggedIn(true) : setUserLoggedIn(false);
 
     //on load fetch all data based on url
     if (location.pathname === "/products" || location.pathname === "/add-product") dispatch(fetchProducts());

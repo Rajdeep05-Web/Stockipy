@@ -10,7 +10,7 @@ const createAccessToken = async (user) => {
 
 const generateRefreshToken = async (user) => {
     const refreshToken = jwt.sign({ id: user.id, email: user.email }, process.env.REFRESH_SECRET, {
-      expiresIn: `${process.env.REFRESH_TOKEN_LIFE}m`,
+      expiresIn: `${process.env.REFRESH_TOKEN_LIFE}d`,
     });
     return refreshToken;
   };
@@ -76,7 +76,7 @@ export const logInUser = async (req, res) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true, //cookie is not accessible via client side js (XSS attacks)
             secure : false, //cookie is only sent over https (secure connection)
-            maxAge: parseInt(process.env.REFRESH_TOKEN_LIFE)* 60 * 1000, //cookie expire
+            maxAge: parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000, //cookie expire
             sameSite: "lax",//cookie is only sent to the same origin as the domain in the address bar
             path: '/', // Accessible across all routes
         })
