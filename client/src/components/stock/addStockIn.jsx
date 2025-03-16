@@ -184,15 +184,15 @@ const AddStockIn = () => {
   //final submit of stock in
   const handleSubmitStockIn = async () => {
 
-    let products = [];
+    let stockInProducts = [];
     const stockInFormdata = new FormData();
 
     for (const [key, value] of Object.entries(productQuantities)) {
-      products.push({
+      stockInProducts.push({
         product: key,
         quantity: value,
         productPurchaseRate: allProductRates[key],
-        mrp: allProductMRPs[key] || -1
+        mrp: (products.some((p) => p._id == key && p.mrp == allProductMRPs[key])) ? -1 : allProductMRPs[key],
       });
     }
 
@@ -202,7 +202,7 @@ const AddStockIn = () => {
       date: startDate,
       totalAmount,
       description,
-      products,
+      products : stockInProducts,
     };
 
     try {
@@ -251,10 +251,10 @@ const AddStockIn = () => {
       />
 
       {/* stockIn */}
-      <div class="flex flex-col gap-6 h-auto lg:h-screen sm:flex-row">
+      <div class="flex flex-col gap-6 h-auto lg:h-screen md:flex-row">
 
         {/* vendor */}
-        <div class="basis-2/5 bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
+        <div class="basis-full sm:basis-2/5 min-w-[360px] bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
           <form class=" max-w-full lg:max-w-sm mx-auto">
             <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
               Add Vendor Details
@@ -495,7 +495,7 @@ const AddStockIn = () => {
         </div>
         
         {/* product */}
-        <div class="basis-full sm:basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
+        <div class="basis-full sm:basis-3/5 min-w-[360px] bg-green-50 p-5 border border-green-300 rounded-md">
           <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
             Add Products
           </h1>
