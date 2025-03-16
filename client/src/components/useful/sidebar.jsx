@@ -83,7 +83,7 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
   return (
     <div
       id="sidebar"
-      className={`fixed z-20 inset-y-0 left-0 w-64 bg-white shadow-md transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      className={`fixed z-20 inset-y-0 left-0 w-[200px] bg-white shadow-lg transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static`}
     >
       <div className="p-6">
