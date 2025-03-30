@@ -191,8 +191,8 @@ const AddStockIn = () => {
       stockInProducts.push({
         product: key,
         quantity: value,
-        productPurchaseRate: allProductRates[key],
-        mrp: (products.some((p) => p._id == key && p.mrp == allProductMRPs[key])) ? -1 : allProductMRPs[key],
+        productPurchaseRate: parseInt(allProductRates[key]),
+        mrp: parseInt(allProductMRPs[key]),
       });
     }
 
@@ -640,7 +640,8 @@ const AddStockIn = () => {
                         <input
                           type="text"
                           placeholder="MRP"
-                          value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp}
+                          required
+                          value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp && handleProductMRP(product._id, product.mrp)}
                           onChange={(e) =>
                             handleProductMRP(product._id, e.target.value )
                           }

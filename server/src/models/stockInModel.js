@@ -52,6 +52,10 @@ const stockInSchema = mongoose.Schema({
             }
         },
     ],
+    createdAt:{
+        type: Date,
+        default: new Date()
+    }
 });
 
 export const StockIn = mongoose.model("StockIn", stockInSchema);

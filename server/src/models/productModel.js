@@ -20,12 +20,38 @@ const productSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    prevProductPurchaseRate:[
+        {
+            type: Object,
+            date: {
+                type: Date,
+                default: new Date()
+            },
+            productPurchaseRate: {
+                type: Number,
+                default: 0
+            }
+        }
+    ],
     //product mrp
     mrp: {
         type: Number,
         required: true,
         default: 0
     },
+    prevMrp:[
+        {
+            type: Object,
+            date: {
+                type: Date,
+                default: new Date()
+            },
+            productPurchaseRate: {
+                type: Number,
+                default: 0
+            }
+        }
+    ],
     productStockIns:[
         { 
             type : mongoose.Schema.Types.ObjectId,
@@ -47,6 +73,10 @@ const productSchema = mongoose.Schema({
         type: String,
      
     },
+    createdAt:{
+        type: Date,
+        default: new Date()
+    }
 });
 
 export const Product = mongoose.model('Product', productSchema);

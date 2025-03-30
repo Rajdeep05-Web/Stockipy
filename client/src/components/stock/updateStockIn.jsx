@@ -237,14 +237,14 @@ const UpdateStockIn = () => {
   //final submit of stock in
   const handleUpdateStockIn = async () => {
 
-    let products = [];
+    let stockInProducts = [];
 
     for (const [key, value] of Object.entries(productQuantities)) {
-      products.push({
+      stockInProducts.push({
         product: key,
         quantity: value,
-        productPurchaseRate: allProductRates[key],
-        mrp: allProductMRPs[key] || -1
+        productPurchaseRate: parseInt(allProductRates[key]), //nned to be sent as number
+        mrp: parseInt(allProductMRPs[key]),
       });
     }
 
@@ -254,10 +254,9 @@ const UpdateStockIn = () => {
       date: startDate,
       totalAmount,
       description,
-      products,
+      products : stockInProducts,
       isFileUpdated: (file || isFileCleared ? true : false),
     };
-    // console.log("stockInData", stockInData);
 
     try {
       await dispatch(updateStockIn({id, stockInData, file })).unwrap();
@@ -299,10 +298,10 @@ const UpdateStockIn = () => {
       />
 
       {/* stockIn */}
-      <div class="flex flex-col gap-6 h-auto lg:h-screen sm:flex-row">
+      <div class="flex flex-col gap-6 h-auto lg:h-screen md:flex-row">
 
         {/* vendor */}
-        <div class="basis-2/5 bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
+        <div class="basis-full sm:basis-2/5 min-w-[360px] bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
           <form class=" max-w-full lg:max-w-sm mx-auto">
             <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
               Update Vendor Details
@@ -587,7 +586,7 @@ const UpdateStockIn = () => {
         </div>
 
         {/* product */}
-        <div class="basis-full sm:basis-3/5 bg-green-50 p-5 border border-green-300 rounded-md">
+        <div class="basis-full sm:basis-3/5 min-w-[360px] bg-green-50 p-5 border border-green-300 rounded-md">
           <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
             Update Products
           </h1>
@@ -732,7 +731,7 @@ const UpdateStockIn = () => {
                         <input
                           type="text"
                           placeholder="MRP"
-                          value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp}
+                          value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp && handleProductMRP(product._id, product.mrp)}
                           onChange={(e) =>
                             handleProductMRP(product._id, e.target.value)
                           }

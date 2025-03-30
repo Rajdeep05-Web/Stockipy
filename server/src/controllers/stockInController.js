@@ -31,6 +31,9 @@ export const addStockIn = async (req, res) => {
     if(products.length > 0 && products.some(item => !item.product || !item.quantity)){
         return res.status(400).json({error: "Product or Quantity not provided"});
     }
+    if(products.length > 0 && products.some(item => !item.mrp)){
+        return res.status(400).json({error: "MRP not provided"});
+    }
     if(products.length > 0 && products.some(item => !mongoose.Types.ObjectId.isValid(item.product))){
         return res.status(400).json({error: "Invalid Product ID"});
     }
@@ -46,7 +49,6 @@ export const addStockIn = async (req, res) => {
     if(products && products.some(item => item.productPurchaseRate <= 0)){
         return res.status(400).json({error: "Purchase Price must be greater than 0"});
     }
-    //no invalid date
 
 
     try {
@@ -61,14 +63,21 @@ export const addStockIn = async (req, res) => {
             fileCloudUrl
         })
         await newStockIn.save();
-
+        
         //update product quantity, purchase rate and quantity
         for(const item of products){
             const product = await Product.findById(item.product);
             if(product){
+
                 product.quantity += parseInt(item.quantity); // update quantity
-                product.productPurchaseRate = parseInt(item.productPurchaseRate); // update purchase rate
-                product.mrp = (item.mrp === -1 ? product.mrp : item.mrp ); // update mrp
+
+                if(!product.productPurchaseRate){
+                    //if the the product purchase is new or is 0 (null)
+                    product.productPurchaseRate = item.productPurchaseRate; // update purchase rate
+                }
+                
+                //only sotckin prouduct MRP is updated not the product DB MRP
+
                 product.productStockIns.push(newStockIn._id); // add stockin id to product
                 await product.save();
             }
@@ -140,6 +149,9 @@ export const updateStockIn = async (req, res) => {
     if(products.length > 0 && products.some(item => !item.product || !item.quantity)){
         return res.status(400).json({error: "Product or Quantity not provided"});
     }
+    if(products.length > 0 && products.some(item => !item.mrp)){
+        return res.status(400).json({error: "MRP not provided"});
+    }
     if(products.length > 0 && products.some(item => !mongoose.Types.ObjectId.isValid(item.product))){
         return res.status(400).json({error: "Invalid Product ID"});
     }
@@ -189,6 +201,7 @@ export const updateStockIn = async (req, res) => {
         //vendor
         newStockInDataToSave.vendor = vendor;
         //products
+        console.log(products);
         newStockInDataToSave.products = products;
         //totalAmount
         if(totalAmount){
@@ -212,20 +225,18 @@ export const updateStockIn = async (req, res) => {
             newStockInDataToSave.fileCloudUrl = stockInDataFromDB.fileCloudUrl;
         }
 
-    // console.log(newStockInDataToSave);
        
     //saving the updated data
        const savedStockInData = await StockIn.findByIdAndUpdate(id, newStockInDataToSave, {
         new: true,
        });
-    //    console.log(savedStockInData);
 
        //update vendor stock in details if vendor is changed
        if(stockInDataFromDB.vendor != vendor){
         const oldVendor = await Vendor.findById(stockInDataFromDB.vendor);
         //if the vendor is updated then delete the stockin id from old vendor stockin data
         oldVendor.stockIns = oldVendor.stockIns.filter(item => item != id);
-        await oldVendor.save();
+        // await oldVendor.save();
         //add the stockin id to the new vendor
         const newVendor = await Vendor.findById(vendor);
         newVendor.stockIns.push(id);
@@ -238,41 +249,54 @@ export const updateStockIn = async (req, res) => {
         product: item.product,
         quantity: item.quantity,
         productPurchaseRate: item.productPurchaseRate,
-        mrp: item.mrp,
+        mrp: (products.find((newItem) => newItem.product == item.product)?.mrp == -1 ? -1 : item.mrp),
        })));
     const newProducts = JSON.stringify(products);
-       //if producs are changed then update the product details
+
+    //if producs are changed then update the product details
     if(oldDBproducts !== newProducts){
         for(const newProduct of products){
             //old product find and update
             const oldProduct = stockInDataFromDB.products.find((item)=> 
             item.product == newProduct.product);
 
+            //convert into string to compare -> if equeal then no need to update
+            if(oldProduct){
+            const oldProductString = JSON.stringify({
+                product: oldProduct?.product,
+                quantity: oldProduct?.quantity,
+                productPurchaseRate: oldProduct?.productPurchaseRate,
+                mrp: (newProduct.mrp == -1 ? -1 : oldProduct?.mrp),
+            })
+            const newProductString = JSON.stringify({
+                product: newProduct.product,
+                quantity: newProduct.quantity,
+                productPurchaseRate: newProduct.productPurchaseRate,
+                mrp: newProduct.mrp,
+            })
+            if(oldProductString === newProductString) continue;
+            }
                 //if old product -> update the quanty , purchase rate and MRP in product
                 const product = await Product.findById(newProduct.product);
                     //update the quantity
                     product.quantity = product.quantity - parseInt(oldProduct?.quantity ? oldProduct.quantity : 0) + parseInt(newProduct.quantity);
-                    // console.log("Old Prod qntity is updated");
-                    //update the purchase rate
-                    product.productPurchaseRate = newProduct.productPurchaseRate;
-                    // console.log("Old Prod productPurchaseRate is updated");
-                    //update the mrp
-                    if(newProduct.mrp != -1){
-                       //update the mrp if it changed
-                       product.mrp = newProduct.mrp;
-                    //    console.log("Old Prod MRP is updated");
-                    }
+                 
+                    //no change in product DB purchase rate
+
+                    // no change in product DB mrp
+
                     if(!oldProduct){
                         //if not a old product -> means new product -> add the stockin id to product stockIn array
                         product.productStockIns.push(id);
                     }
                 //save the product
                 await product.save();
-                // console.log(product);
         }
-        //check if any product is deleted in the update -> update the quantity in product
+
+        //check if any product is deleted in the update -> update the quantity in product, stockin array and purchase rate
         for(const oldProduct of stockInDataFromDB.products){
             const productFound = products.find((item)=> item.product == oldProduct.product);
+
             if(!productFound){
                 //if the old product is not found in new products -> means deleted in update ( update the quantity in product )
                 const product = await Product.findById(oldProduct.product);
@@ -281,7 +305,6 @@ export const updateStockIn = async (req, res) => {
                 product.productStockIns = product.productStockIns.filter(item => item != id);
                 //save the product
                 await product.save();
-                // console.log(product);
             }
         }
 
@@ -307,7 +330,7 @@ export const deleteStockIn = async (req, res) => {
         }
         //delete the stockin from the db
         const deletedStockIn = await StockIn.findByIdAndDelete(id);
-        if(deleteStockIn){
+        if(deletedStockIn){
             //delete the stockin id from vendor stockin data
             const vendor = await Vendor.findById(stockInData.vendor);
             vendor.stockIns = vendor.stockIns.filter(stockInId => stockInId != id);

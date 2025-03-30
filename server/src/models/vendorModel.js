@@ -23,6 +23,10 @@ const vendorSchema = mongoose.Schema({
               ref: "StockIn",
             },
         ],
+        createdAt:{
+          type: Date,
+          default: new Date()
+      }
 
 })
 
