@@ -32,8 +32,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../components/ui/card"
-import { ScrollArea } from "../components/ui/scroll-area"
+} from "./ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 import {
   LineChart,
   Line,
