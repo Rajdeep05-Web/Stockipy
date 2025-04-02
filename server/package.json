@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "npm, node",
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
   "author": "Rajdeep Paul",
   "license": "ISC",
