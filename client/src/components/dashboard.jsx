@@ -32,7 +32,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/Card"
+} from "./ui/card"
 import { ScrollArea } from "../components/ui/scroll-area"
 import {
   LineChart,
