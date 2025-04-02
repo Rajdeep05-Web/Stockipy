@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
 
 // Components
-import NavbarSidebar from "./components/useful/navbarSidebar";
+// import NavbarSidebar from "./components/useful/navbarSidebar";
 import Loading from "./components/useful/Loading/loading";
 import Dashboard from "./components/dashboard";
 import AddProduct from "./components/products/addProduct";

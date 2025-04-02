@@ -281,7 +281,7 @@ const AllStockIns = () => {
                 </div>
                 {/* product and vendor details */}
                 <div className="flex flex-col sm:flex-row gap-2 mt-2 mx-0">
-                  <div className="flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
+                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 rounded-lg p-2">
                     <h6 class="text-sm sm:text-lg font-bold dark:text-white">
                       VENDOR
                     </h6>
@@ -315,7 +315,7 @@ const AllStockIns = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col basis-1/2 border border-gray-300 dark:border-gray-700 rounded-lg p-2 overflow-x-auto">
+                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 rounded-lg p-2 overflow-x-auto">
                     <div className="flex justify-between">
                       <h6 className="text-sm sm:text-lg font-bold dark:text-white basis-[40%] min-w-[150px]">
                         PRODUCT
