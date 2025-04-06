@@ -3,10 +3,10 @@ import { fetchCustomer, fetchCustomers, addCustomer, updateCustomer, deleteCusto
 
 const customerRouter = Router();
 
-customerRouter.get('/v1/customers', fetchCustomers);
-customerRouter.get('/v1/customers/:id', fetchCustomer);
-customerRouter.post('/v1/customers', addCustomer);
-customerRouter.put('/v1/customers/:id', updateCustomer);
-customerRouter.delete('/v1/customers/:id', deleteCustomer);
+customerRouter.get('/v1/customers/:userId', fetchCustomers);
+customerRouter.get('/v1/customerById/:userId/:cId', fetchCustomer);
+customerRouter.post('/v1/customers/:userId', addCustomer);
+customerRouter.put('/v1/customers/:userId/:cId', updateCustomer);
+customerRouter.delete('/v1/customers/:userId/:cId', deleteCustomer);
 
 export default customerRouter;

@@ -70,11 +70,11 @@ app.delete("/v1/vendors/:id", vendorRouter);
 
 //customer routing
 app.use("/api", customerRouter);
-app.get("/v1/customers", customerRouter);
-app.get("/v1/customers/:id", customerRouter);
-app.post("/v1/customers", customerRouter);
-app.put("/v1/customers/:id", customerRouter);
-app.delete("/v1/customers/:id", customerRouter);
+app.get("/v1/customers/:userId", customerRouter);
+app.get("/v1/customerById/:userId/:cId", customerRouter);
+app.post("/v1/customers/:userId", customerRouter);
+app.put("/v1/customers/:userId/:cId", customerRouter);
+app.delete("/v1/customers/:userId/:cId", customerRouter);
 
 //stock In routing
 app.use("/api", stockInRouter);

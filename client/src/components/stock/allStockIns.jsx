@@ -9,7 +9,7 @@ import {
 import {useNavigate} from "react-router";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
-import { StockInPDF } from "./stockInPdf";
+import { StockInPDF } from "../pdf/stockInPdf";
 import { fetchStockIns, deleteStockIn } from "../../redux/slices/stock/stockInSlice";
 import { useDispatch, useSelector } from "react-redux";
 
