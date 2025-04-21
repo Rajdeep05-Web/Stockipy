@@ -12,13 +12,13 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-// app.use(cors({
-//   origin: "*", // Allow requests from frontend
-//   credentials: true, // Allow cookies/auth headers
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-//   methods: ['GET', 'POST', 'PUT', 'DELETE']
-// }));
-app.use(cors()); // Allow requests from frontend,
+app.use(cors({
+  origin:  'http://localhost:5174',
+  credentials: true, 
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+// app.use(cors()); 
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 //import Routes
