@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../../api/api.js";
 
-const API_URL_AUTH = "http://localhost:5000/api/v1/auth";
+const API_URL_AUTH = "/api/v1/auth";
 
 //async thunk to create a new user
 export const createUser = createAsyncThunk("user/signup", async (user, { rejectWithValue }) => {
