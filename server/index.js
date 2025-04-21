@@ -18,7 +18,7 @@ app.use(cookieParser());
 //   allowedHeaders: ['Content-Type', 'Authorization'],
 //   methods: ['GET', 'POST', 'PUT', 'DELETE']
 // }));
-app.use(cors()); // Allow requests from frontend
+app.use(cors()); // Allow requests from frontend,
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 //import Routes
