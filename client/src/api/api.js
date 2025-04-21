@@ -4,7 +4,7 @@ import {logOutUser} from '../redux/slices/auth/authSlice';
 
 
 const API = axios.create({
-  baseURL: process.env.API_URL, // Your API base URL
+  baseURL: import.meta.env.API_URL, // Your API base URL
   withCredentials: true,
 });
 
