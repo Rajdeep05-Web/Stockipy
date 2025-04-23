@@ -13,8 +13,8 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin:  ['http://192.168.29.110:5174'],
-  credentials: true, 
+  origin: process.env.CLIENT_URL || 'http://localhost:5000', // Replace with your frontend URL
+  credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
