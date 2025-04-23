@@ -2,9 +2,11 @@ import axios from 'axios';
 import { resetAuthState, updateAccessToken } from '../redux/slices/auth/authSlice';
 import {logOutUser} from '../redux/slices/auth/authSlice';
 
+// Use environment variables for API URL
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 const API = axios.create({
-  baseURL: import.meta.env.API_URL, // Your API base URL
+  baseURL: API_URL, // Your API base URL
   withCredentials: true,
 });
 
