@@ -3,6 +3,7 @@ import {User} from '../models/userModel.js';
 import jwt from 'jsonwebtoken'; // to generate signed token
 import bcrypt from 'bcryptjs'; // to hash password
 import mongoose from 'mongoose'; // to check object id
+import connectDB from '../DB/index.js'; // to connect to db
 
 const createAccessToken = async (user) => {
     return jwt.sign({userId:user._id}, process.env.JWT_SECRET, {expiresIn: process.env.ACCESS_TOKEN_LIFE })  
@@ -20,6 +21,7 @@ const generateRefreshToken = async (user) => {
   
 export const signUpUser = async (req, res) => {
     try {
+        await connectDB();
         const { name, email, password } = req.body;
         if(!name || !email || !password){
             return res.status(400).json({ error: "Please fill all the fields" });
@@ -43,6 +45,7 @@ export const signUpUser = async (req, res) => {
 };
 export const logInUser = async (req, res) => {
     try {
+        await connectDB();
        const {email, password} = req.body;
        //check if email and password are provided
        if(!email || !password){
@@ -89,6 +92,7 @@ export const logInUser = async (req, res) => {
 };
 export const logOutUser = async (req, res) => {
     try {
+        await connectDB();
         const {id} = req.params;
         const {email} = req.body;
           if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -126,6 +130,7 @@ export const logOutUser = async (req, res) => {
 
 export const reGenerateAccessToken = async (req, res) => {
   try {
+    await connectDB();
      const refreshToken = req.cookies.refreshToken;
     //  console.log("Cookie in regenerate controller",refreshToken);
      if(!refreshToken){
