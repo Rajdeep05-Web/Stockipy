@@ -4,8 +4,8 @@ import {jwtDecode}  from "jwt-decode";
 
 
 const API_URL = "/api/v1/customers";
-const user = localStorage?.getItem("user") || "";
-const userId = JSON.parse(user)?._id;
+const userStr = localStorage?.getItem("user") || "";
+const userId = userStr ? JSON.parse(userStr)?._id : undefined;
 
 export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async (_, {rejectWithValue}) => {
     try {
