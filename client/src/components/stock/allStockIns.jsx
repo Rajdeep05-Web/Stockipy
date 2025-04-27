@@ -255,8 +255,8 @@ const AllStockIns = () => {
                           </span>
                         ) : (
                           <span className="flex items-center">
-                            <Download className="mr-2" size={20} />
-                            Download as PDF
+                            <Download className="lg:mr-2" size={20} />
+                            <span className="hidden lg:inline">Download as PDF</span>
                           </span>
                         )
                       }
@@ -266,16 +266,16 @@ const AllStockIns = () => {
                       onClick={() => handleEditStockIn(item)}
                       class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
                     >
-                      <Edit className="sm:mr-2" size={20} />
-                      Edit
+                      <Edit className="lg:mr-2" size={20} />
+                      <span className="hidden lg:inline">Edit</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteStockIn(item)}
                       class="flex text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 transition-all duration-300 items-center"
                     >
-                      <Trash className="sm:mr-2" size={20} />
-                      Delete
+                      <Trash className="lg:mr-2" size={20} />
+                      <span className="hidden lg:inline ">Delete</span>
                     </button>
                   </div>
                 </div>

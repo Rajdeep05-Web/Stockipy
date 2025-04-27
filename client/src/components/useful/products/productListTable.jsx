@@ -6,6 +6,7 @@ import {
 } from "../../../redux/slices/products/productsSlice";
 import { useDispatch } from "react-redux";
 import SearchBar from "../searchBar";
+import { Edit, Trash2 } from "lucide-react";
 
 const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
   const [search, setSearch] = useState("");
@@ -93,20 +94,22 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
                   <td class="px-6 py-4">{product.rate}</td>
                   <td class="px-6 py-4">{product.mrp}</td>
                   <td class="px-6 py-4">{product.gstPercentage}</td>
-                  <td class="px-6 py-4">
+                  <td class="inline-flex px-6 py-4">
                     <button
                       type="button"
                       onClick={() => handleEdit(product)}
-                      class="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                      class="flex items-center justify-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                     >
-                      Edit
+                      <Edit className="flex-shrink-0" size={16} />
+                      <span className="hidden xl:inline ml-1">Edit</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(product)}
-                      class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                      class="flex items-center justify-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                     >
-                      Delete
+                      <Trash2 className="flex-shrink-0" size={16} />
+                      <span className="hidden xl:inline ml-1">Delete</span>
                     </button>
                   </td>
                 </tr>
