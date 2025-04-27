@@ -4,11 +4,13 @@ import {jwtDecode}  from "jwt-decode";
 
 
 const API_URL = "/api/v1/customers";
+const user = localStorage?.getItem("user") || "";
+const userId = JSON.parse(user)?._id;
 
 export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async (_, {rejectWithValue}) => {
     try {
-        const  {data}  = await API.get(API_URL);
-        return data;
+        const  {data}  = await API.get(`${API_URL}/${userId}`);
+        return data?.customerDetails;
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
     }
@@ -29,8 +31,8 @@ export const addCustomer = createAsyncThunk('customers/addCustomer', async (clen
         // const exp = new Date(decoded.exp * 1000).toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
         // console.log("Token expire time: ", exp);
 
-        const { data } = await API.post(`${API_URL}`, customer);
-        return data;
+        const { data } = await API.post(`${API_URL}/${userId}`, customer);
+        return data?.customerDetails;
         
     } catch (error) {
          // If error.response exists, return the error message; otherwise return a generic message
@@ -38,8 +40,10 @@ export const addCustomer = createAsyncThunk('customers/addCustomer', async (clen
     }
 });
 export const updateCustomer = createAsyncThunk('customers/updateCustomer', async ({ id, customer }, {rejectWithValue}) => {
+    console.log("Step 2 ", id, customer);
     try {
-        const { data } = await API.put(`${API_URL}/${id}`, customer);
+        const { data } = await API.put(`${API_URL}/${userId}/${id}`, customer);
+        console.log("Step 2 ", data);
         return data;  
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);

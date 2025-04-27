@@ -56,7 +56,7 @@ export const fetchCustomer = async (req, res) => {
 
 export const addCustomer = async (req, res) => {
     const { userId } = req.params;
-    const { customer } = req.body;
+    const customer = req.body;
     if (!userId || !ObjectId.isValid(userId)) {
         return res.status(400).json({ error: 'User ID is required' });
     }
@@ -116,8 +116,8 @@ export const addCustomer = async (req, res) => {
 
             //if user exists then push the new customer to the customer array
             existingCustomerWithUserId.customerDetails.push(customer);
-            const response = await existingCustomerWithUserId.save();
-            return res.status(200).json(response);
+            const {customerDetails} = await existingCustomerWithUserId.save();
+            return res.status(200).json(customerDetails);
         }
     } catch (error) {
         console.log(error);
@@ -127,7 +127,7 @@ export const addCustomer = async (req, res) => {
 
 export const updateCustomer = async (req, res) => {
     const { userId, cId } = req.params;
-    const { customer } = req.body;
+    const customer = req.body;
     if (!userId || !ObjectId.isValid(userId)) {
         return res.status(400).json({ error: 'User ID is required' });
     }

@@ -133,6 +133,8 @@ export const reGenerateAccessToken = async (req, res) => {
      }
      //verify refresh token
      const decode = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
+
+     console.log("Decoded refresh token",decode);
      
      //check if user exists in db
         const user = await User.findOne({email:{ $eq : decode.email}});
