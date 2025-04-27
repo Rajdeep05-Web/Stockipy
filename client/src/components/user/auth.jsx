@@ -94,7 +94,7 @@ export default function AuthForm() {
       </div>
       
       <div className="max-w-md w-full mx-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 transition-colors duration-300">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 mx-4 transition-colors duration-300">
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
               {isLogin ? 'Welcome back' : 'Create account'}

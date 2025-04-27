@@ -50,7 +50,7 @@ export const updateCustomer = createAsyncThunk('customers/updateCustomer', async
     }
 });
 export const deleteCustomer = createAsyncThunk('customers/deleteCustomer', async (customer) => {
-    await API.delete(`${API_URL}/${customer._id}`);
+    await API.delete(`${API_URL}/${userId}/${customer._id}`);
     return customer._id;
 });
 

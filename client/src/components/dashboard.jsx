@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 function Dashboard() {
   const { products, loading } = useSelector((state) => state.products);
+  const user = JSON.parse(localStorage.getItem('user')) || null;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +17,8 @@ function Dashboard() {
 
   return (
     <>
-      <h1 className="text-3xl font-black underline">Wecome</h1>
+      <h1 className="text-3xl font-medium">Wecome, {user?.name?.toUpperCase()}
+      </h1>
     </>
   );
 }

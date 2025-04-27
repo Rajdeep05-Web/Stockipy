@@ -116,7 +116,7 @@ export const addCustomer = async (req, res) => {
 
             //if user exists then push the new customer to the customer array
             existingCustomerWithUserId.customerDetails.push(customer);
-            const {customerDetails} = await existingCustomerWithUserId.save();
+            const { customerDetails } = await existingCustomerWithUserId.save();
             return res.status(200).json(customerDetails);
         }
     } catch (error) {
@@ -218,7 +218,7 @@ export const updateCustomer = async (req, res) => {
 };
 
 export const deleteCustomer = async (req, res) => {
-    
+
     const { userId, cId } = req.params;
     if (!userId || !ObjectId.isValid(userId)) {
         return res.status(400).json({ error: 'User ID is required' });
@@ -226,7 +226,28 @@ export const deleteCustomer = async (req, res) => {
     if (!cId || !ObjectId.isValid(cId)) {
         return res.status(400).json({ error: 'Customer ID is required' });
     }
-
-    //now check that if customer exists or not for the user
-    
+    try {
+        //now check that if customer exists or not for the user
+        const existingCustomerWithUserId = await Customer.findOne({ userId: userId });
+        if (!existingCustomerWithUserId) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+        //check if customer exists in the customer array
+        const customerIndex = existingCustomerWithUserId.customerDetails.findIndex((c) => c._id.equals(cId));
+        if (customerIndex === -1) {
+            return res.status(404).json({ error: 'Customer not found' });
+        }
+        //remove the customer from the array    
+        existingCustomerWithUserId.customerDetails.splice(customerIndex, 1);
+        //save the customer
+        const updatedCustomerDocument = await existingCustomerWithUserId.save();
+        if (updatedCustomerDocument) {
+            return res.status(200).json({ message: 'Customer deleted successfully' });
+        } else {
+            return res.status(500).json({ error: 'Error while deleting customer' });
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
 };
