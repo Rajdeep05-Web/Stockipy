@@ -32,7 +32,7 @@ import authRouter from "./src/routes/authRouter.js";
 import authTokenVerifyMiddleware from "./src/middlewares/authTokenVerifyMiddleware.js";
 
 // MongoDB Connection
-await connectDB();
+// await connectDB(); //to check if connected fetch any resource bc db connection happens in the router
 
 // Routes
 app.get("/", (req, res) => {

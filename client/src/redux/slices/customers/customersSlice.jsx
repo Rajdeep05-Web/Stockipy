@@ -4,10 +4,10 @@ import {jwtDecode}  from "jwt-decode";
 
 
 const API_URL = "/api/v1/customers";
-const userStr = localStorage?.getItem("user") || "";
-const userId = userStr ? JSON.parse(userStr)?._id : undefined;
 
 export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async (_, {rejectWithValue}) => {
+    const userStr = localStorage?.getItem("user") || "";
+    const userId = userStr ? JSON.parse(userStr)?._id : undefined;
     try {
         const  {data}  = await API.get(`${API_URL}/${userId}`);
         return data?.customerDetails;
@@ -20,26 +20,31 @@ export const fetchCustomer = createAsyncThunk('customers/fetchCustomer', async (
     return data;
 });
 export const addCustomer = createAsyncThunk('customers/addCustomer', async (clentData, {rejectWithValue }) => {
+    const userStr = localStorage?.getItem("user") || "";
+    const userId = userStr ? JSON.parse(userStr)?._id : undefined;
     try {
         console.log("Step 1 ");
-
+        
         const customer = clentData.newCustomer;
         // const accessToken = clentData.token;
-
+        
         //readable token expire time in ist
         // const decoded = jwtDecode(accessToken);
         // const exp = new Date(decoded.exp * 1000).toLocaleString("en-US", {timeZone: "Asia/Kolkata"});
         // console.log("Token expire time: ", exp);
-
+        // console.log("Customer Data: ", customer);
         const { data } = await API.post(`${API_URL}/${userId}`, customer);
+        // console.log("Step 1 ", data);
         return data?.customerDetails;
         
     } catch (error) {
-         // If error.response exists, return the error message; otherwise return a generic message
-      return rejectWithValue(error.response?.data?.error || error.message);
+        // If error.response exists, return the error message; otherwise return a generic message
+        return rejectWithValue(error.response?.data?.error || error.message);
     }
 });
 export const updateCustomer = createAsyncThunk('customers/updateCustomer', async ({ id, customer }, {rejectWithValue}) => {
+    const userStr = localStorage?.getItem("user") || "";
+    const userId = userStr ? JSON.parse(userStr)?._id : undefined;
     console.log("Step 2 ", id, customer);
     try {
         const { data } = await API.put(`${API_URL}/${userId}/${id}`, customer);
@@ -50,8 +55,14 @@ export const updateCustomer = createAsyncThunk('customers/updateCustomer', async
     }
 });
 export const deleteCustomer = createAsyncThunk('customers/deleteCustomer', async (customer) => {
-    await API.delete(`${API_URL}/${userId}/${customer._id}`);
-    return customer._id;
+    const userStr = localStorage?.getItem("user") || "";
+    const userId = userStr ? JSON.parse(userStr)?._id : undefined;
+    try {
+        await API.delete(`${API_URL}/${userId}/${customer._id}`);
+        return customer._id;
+    } catch (error) {
+        return rejectWithValue(error.response?.data?.error || error.message);
+    }
 });
 
 const customersSlice = createSlice({
