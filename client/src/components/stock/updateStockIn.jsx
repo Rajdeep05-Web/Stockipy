@@ -21,7 +21,6 @@ import {
   fetchStockIns,
 } from "../../redux/slices/stock/stockInSlice";
 import { fetchProducts } from "../../redux/slices/products/productsSlice";
-import { Product } from "../../../../server/src/models/productModel";
 
 const UpdateStockIn = () => {
   const dispatch = useDispatch();

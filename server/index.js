@@ -13,12 +13,12 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // Allow requests from frontend
-  credentials: true, // Allow cookies/auth headers
+  origin: process.env.CLIENT_URL || 'http://localhost:5000', // Replace with your frontend URL
+  credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
-app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(express.urlencoded({ extended: true }));
 
 //import Routes
 import productRouter from "./src/routes/productRouter.js";

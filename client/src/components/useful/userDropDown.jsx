@@ -3,9 +3,6 @@ import {useDispatch} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import { logOutUser, resetAuthState } from "../../redux/slices/auth/authSlice";
 
-import Loading from '../useful/Loading/loading';
-import { Coins } from "lucide-react";
-
 const UserDropdown = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState('');

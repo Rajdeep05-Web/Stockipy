@@ -2,7 +2,7 @@ import {
     Bell,
     Menu,
   } from "lucide-react";
-import UserDropdown from './UserDropdown';
+import UserDropdown from "./userDropDown";
 import {useState } from 'react';
 
 const Navbar = ({setSidebarOpen, sidebarOpen}) => {
