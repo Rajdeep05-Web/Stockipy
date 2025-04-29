@@ -6,7 +6,7 @@ const API_URL_AUTH = "/api/v1/auth";
 //async thunk to create a new user
 export const createUser = createAsyncThunk("user/signup", async (user, { rejectWithValue }) => {
   try {
-    const {data} = await API.post(`${API_URL_AUTH}/signup`, user);
+    const { data } = await API.post(`${API_URL_AUTH}/signup`, user);
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
@@ -16,7 +16,7 @@ export const createUser = createAsyncThunk("user/signup", async (user, { rejectW
 //async thunk to login a user
 export const loginUser = createAsyncThunk("user/login", async (user, { rejectWithValue }) => {
   try {
-    const {data} = await API.post(`${API_URL_AUTH}/login`, user);
+    const { data } = await API.post(`${API_URL_AUTH}/login`, user);
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
@@ -26,7 +26,7 @@ export const loginUser = createAsyncThunk("user/login", async (user, { rejectWit
 //async thunk to logout a user
 export const logOutUser = createAsyncThunk("user/Logout", async (userData, { rejectWithValue }) => {
   try {
-    const {data} = await API.put(`${API_URL_AUTH}/logout/${userData._id}`, userData);
+    const { data } = await API.put(`${API_URL_AUTH}/logout/${userData._id}`, userData);
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
@@ -36,7 +36,7 @@ export const logOutUser = createAsyncThunk("user/Logout", async (userData, { rej
 //verify user
 export const verifyUserOnPageLoad = createAsyncThunk("user/Verify", async (_, { rejectWithValue }) => {
   try {
-    const {data} = await API.post(`${API_URL_AUTH}/verify-user`, {});
+    const { data } = await API.post(`${API_URL_AUTH}/verify-user`, {});
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);
@@ -70,9 +70,9 @@ const authSlice = createSlice({
       localStorage.setItem("user", JSON.stringify(action.payload.user));
       localStorage.setItem("token", action.payload.token);
     },
-    
+
     //resets the auth state
-      resetAuthState: (state) => {
+    resetAuthState: (state) => {
       state.user = null;
       state.loading = false;
       state.error = null;
@@ -82,10 +82,15 @@ const authSlice = createSlice({
     },
 
     //stores the new access token in the Redux store and local storage
-    updateAccessToken : (state, action) => {
+    updateAccessToken: (state, action) => {
       // state.loading = false;
       // state.user = action.payload.user;
       state.token = action.payload;
+    },
+
+    //sets the loading state to true or false
+    setLoader: (state, action) => {
+      state.loading = !state.loading;
     }
   },
 
@@ -94,77 +99,77 @@ const authSlice = createSlice({
     // Extra reducers go here
     builder.
 
-    addCase(createUser.pending, (state) => {
-      state.loading = true;
-      state.message = null;
-    })
-    .addCase(createUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.message = action.payload.message;
-    })
-    .addCase(createUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.message = action.payload.error;
-    })
-    
-    .addCase(loginUser.pending, (state) => {
-      state.loading = true;
-      state.message = null;
-    })
-    .addCase(loginUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.isAuthenticated = action.payload.isAuthenticated;
-      state.message = action.payload.message;
-      localStorage.setItem("user", JSON.stringify(action.payload.user));
-      localStorage.setItem("token", action.payload.token);
-    })
-    .addCase(loginUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload; 
-    })
+      addCase(createUser.pending, (state) => {
+        state.loading = true;
+        state.message = null;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.message = action.payload.message;
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.message = action.payload.error;
+      })
 
-    .addCase(logOutUser.pending, (state) => {
-      state.loading = true;
-      state.message = null;
-    })
-    .addCase(logOutUser.fulfilled, (state, action) => {
-      state.loading = false;
-      state.user = null;
-      state.token = null;
-      state.message = action.payload.message;
-      state.isAuthenticated = false;
-    })  
-    .addCase(logOutUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.message = null;
-    })
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+        state.message = null;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.isAuthenticated = action.payload.isAuthenticated;
+        state.message = action.payload.message;
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
 
-    .addCase(verifyUserOnPageLoad.pending, (state) => {
-      state.loading = true;
-    })
-    .addCase(verifyUserOnPageLoad.fulfilled, (state, action) => {
-      state.loading = false;
-      state.message = action.payload;
-      state.isAuthenticated = true;
-    })
-    .addCase(verifyUserOnPageLoad.rejected, (state, action) => {
-      state.loading = false;
-       state.error = action.payload.error;
-       state.user = null;
-       state.token = null;
-       state.isAuthenticated = false;
-       localStorage.removeItem('user');
-       localStorage.removeItem('token');
-    })
+      .addCase(logOutUser.pending, (state) => {
+        state.loading = true;
+        state.message = null;
+      })
+      .addCase(logOutUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.message = action.payload.message;
+        state.isAuthenticated = false;
+      })
+      .addCase(logOutUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.message = null;
+      })
+
+      .addCase(verifyUserOnPageLoad.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(verifyUserOnPageLoad.fulfilled, (state, action) => {
+        state.loading = false;
+        state.message = action.payload;
+        state.isAuthenticated = true;
+      })
+      .addCase(verifyUserOnPageLoad.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.error;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      })
 
   }
 });
 
-export const { resetAuthState, updateAccessToken } = authSlice.actions; //exports the actions
+export const { resetAuthState, updateAccessToken, setLoader } = authSlice.actions; //exports the actions
 export default authSlice.reducer; //exports the reducer async thunk functions
