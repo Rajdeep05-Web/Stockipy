@@ -43,9 +43,6 @@ export const verifyUserOnPageLoad = createAsyncThunk("user/Verify", async (_, { 
   }
 });
 
-
-
-
 const initialState = {
   user: JSON.parse(localStorage.getItem('user')) || null,
   isAuthenticated: false,
@@ -90,7 +87,14 @@ const authSlice = createSlice({
 
     //sets the loading state to true or false
     setLoader: (state, action) => {
+      console.log("Loading state changed");
       state.loading = !state.loading;
+      if (action.payload) {
+        state.loading = action.payload;
+      }
+      if (action.payload === false) {
+        state.loading = false;
+      }
     }
   },
 

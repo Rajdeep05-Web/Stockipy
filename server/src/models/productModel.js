@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-
-const productSchema = mongoose.Schema({
+//productSchema to productDetailsSchema
+const productDetailsSchema = mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -16,11 +16,11 @@ const productSchema = mongoose.Schema({
         default: 0
     },
     // purchase rate from vendor
-    productPurchaseRate:{
+    productPurchaseRate: {
         type: Number,
         default: 0
     },
-    prevProductPurchaseRate:[
+    prevProductPurchaseRate: [
         {
             type: Object,
             date: {
@@ -39,7 +39,7 @@ const productSchema = mongoose.Schema({
         required: true,
         default: 0
     },
-    prevMrp:[
+    prevMrp: [
         {
             type: Object,
             date: {
@@ -52,9 +52,9 @@ const productSchema = mongoose.Schema({
             }
         }
     ],
-    productStockIns:[
-        { 
-            type : mongoose.Schema.Types.ObjectId,
+    productStockIns: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'StockIn',
             required: true
         }
@@ -62,21 +62,26 @@ const productSchema = mongoose.Schema({
     description: {
         type: String,
         default: ""
-      
+
     },
     gstPercentage: {
-       type: Number,
-       required: true,
-       default: 18
+        type: Number,
+        required: true,
+        default: 18
     },
     imageUrl: {
         type: String,
-     
+
     },
-    createdAt:{
+    createdAt: {
         type: Date,
         default: new Date()
     }
 });
+
+const productSchema = mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
+    productDetails: [productDetailsSchema],
+}, { timestamps: true });
 
 export const Product = mongoose.model('Product', productSchema);

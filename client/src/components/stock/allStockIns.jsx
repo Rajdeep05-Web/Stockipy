@@ -220,8 +220,8 @@ const AllStockIns = () => {
                         onClick={() => handleOpenInvoice(item.fileCloudUrl)}
                         class="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
                       >
-                        <Eye className="sm:mr-2" size={20} />
-                        View Invoice
+                        <Eye className="lg:mr-2" size={20} />
+                         <span className="hidden lg:inline">View Invoice</span>
                       </button>
                     )}
                     {/* Download stock In details as invoice PDF */}

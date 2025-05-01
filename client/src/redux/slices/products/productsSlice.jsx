@@ -114,10 +114,7 @@ const productsSlice = createSlice({
     })
     // Update Product
     .addCase(updateProduct.fulfilled, (state, action) => {
-        const index = state.products.findIndex((p) => p._id === action.payload._id);
-        if (index !== -1) {
-            state.products[index] = action.payload;
-        }
+        state.products = action.payload;
     })
     .addCase(updateProduct.rejected, (state, action) => {
         state.status = 'failed';
@@ -131,7 +128,7 @@ const productsSlice = createSlice({
     })
     // Delete Product
     .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.products = state.products.filter((product) => product._id !== action.payload);
+        state.products = action.payload;
     })
     .addCase(deleteProduct.rejected, (state, action) => {
         state.status = 'failed';
