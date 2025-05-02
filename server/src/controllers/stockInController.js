@@ -100,9 +100,54 @@ export const addStockIn = async (req, res) => {
 }
 
 export const getStockIns = async (req, res) => {
+    const userId = req.user.userId;
+    if(!userId){
+        return res.status(400).json({error: "User ID is required"});
+    }
     try {
-    const stockIns = await StockIn.find().populate("vendor").populate("products.product");//populate the vendor and product fields
-    return res.status(200).json(stockIns);
+        // First get the user's product document which contains all products
+        const userProductDocument = await Product.findOne({ userId: userId });
+        
+        if (!userProductDocument) {
+            return res.status(200).json({ message: "No products found for this user." });
+        }
+        
+        // Extract all product IDs from productDetails array
+        const productDetailsMap = {};
+        const userProductIds = userProductDocument.productDetails.map(p => {
+            // Create a map of product IDs to their details for easy lookup
+            productDetailsMap[p._id.toString()] = p;
+            return p._id;
+        });
+        
+        // Find stockIns that contain any of these products
+        const stockIns = await StockIn.find({
+            'products.product': { $in: userProductIds }
+        }).populate("vendor");
+        
+        // Manually "populate" the product details using our map
+        const populatedStockIns = stockIns.map(stockIn => {
+            // Convert to plain object so we can modify it
+            const stockInObj = stockIn.toObject();
+            
+            // Replace each product reference with the actual product details
+            stockInObj.products = stockInObj.products.map(productEntry => {
+                const productId = productEntry.product.toString();
+                
+                // Replace the ID reference with the actual product details
+                if (productDetailsMap[productId]) {
+                    return {
+                        ...productEntry,
+                        product: productDetailsMap[productId]
+                    };
+                }
+                return productEntry;
+            });
+            
+            return stockInObj;
+        });
+        
+        return res.status(200).json(populatedStockIns);
     } catch (error) {
         console.log(error);
         res.status(500).json({error: error.message});

@@ -11,7 +11,7 @@ export const fetchVendors = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await API.get(API_URL);
-      return data;
+      return data?.vendorsDetails;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
     }
@@ -33,7 +33,7 @@ export const addVendor = createAsyncThunk(
   async (vendor, { rejectWithValue }) => {
     try {
       const { data } = await API.post(API_URL, vendor);
-      return data;
+      return data?.vendorsDetails;
     } catch (error) {
       return rejectWithValue(error.response?.data?.error || error.message);
     }

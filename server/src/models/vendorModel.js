@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const vendorSchema = mongoose.Schema({
+const vendorDetailsSchema = mongoose.Schema({
       name:{
         type: String,
         required: true
@@ -29,5 +29,10 @@ const vendorSchema = mongoose.Schema({
       }
 
 })
+
+const vendorSchema = mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
+    vendorsDetails: [vendorDetailsSchema],
+}, { timestamps: true });
 
 export const Vendor = mongoose.model('Vendor', vendorSchema);
