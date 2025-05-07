@@ -12,12 +12,12 @@ export const fetchVendors = async (req, res) => {
         return res.status(400).json({ error: 'Invalid user ID' });
     }
     try {
-        const exist = await Vendor.findOne({userId : userId});
+        const exist = await Vendor.find({userId : userId});
         if (!exist) {
             return res.status(404).json({ error: 'User not found' });
         }
-        const vendors = await Vendor.findOne({ userId: userId });
-        if (!vendors?.vendorsDetails || vendors?.vendorsDetails.length === 0) {
+        const vendors = exist;
+        if (!vendors || vendors?.length === 0) {
             return res.status(404).json({ error: 'No vendors found' });
         }
         return res.status(201).json(vendors);
@@ -39,8 +39,8 @@ export const fetchVendor = async (req, res) => {
         return res.status(400).json({ error: 'Invalid vendor ID' });
     }
     try {
-        const {vendorsDetails} = await Vendor.findOne({ userId: userId, 'vendorsDetails._id': id }, { 'vendorsDetails.$': 1 });
-        return res.status(200).json(vendorsDetails[0]);
+        const vendorsDetails = await Vendor.findOne({'_id': id });
+        return res.status(200).json(vendorsDetails);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -48,7 +48,7 @@ export const fetchVendor = async (req, res) => {
 };
 export const addVendor = async (req, res) => {
     const userId = req.user.userId;
-    const {vendor} = req.body;
+    const vendor = req.body;
     if (!userId || !ObjectId.isValid(userId)) {
         return res.status(400).json({ error: 'User ID is required' });
     }
@@ -70,37 +70,38 @@ export const addVendor = async (req, res) => {
     }
     try {
         // Check if vendor already exists
-        const existingVendorWithUserId = await Vendor.findOne({ userId: userId });
+        const existingVendorWithUserId = await Vendor.find({ userId: userId });
         if (!existingVendorWithUserId) {
-            const newVendor = new Vendor({ userId, vendorsDetails: [vendor] });
+            const newVendor = new Vendor({ userId, ...vendor });
 
             const response = await newVendor.save();
             return res.status(200).json(response);
         } else {
-            const isVendorPresent = existingVendorWithUserId.vendorsDetails.some((v) =>
+            const isVendorPresent = existingVendorWithUserId.some((v) =>
                 vendor.name.toLowerCase() === v.name.toLowerCase()
             )
             if (isVendorPresent) {
                 return res.status(400).json({ error: 'Vendor already exists' });
             }
             //check if gst is given then check if gst already exists
-            const isGstPresent = existingVendorWithUserId.vendorsDetails.some((v) => vendor.gstNo && vendor.gstNo.toLowerCase() === v.gstNo.toLowerCase())
+            const isGstPresent = existingVendorWithUserId.some((v) => vendor.gstNo && vendor.gstNo.toLowerCase() === v.gstNo.toLowerCase())
             if (isGstPresent) {
                 return res.status(400).json({ error: 'Vendor GST number already exists' });
             }
             //check if phne is given then check if phone already exists
-            const isPhonePresent = existingVendorWithUserId.vendorsDetails.some((v) => vendor.phone && vendor.phone.toLowerCase() === v.phone.toLowerCase())
+            const isPhonePresent = existingVendorWithUserId.some((v) => vendor.phone && vendor.phone === v.phone)
             if (isPhonePresent) {
                 return res.status(400).json({ error: 'Vendor phone number already exists' });
             }
             //check email if given
-            const isEmailPresent = existingVendorWithUserId.vendorsDetails.some((v) => vendor.email && vendor.email.toLowerCase() === v.email.toLowerCase())
+            const isEmailPresent = existingVendorWithUserId.some((v) => vendor.email && vendor.email.toLowerCase() === v.email.toLowerCase())
             if (isEmailPresent) {
                 return res.status(400).json({ error: 'Customer email already exists' });
             }
-            existingVendorWithUserId.vendorsDetails.push(vendor);
-            const response = await existingVendorWithUserId.save();
-            return res.status(200).json(response);
+            const newVendor = await new Vendor({ userId, ...vendor });
+            const response = await newVendor.save();
+            existingVendorWithUserId.push(response);
+            return res.status(200).json(existingVendorWithUserId);
         }
     } catch (error) {
         console.log(error);
@@ -108,8 +109,12 @@ export const addVendor = async (req, res) => {
     }
 };
 export const updateVendor = async (req, res) => {
+    const userId = req.user.userId;
     const { id } = req.params;
     const vendor = req.body;
+    if (!userId || !ObjectId.isValid(userId)) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
     if (!id || !vendor) {
         return res.status(400).json({ error: 'ID or Vendor details is required' });
     }
@@ -131,18 +136,18 @@ export const updateVendor = async (req, res) => {
         return res.status(400).json({ error: 'Phone number must be 10 digits' });
     }
     try {
-        const existingVendors = await Vendor.find();
+        const existingVendors = await Vendor.find({userId : userId});
         if (existingVendors.length > 0) {
             const isVendorPresent = existingVendors.some((v) =>
                 vendor.name.toLowerCase() === v.name.toLowerCase() && v._id.toString() !== id
             )
             if (isVendorPresent) {
-                return res.status(400).json({ error: 'Vendor already exists' });
+                return res.status(400).json({ error: 'Vendor name already exists' });
             }
         }
         const updateVendor = await Vendor.findByIdAndUpdate(
             id,
-            vendor,
+            {...vendor, userId: userId},
             { new: true }
         );
         if (!updateVendor) {
