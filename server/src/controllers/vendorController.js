@@ -68,6 +68,9 @@ export const addVendor = async (req, res) => {
     if (vendor.phone && vendor.phone.length !== 10) {
         return res.status(400).json({ error: 'Phone number must be 10 digits' });
     }
+    if (vendor.gstNo && vendor.gstNo.length !== 15) {
+        return res.status(400).json({ error: 'GST number must be 15 digits' });
+    }
     try {
         // Check if vendor already exists
         const existingVendorWithUserId = await Vendor.find({ userId: userId });
@@ -134,6 +137,9 @@ export const updateVendor = async (req, res) => {
     //phone no from DB is number and from req is string
     if (vendor.phone && vendor.phone.toString().length !== 10) {
         return res.status(400).json({ error: 'Phone number must be 10 digits' });
+    }
+       if (vendor.gstNo && vendor.gstNo.length !== 15) {
+        return res.status(400).json({ error: 'GST number must be 15 digits' });
     }
     try {
         const existingVendors = await Vendor.find({userId : userId});
