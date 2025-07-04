@@ -211,7 +211,9 @@ const AllStockIns = () => {
                 id={`accordion-body-${item._id}`}
               >
                 <div className="flex flex-row justify-between">
-                  <h4 class="text-2xl font-bold dark:text-white">Details:</h4>
+                  <div>
+                  <h4 class="text-[15px] md:text-2xl font-bold dark:text-white">Details:</h4>
+                  </div>
                   <div name="buttons" className="flex flex-row gap-2">
                     {item.fileCloudUrl && (
                       // View the invoice uploaded during stock-In (In a new tab)
