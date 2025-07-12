@@ -29,12 +29,10 @@ const ProductList = () => {
 
 
   if (status === "loading") return <Loading />;
-  if (status === "failed") {
-    return <ErrorAlert errorMsg={`Error fetching data: ${error}`} />;
-  }
 
   return (
     <>
+    {(status === "failed") && <ErrorAlert errorMsg={`Error fetching data: ${error}`} />}
     <ProductListTable products={products} setSuccessMsg={setSuccessMsg} setErrorMsg={setErrorMsg}/>
       {/** success message **/}
       {successMsg && <SuccessAlert successMsg={successMsg} />}

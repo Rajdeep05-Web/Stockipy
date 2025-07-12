@@ -109,7 +109,7 @@ export const getStockIns = async (req, res) => {
         const userProductDocument = await Product.findOne({ userId: userId });
         
         if (!userProductDocument) {
-            return res.status(200).json({ message: "No products found for this user." });
+            return res.status(404).json({ message: "No products found for this user." });
         }
         
         // Extract all product IDs from productDetails array

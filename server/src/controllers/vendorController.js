@@ -13,9 +13,9 @@ export const fetchVendors = async (req, res) => {
     }
     try {
         const exist = await Vendor.find({userId : userId});
-        if (!exist) {
-            return res.status(404).json({ error: 'User not found' });
-        }
+        // if (!exist) {
+        //     return res.status(404).json({ error: 'User not found' });
+        // }
         const vendors = exist;
         if (!vendors || vendors?.length === 0) {
             return res.status(404).json({ error: 'No vendors found' });

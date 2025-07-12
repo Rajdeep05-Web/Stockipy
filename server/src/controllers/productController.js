@@ -9,13 +9,13 @@ export const fetchProducts = async (req, res) => {
   }
   try {
     const existingProductsWithUserId = await Product.findOne({ userId: userId });
-    if(!existingProductsWithUserId) {
-      return res.status(200).json("User not found");
-    }
+    // if(!existingProductsWithUserId) {
+    //   return res.status(400).json({error : "User not found"});
+    // }
     if (existingProductsWithUserId && existingProductsWithUserId?.productDetails.length > 0) {
       return res.status(200).json(existingProductsWithUserId.productDetails);
     }
-    return res.status(200).json("No products found");
+    return res.status(404).json("No products found");
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
