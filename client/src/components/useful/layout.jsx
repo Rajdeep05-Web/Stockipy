@@ -10,7 +10,7 @@ const Layout = () => {
   const { loading: authLoading } = useSelector((state) => state.auth);
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-slate-900">
       <Sidebar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} /> {/* Left navigation bar */}
       <div className="flex-1 flex flex-col min-h-screen overflow-scroll"> {/* Main content area */}
         <Navbar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} /> {/* Top navigation bar */}

@@ -4,6 +4,7 @@ import { Sun, Moon, Mail, Lock, User, Eye, EyeOff, Facebook, Chrome } from 'luci
 import { createUser, loginUser, logOutUser } from '../../redux/slices/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
+import ThemeToggle from '../useful/themeToggle/themeToggle';
 
 import Loading from '../useful/Loading/loading';
 
@@ -70,9 +71,9 @@ export default function AuthForm() {
      
     }
   };
-  if (loading) {
-    return <Loading />;
-  }
+  // if (loading) {
+  //   return <Loading />;
+  // }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -80,17 +81,7 @@ export default function AuthForm() {
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Stockipy.</h2>
         </div>
       <div className="absolute top-4 right-4">
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-          aria-label="Toggle theme"
-        >
-          {theme === 'light' ? (
-            <Moon className="w-6 h-6 text-gray-800 dark:text-gray-200" />
-          ) : (
-            <Sun className="w-6 h-6 text-gray-800 dark:text-gray-200" />
-          )}
-        </button>
+      <ThemeToggle />
       </div>
       
       <div className="max-w-md w-full mx-4">
@@ -117,7 +108,7 @@ export default function AuthForm() {
           )}
 
           <div className="space-y-4 mb-8">
-            <button
+            {/* <button
               onClick={handleGoogleLogin}
               disabled={loading}
               className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50"
@@ -133,7 +124,7 @@ export default function AuthForm() {
             >
               <Facebook className="w-5 h-5" />
               <span>Continue with Facebook</span>
-            </button>
+            </button> */}
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">

@@ -83,11 +83,11 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
   return (
     <div
       id="sidebar"
-      className={`fixed z-20 inset-y-0 left-0 w-[200px] bg-white shadow-lg transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      className={`fixed z-20 inset-y-0 left-0 w-[200px] bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 backdrop-blur-md border-b border-neutral-50 dark:border-gray-700 transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static`}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold">Stockipy.</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stockipy.</h1>
       </div>
       <nav className="mt-4">
         {navItems.map((navitem) => (
@@ -95,7 +95,7 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
             {!navitem.subFolders.length ? (
               <NavLink
                 to={navitem.path}
-                className="block px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+                className="block px-6 py-3 text-gray-700 dark:text-slate-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <div className="flex items-center gap-4">
                   <navitem.icon size={20} />
@@ -107,7 +107,7 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
               onClick={() =>
                 navitem.subFolders.length > 0 && toggleDropdown(navitem.label)
               }
-              className="w-full flex items-center justify-between px-6 py-3 text-gray-700 hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center justify-between px-6 py-3 dark:text-slate-50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className="flex items-center gap-4">
                 <navitem.icon size={20} />
@@ -129,8 +129,7 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
                     key={sub.path}
                     to={sub.path}
                     className={({ isActive }) =>
-                      `block py-2 text-gray-600 hover:text-blue-600 transition ${isActive ? "font-semibold text-blue-600" : ""
-                      }`
+                      `block py-2 text-gray-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-500 transition ${isActive ? "font-semibold text-blue-600 dark:text-lime-400" : ""}`
                     }
                   >
                     <span className="font-medium"> {sub.label}</span>
