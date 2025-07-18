@@ -12,8 +12,7 @@ const CustomerListTable = ({ customers = [], setSuccessMsg, setErrorMsg }) => {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState("");
-
-  const filteredCustomers = customers.filter((customer) => customer?.name.toLowerCase().includes(search.toLowerCase()));
+  const filteredCustomers = customers.filter((customer) => customer?.name?.toLowerCase().includes(search.trim().toLowerCase()));
 
   const handleEdit = (customer) => {
     const userResponse = window.confirm(`Are you want to edit ${customer.name}?`);

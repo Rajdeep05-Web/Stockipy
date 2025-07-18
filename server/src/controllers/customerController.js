@@ -9,13 +9,10 @@ export const fetchCustomers = async (req, res) => {
         return res.status(400).json({ error: 'User ID is required' });
     }
     try {
-        const exist = await User.findById(userId);
-        if (!exist) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        const customers = await Customer.findOne({ userId: userId });
-        if (!customers?.customerDetails || customers?.customerDetails.length === 0) {
-            return res.status(404).json({ error: 'No customers found' });
+        // const exist = await User.findById(userId);
+        const customers = await Customer.find({ userId: userId });
+        if (customers.length === 0) {
+            return res.status(404).json({ error: 'No customers found for this user' });
         }
         return res.status(200).json(customers);
     } catch (error) {
@@ -33,17 +30,9 @@ export const fetchCustomer = async (req, res) => {
         return res.status(400).json({ error: 'Customer ID is required' });
     }
     try {
-        const exist = await User.findById(userId);
-        if (!exist) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        const customers = await Customer.findOne({ userId: userId });
-        if (!customers) {
-            return res.status(404).json({ error: 'Customer for this user not found' });
-        }
-        const customer = customers.customerDetails.find((c) => c._id.toString() === cId);
+        const customer = await Customer.findOne({ userId: userId, _id: cId });
         if (!customer) {
-            return res.status(404).json({ error: 'Customer not found' });
+            return res.status(404).json({ error: 'Customer for this user not found' });
         }
 
         return res.status(200).json(customer);
@@ -83,42 +72,38 @@ export const addCustomer = async (req, res) => {
     }
     try {
         //check if customer already exists
-        const existingCustomerWithUserId = await Customer.findOne({ userId: userId });
-        //if its first time adding customer, create new customer
-        if (!existingCustomerWithUserId) {
-            const newCustomer = new Customer({ userId, customerDetails: [customer] });
+        const existingCustomerWithUserId = await Customer.find({ userId: userId });
 
-            const response = await newCustomer.save();
-            return res.status(200).json(response);
-        } else {
+        //if its not the first time, then check some conditions
+        if (existingCustomerWithUserId) {
             //is user exists then check if customer name already exists
-            const isPresent = existingCustomerWithUserId.customerDetails.some((c) =>
+            const isPresent = existingCustomerWithUserId.some((c) =>
                 customer.name.toLowerCase() === c.name.toLowerCase()
             )
             if (isPresent) {
                 return res.status(400).json({ error: 'Customer name already exists' });
             }
             //check if gst is given then check if gst already exists
-            const isGstPresent = existingCustomerWithUserId.customerDetails.some((c) => customer.gstNo && customer.gstNo.toLowerCase() === c.gstNo.toLowerCase())
+            const isGstPresent = existingCustomerWithUserId.some((c) => customer.gstNo && customer.gstNo.toLowerCase() === c.gstNo.toLowerCase())
             if (isGstPresent) {
                 return res.status(400).json({ error: 'Customer GST number already exists' });
             }
             //check if phne is given then check if phone already exists
-            const isPhonePresent = existingCustomerWithUserId.customerDetails.some((c) => customer.phone && customer.phone.toLowerCase() === c.phone.toLowerCase())
+            const isPhonePresent = existingCustomerWithUserId.some((c) => customer.phone && customer.phone.toLowerCase() === c.phone.toLowerCase())
             if (isPhonePresent) {
                 return res.status(400).json({ error: 'Customer phone number already exists' });
             }
             //check email if given
-            const isEmailPresent = existingCustomerWithUserId.customerDetails.some((c) => customer.email && customer.email.toLowerCase() === c.email.toLowerCase())
+            const isEmailPresent = existingCustomerWithUserId.some((c) => customer.email && customer.email.toLowerCase() === c.email.toLowerCase())
             if (isEmailPresent) {
                 return res.status(400).json({ error: 'Customer email already exists' });
             }
-
-            //if user exists then push the new customer to the customer array
-            existingCustomerWithUserId.customerDetails.push(customer);
-            const { customerDetails } = await existingCustomerWithUserId.save();
-            return res.status(200).json(customerDetails);
         }
+
+        const newCustomer = new Customer({ userId, ...customer });
+        await newCustomer.save();
+        const allCustomers = await Customer.find({ userId: userId });
+        return res.status(201).json(allCustomers);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: `Error while adding new customer: ${error.message}` });
@@ -159,15 +144,13 @@ export const updateCustomer = async (req, res) => {
     }
     try {
         //first find the customer to be updated
-        const customerDocument = await Customer.findOne({ userId: userId });
-        if (!customerDocument || customerDocument?.customerDetails.length === 0) {
-            return res.status(404).json({ error: 'Customer not found' });
+        const customerToBeUpdated = await Customer.findOne({userId: userId, _id: cId});
+         if (!customerToBeUpdated) {
+            return res.status(404).json({ error: 'Customer not found to update' });
         }
-        const existingCustomers = customerDocument.customerDetails;
-
-        const customerToBeUpdated = existingCustomers.find((c) => c._id.equals(cId));
-        if (!customerToBeUpdated) {
-            return res.status(404).json({ error: 'Customer not found' });
+        const existingCustomers = await Customer.find({ userId: userId });
+        if (!existingCustomers || existingCustomers.length === 0) {
+            return res.status(404).json({ error: 'Customers not found for this user' });
         }
 
         //chack if customer with same name already exists
@@ -183,34 +166,29 @@ export const updateCustomer = async (req, res) => {
         if (isGstNoPresent) {
             return res.status(400).json({ error: 'Customer GST number already exists' });
         }
+
         //check if phne is given then check if phone already exists
         const isPhonePresent = existingCustomers.some((c) => customer.phone && (c.phone && customer.phone.toLowerCase() === c.phone.toLowerCase() && !c._id.equals(cId)));
         if (isPhonePresent) {
             return res.status(400).json({ error: 'Customer phone number already exists' });
         }
+
         //check email if given
         const isEmailPresent = existingCustomers.some((c) => customer.email && (c.email && !c._id.equals(cId) && customer.email.toLowerCase() === c.email.toLowerCase()));
         if (isEmailPresent) {
             return res.status(400).json({ error: 'Customer email already exists' });
         }
+        
         //now update the customer
-        const customerIndex = customerDocument.customerDetails.findIndex((c) => c._id.toString() === cId);
-        if (customerIndex === -1) {
-            return res.status(404).json({ error: 'Customer not found' });
-        }
-        //update the customer
-        const customerToUpdate = customerDocument.customerDetails[customerIndex];
-
         Object.keys(customer).forEach((key) => {
             if (customer[key] !== undefined) {
-                customerToUpdate[key] = customer[key];
+                customerToBeUpdated[key] = customer[key];
             }
         });
 
         //save the customer
-        const updatedCustomerDocument = await customerDocument.save();
-
-        return res.status(200).json(updatedCustomerDocument.customerDetails[customerIndex]);
+        const response = await customerToBeUpdated.save();
+        return res.status(200).json(response);
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -228,20 +206,14 @@ export const deleteCustomer = async (req, res) => {
     }
     try {
         //now check that if customer exists or not for the user
-        const existingCustomerWithUserId = await Customer.findOne({ userId: userId });
+        const existingCustomerWithUserId = await Customer.find({ userId: userId, _id: cId });
         if (!existingCustomerWithUserId) {
             return res.status(404).json({ error: 'Customer not found' });
         }
         //check if customer exists in the customer array
-        const customerIndex = existingCustomerWithUserId.customerDetails.findIndex((c) => c._id.equals(cId));
-        if (customerIndex === -1) {
-            return res.status(404).json({ error: 'Customer not found' });
-        }
-        //remove the customer from the array    
-        existingCustomerWithUserId.customerDetails.splice(customerIndex, 1);
-        //save the customer
-        const updatedCustomerDocument = await existingCustomerWithUserId.save();
-        if (updatedCustomerDocument) {
+        const result = await Customer.deleteOne({ userId: userId, _id: cId });
+        console.log("Delete result: ", result);
+        if (result.acknowledged) {
             return res.status(200).json({ message: 'Customer deleted successfully' });
         } else {
             return res.status(500).json({ error: 'Error while deleting customer' });

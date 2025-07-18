@@ -10,7 +10,7 @@ export const fetchCustomers = createAsyncThunk('customers/fetchCustomers', async
     const userId = userStr ? JSON.parse(userStr)?._id : undefined;
     try {
         const  {data}  = await API.get(`${API_URL}/${userId}`);
-        return data?.customerDetails;
+        return data;
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
     }
@@ -23,7 +23,6 @@ export const addCustomer = createAsyncThunk('customers/addCustomer', async (clen
     const userStr = localStorage?.getItem("user") || "";
     const userId = userStr ? JSON.parse(userStr)?._id : undefined;
     try {
-        console.log("Step 1 ");
         
         const customer = clentData.newCustomer;
         // const accessToken = clentData.token;
@@ -34,8 +33,7 @@ export const addCustomer = createAsyncThunk('customers/addCustomer', async (clen
         // console.log("Token expire time: ", exp);
         // console.log("Customer Data: ", customer);
         const { data } = await API.post(`${API_URL}/${userId}`, customer);
-        // console.log("Step 1 ", data);
-        return data?.customerDetails;
+        return data;
         
     } catch (error) {
         // If error.response exists, return the error message; otherwise return a generic message
@@ -45,10 +43,8 @@ export const addCustomer = createAsyncThunk('customers/addCustomer', async (clen
 export const updateCustomer = createAsyncThunk('customers/updateCustomer', async ({ id, customer }, {rejectWithValue}) => {
     const userStr = localStorage?.getItem("user") || "";
     const userId = userStr ? JSON.parse(userStr)?._id : undefined;
-    console.log("Step 2 ", id, customer);
     try {
         const { data } = await API.put(`${API_URL}/${userId}/${id}`, customer);
-        console.log("Step 2 ", data);
         return data;  
     } catch (error) {
         return rejectWithValue(error.response?.data?.error || error.message);
