@@ -139,7 +139,8 @@ const AllStockIns = () => {
               aria-expanded={openAccordions[item._id] || false}
               aria-controls={`accordion-body-${item._id}`}
             >
-              <div className="flex basis-7/12 w-full gap-2">
+            <div className="flex flex-col basis-5/6">
+              <div className="flex basis-6/12 w-full gap-2 text-left">
                 <div className="flex-1">
                   <span className=" flex basis-1/5 justify-start items-center ">
                     <h4 className="font-bold text-gray-600">Date:</h4>
@@ -151,11 +152,6 @@ const AllStockIns = () => {
                     &nbsp;
                     {item.invoiceNo}
                   </span>
-                  <span className="flex basis-1/5 justify-start items-center">
-                    <h4 className="font-bold text-gray-600">Vendor:</h4>
-                    &nbsp;
-                    {item.vendor.name}
-                  </span>
                 </div>
                 <div className="flex-1">
                   <span className="flex basis-1/5 justify-start items-center">
@@ -163,22 +159,32 @@ const AllStockIns = () => {
                     &nbsp;
                     {item.totalAmount}
                   </span>
-                  <span className="flex basis-1/5 justify-start items-center">
+                  
+                </div>
+              </div>
+              <div className=" basis-6/12 md:basis-4/12 text-left">
+                {" "}
+                <span className="flex basis-1/5 justify-start items-center">
+                    <h4 className="font-bold text-gray-600">Vendor:</h4>
+                    &nbsp;
+                    {item.vendor.name}
+                  </span>
+                  {item.vendor.gstNo && <span className="flex basis-1/5 justify-start items-center">
                     <h4 className="font-bold text-gray-600">GST:</h4>
                     &nbsp;
                     {item.vendor.gstNo}
-                  </span>
-                </div>
-              </div>
-              <div className=" basis-4/12">
-                {" "}
-                <span className="w-full flex">
+                  </span>}
+                {item.description && <span className="w-full flex">
                   <h4 className="font-bold text-gray-600">Description:</h4>
                   &nbsp;
                   {item.description}
-                </span>
+                </span>}
               </div>
-              <div className="justify-center items-center m-auto">
+            </div>
+              <div className="justify-center items-center m-auto asis-1/6">
+              <div>
+                
+              </div>
                 <svg
                   data-accordion-icon
                   className={`w-3 h-3 ${

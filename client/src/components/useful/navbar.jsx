@@ -34,7 +34,7 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
               {/* toggle */}
               <ThemeToggle />
               {/* Encrypted */}
-              <div className="flex items-center space-x-4">
+              <div className="items-center space-x-4 hidden md:flex">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-full transition-colors duration-300"

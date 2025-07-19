@@ -297,24 +297,24 @@ const UpdateStockIn = () => {
       />
 
       {/* stockIn */}
-      <div class="flex flex-col gap-6 h-auto lg:h-screen md:flex-row">
+      <div className="flex flex-col gap-6 h-auto lg:h-screen md:flex-row dark:bg-gray-900">
 
         {/* vendor */}
-        <div class="basis-full sm:basis-2/5 min-w-[360px] bg-red-50 p-5 border border-red-300 rounded-md overflow-auto">
-          <form class=" max-w-full lg:max-w-sm mx-auto">
-            <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
+        <div className="basis-full sm:basis-2/5 min-w-[360px] bg-red-50 p-5 border border-red-300 rounded-md overflow-auto dark:bg-gray-800 dark:border-gray-700">
+          <form className="max-w-full lg:max-w-sm mx-auto">
+            <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
               Update Vendor Details
             </h1>
-            <div class="mb-5">
+            <div className="mb-5">
               <label
-                for="vendors"
-                class="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
+                htmlFor="vendors"
+                className="block mb-2 text-sm font-bold text-gray-900 dark:text-white"
               >
                 Select a vendor
               </label>
               <select
                 id="vendors"
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 value={selectedVendorId}
                 onChange={handleVendorChange}
                 required
@@ -327,10 +327,10 @@ const UpdateStockIn = () => {
                 ))}
               </select>
             </div>
-            <div class="mb-1">
+            <div className="mb-1">
               <label
-                for="base-input"
-                class="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
+                htmlFor="base-input"
+                className="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
               >
                 Invoice no
               </label>
@@ -340,14 +340,14 @@ const UpdateStockIn = () => {
                 onChange={(e) => setInvNo(e.target.value.trim())}
                 value={invNo}
                 required
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </div>
             <div className="w-full mb-1 flex gap-2 flex-col md:flex-row">
               <div>
                 <label
-                  for="date"
-                  class="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="date"
+                  className="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Invoice date
                 </label>
@@ -355,19 +355,19 @@ const UpdateStockIn = () => {
                   id="date"
                   selected={startDate}
                   onChange={(date) => setStartDate(date)}
-                  className="block p-2.5 border border-gray-300 rounded-lg text-gray-900 bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-                  calendarClassName="rounded-lg shadow-lg bg-white"
+                  className="block p-2.5 border border-gray-300 rounded-lg text-gray-900 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  calendarClassName="rounded-lg shadow-lg bg-white dark:bg-gray-800"
                   dayClassName={(date) =>
                     date.getDay() === 6 || date.getDay() === 0
                       ? "text-red-500"
-                      : "text-black"
+                      : "text-black dark:text-white"
                   }
                 />
               </div>
               <div>
                 <label
-                  for="base-input"
-                  class="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
+                  htmlFor="base-input"
+                  className="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Amount
                 </label>
@@ -376,16 +376,15 @@ const UpdateStockIn = () => {
                   id="base-input"
                   onChange={(e) => setTotalAmount(e.target.value)}
                   value={totalAmount || ""}
-                  // placeholder="Amount"
                   required
-                  class="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  className="bg-gray-50 border border-gray-300 text-gray-900 text-base rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 />
               </div>
             </div>
-            <div class="mb-1">
+            <div className="mb-1">
               <label
-                for="base-input"
-                class="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
+                htmlFor="base-input"
+                className="block mb-1 text-sm font-medium text-gray-900 dark:text-white"
               >
                 Description
               </label>
@@ -394,17 +393,16 @@ const UpdateStockIn = () => {
                 id="base-input"
                 onChange={(e) => setDescription(e.target.value)}
                 value={description}
-                // required
-                class="bg-gray-50 border h-14 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border h-14 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
             </div>
 
             {/* if vendor is selected */}
             {selectedVendorId && (
               <>
-                <hr class="h-px my-8 bg-red-400 border-0 dark:bg-gray-700"></hr>
-                <div class="flex justify-between">
-                  <h1 class="mb-4 text-2xl font-bold leading-none tracking-tight text-gray-900 md:text-1xl lg:text-2xl dark:text-white">
+                <hr className="h-px my-8 bg-red-400 border-0 dark:bg-gray-700"></hr>
+                <div className="flex justify-between">
+                  <h1 className="mb-4 text-2xl font-bold leading-none tracking-tight text-gray-900 md:text-1xl lg:text-2xl dark:text-white">
                     Selected Vendor Details
                   </h1>
 
@@ -420,7 +418,7 @@ const UpdateStockIn = () => {
                     </div>
                   )} */}
                 </div>
-                <div class="mb-5">
+                <div className="mb-5">
                   <label
                     for="base-input"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -437,7 +435,7 @@ const UpdateStockIn = () => {
                     class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
-                <div class="mb-5">
+                <div className="mb-5">
                   <label
                     for="base-input"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -453,7 +451,7 @@ const UpdateStockIn = () => {
                     class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
-                <div class="mb-5">
+                <div className="mb-5">
                   <label
                     for="base-input"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -469,7 +467,7 @@ const UpdateStockIn = () => {
                     class={`${isUserWantSubmit ? "bg-gray-50" : "bg-gray-100"} border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
                   />
                 </div>
-                <div class="mb-5">
+                <div className="mb-5">
                   <label
                     for="large-input"
                     class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -504,7 +502,7 @@ const UpdateStockIn = () => {
                 </div>
                 {/* if user selects to edit and confirm this section shows */}
                 {isUserWantSubmit && (
-                  <div class="flex justify-end">
+                  <div className="flex justify-end">
                     <button
                       type="button"
                       onClick={handleVendorUpdateSubmit}
@@ -517,13 +515,13 @@ const UpdateStockIn = () => {
               </>
             )}
 
-            <hr class="h-px my-8 bg-red-400 border-0 dark:bg-gray-700"></hr>
+            <hr className="h-px my-8 bg-red-400 border-0 dark:bg-gray-700"></hr>
 
-            <div class="flex justify-end">
+            <div className="flex justify-end">
               <button
                 type="button"
                 onClick={() => setIsVendorModalVisible(!isVendorModalVisible)}
-                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
                 Vendor not found? Create one
               </button>
@@ -531,13 +529,13 @@ const UpdateStockIn = () => {
 
             {/* file upload */}
             <label
-              for="file"
-              class="block mt-6 mb-2 text-base font-bold text-gray-900 dark:text-white"
+              htmlFor="file"
+              className="block mt-6 mb-2 text-base font-bold text-gray-900 dark:text-white"
             >
               Upload invoice
             </label>
             {/* file upload component */}
-            <div class="flex flex-col justify-end" name="file">
+            <div className="flex flex-col justify-end" name="file">
               {fileUrl ?
                 // if file url present from then show view file and update file btn
                 <>
@@ -585,16 +583,16 @@ const UpdateStockIn = () => {
         </div>
 
         {/* product */}
-        <div class="basis-full sm:basis-3/5 min-w-[360px] bg-green-50 p-5 border border-green-300 rounded-md">
-          <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
+        <div className="basis-full sm:basis-3/5 min-w-[360px] bg-green-50 p-5 border border-green-300 rounded-md dark:bg-gray-800 dark:border-gray-700">
+          <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
             Update Products
           </h1>
           {/* search and search result dropdown component */}
           <div className="flex flex-row justify-between">
-            <div class="mb-5 relative w-4/6 sm:w-3/4">
+            <div className="mb-5 relative w-4/6 sm:w-3/4">
               <label
-                for="products"
-                class="block mb-2 text-base font-bold text-gray-900 dark:text-white"
+                htmlFor="products"
+                className="block mb-2 text-base font-bold text-gray-900 dark:text-white"
               >
                 Select products
               </label>
@@ -603,13 +601,13 @@ const UpdateStockIn = () => {
                 placeholder="Search products name"
                 value={productSearchInput}
                 onChange={handleProductSearch}
-                class="bg-gray-50 border border-gray-300 text-gray-900 text-base font-normal rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-base font-normal rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               />
               {filteredProducts.length > 0 &&
                 productSearchInput.trim().length > 0 && (
-                  <div class="absolute z-10 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg shadow-md w-full mt-1 max-h-60 overflow-y-auto focus:ring-blue-500 focus:border-blue-500 block p-0.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                    <table class="w-full">
-                      <thead class="text-base text-gray-1000 uppercase underline bg-blue-300 dark:bg-gray-700 dark:text-gray-400">
+                  <div className="absolute z-10 mb-5 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg shadow-md w-full mt-1 max-h-60 overflow-y-auto focus:ring-blue-500 focus:border-blue-500 block p-0.5 dark:bg-gray-800 dark:border-gray-700 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <table className="w-full">
+                      <thead className="text-base text-gray-1000 uppercase underline bg-blue-300 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                           <th scope="col" class="px-8 py-2 text-left">
                             Product name
@@ -623,18 +621,18 @@ const UpdateStockIn = () => {
                         {filteredProducts.map((product) => (
                           <tr
                             key={product._id}
-                            class=" cursor-pointer bg-gray-50 border-b dark:bg-gray-800 text-base dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                            className="cursor-pointer bg-gray-50 border-b dark:bg-gray-900 text-base dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
                             onClick={() => handleProductSelect(product)}
                           >
                             <th
                               scope="row"
-                              class="px-4 py-2 text-left font-medium text-wrap text-gray-900 whitespace-nowrap dark:text-white"
+                              className="px-4 py-2 text-left font-medium text-wrap text-gray-900 whitespace-nowrap dark:text-white"
                             >
                               {filteredProducts.indexOf(product) + 1}
                               {". "}
                               {product.name}
                             </th>
-                            <td class="px-4 py-2 text-right">
+                            <td className="px-4 py-2 text-right">
                               {product.quantity}
                             </td>
                           </tr>
@@ -644,137 +642,126 @@ const UpdateStockIn = () => {
                   </div>
                 )}
             </div>
-            <div class=" my-auto">
+            <div className="my-auto">
               <button
                 type="button"
                 onClick={() => setIsProductModalVisible(!isProductModalVisible)}
-                class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-md w-auto mt-4 py-3 px-3 sm:px-5  text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-md w-auto mt-4 py-3 px-3 sm:px-5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
               >
-                {/* Add new */}
                 <Plus strokeWidth={3} />
-
               </button>
             </div>
           </div>
 
           {/* selected product list */}
-          <div class="mb-5 w-full border rounded-lg flex flex-col h-3/5 justify-between overflow-auto dark:border-gray-600">
+          <div className="mb-5 w-full border rounded-lg flex flex-col h-3/5 justify-between overflow-auto dark:border-gray-600">
             {/* <h1>hi</h1> */}
 
-            <table class="w-full text-sm text-left overflow-x-auto rtl:text-right text-gray-500 dark:text-gray-400">
-              <thead class="text-sm text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400">
+            <table className="w-full text-sm text-left overflow-x-auto rtl:text-right text-gray-500 dark:text-gray-400">
+              <thead className="text-sm text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                   <th
                     scope="col"
-                    class="px-3 py-3 w-6/12 border-r border-green-300 dark:border-gray-700"
+                    className="px-3 py-3 w-6/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Product name
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
+                    className="px-3 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Purchase Rate
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3 w-2/12 min-w-[100px] border-r border-green-300 dark:border-gray-700"
+                    className="px-3 py-3 w-2/12 min-w-[100px] border-r border-green-300 dark:border-gray-700"
                   >
                     MRP
                   </th>
                   <th
                     scope="col"
-                    class="px-3 py-3 w-2/12 min-w-[100px] border-r border-green-300 dark:border-gray-700"
+                    className="px-3 py-3 w-2/12 min-w-[100px] border-r border-green-300 dark:border-gray-700"
                   >
                     Sale Rate (INC. GST)
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
+                    className="px-6 py-3 w-2/12 border-r border-green-300 dark:border-gray-700"
                   >
                     Quantity
                   </th>
-                  <th scope="col" class="px-3 py-3 w-2/12">
+                  <th scope="col" className="px-3 py-3 w-2/12">
                     Action
                   </th>
                 </tr>
               </thead>
               {selectedProductList.length > 0 && (
-                <tbody class=" border border-red-800">
+                <tbody className="border border-red-800">
                   {selectedProductList.map((product) => (
                     // <>
                     <tr
                       key={product._id}
-                      class="bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                      className="bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-900"
                     >
                       <th
                         scope="row"
-                        class=" text-wrap text-base px-3 py-0 font-medium text-gray-900 whitespace-nowrap dark:text-white w-6/12 border-r border-green-200 dark:border-gray-700"
+                        className="text-wrap text-base px-3 py-0 font-medium text-gray-900 whitespace-nowrap dark:text-white w-6/12 border-r border-green-200 dark:border-gray-700"
                       >
                         {selectedProductList.indexOf(product) + 1}
                         {". "} {product.name}
                       </th>
-                      <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
+                      <td className="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           placeholder="Rate"
                           required
                           value={allProductRates[product._id] !== undefined ? allProductRates[product._id] : product.productPurchaseRate && handleProductPurcahseRate(product._id, product.productPurchaseRate)}
-                          onChange={(e) =>
-                            handleProductPurcahseRate(product._id, e.target.value)
-                          }
-                          class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          onChange={(e) => handleProductPurcahseRate(product._id, e.target.value)}
+                          className="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                       </td>
-                      <td class="px-6 py-0 w-2/12 min-w-[100px] border-r border-green-200 dark:border-gray-700">
+                      <td className="px-6 py-0 w-2/12 min-w-[100px] border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           placeholder="MRP"
                           value={allProductMRPs[product._id] !== undefined ? allProductMRPs[product._id] : product.mrp && handleProductMRP(product._id, product.mrp)}
-                          onChange={(e) =>
-                            handleProductMRP(product._id, e.target.value)
-                          }
-                          class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          onChange={(e) => handleProductMRP(product._id, e.target.value)}
+                          className="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                       </td>
-                      <td class="px-6 py-0 w-2/12 min-w-[100px] border-r border-green-200 dark:border-gray-700">
+                      <td className="px-6 py-0 w-2/12 min-w-[100px] border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           disabled
                           placeholder="Rate"
                           value={product.rate}
-                          class="bg-gray-200 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          className="bg-gray-200 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
                       </td>
-                      <td class="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
+                      <td className="px-6 py-0 w-2/12 border-r border-green-200 dark:border-gray-700">
                         <input
                           type="text"
                           placeholder="Quantity"
                           value={productQuantities[product._id] || ""}
-                          onChange={(e) =>
-                            handleProductQuantity(product._id, e.target.value)
-                          }
-                          class="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                          onChange={(e) => handleProductQuantity(product._id, e.target.value)}
+                          className="bg-gray-50 max-h-9 mt-1 border border-gray-300 text-gray-900 text-base font-normal rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         />
-                        <h1 class={`text-black-400 mt-1 font-normal ${product.quantity < parseInt("5") ? "text-red-500" : "text-green-500"}`}>
-                          Stock: <span class={"font-semibold"}>
+                        <h1 className={`dark:text-gray-300 mt-1 font-normal ${product.quantity < parseInt("5") ? "text-red-500" : "text-green-500"}`}>
+                          Stock: <span className={"font-semibold"}>
                             {product.isUpdateProductType ?
-                              //if a update type product
                               ((product.liveQuantity - product.quantity) + parseInt("0"))
                               :
-                              // if a new added product in list
                               product.quantity + parseInt("0")
                             }
                           </span>
                         </h1>
                       </td>
-                      <td class="px-3 py-0 w-2/12 text-center">
+                      <td className="px-3 py-0 w-2/12 text-center">
                         <button
                           type="button"
                           onClick={() => handleDeleteProductFromList(product)}
-                          class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                         >
-                          {/* Remove  */}
                           <Trash2 />
                         </button>
                       </td>
@@ -785,11 +772,11 @@ const UpdateStockIn = () => {
               )}
             </table>
           </div>
-          <div class="flex justify-end">
+          <div className="flex justify-end">
             <button
               type="button"
               onClick={() => handleUpdateStockIn()}
-              class="text-white  bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-semibold rounded-lg text-lg w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               Update
             </button>

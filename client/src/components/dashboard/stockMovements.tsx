@@ -84,26 +84,27 @@ const movementTypes = {
 };
 
 const statusColors = {
-  completed: 'bg-lime-accent/20 text-lime-accent',
+  'completed': 'bg-green-500/20 text-lime-accent',
   'in-transit': 'bg-orange-500/20 text-orange-400',
   pending: 'bg-yellow-500/20 text-yellow-400',
 };
 
 const StockMovements = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-2 sm:px-4 md:px-0">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="px-1 sm:px-0"
       >
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Recent Stock Movements</h2>
-        <p className="text-gray-600 dark:text-gray-400 mt-1">Latest inventory transactions and adjustments</p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Recent Stock Movements</h2>
+        <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm sm:text-base">Latest inventory transactions and adjustments</p>
       </motion.div>
 
       {/* Movement List */}
-      <div className="bg-white bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-lg transition-colors duration-300">
+      <div className="bg-white bg-opacity-50 dark:bg-gray-800 dark:bg-opacity-50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl p-2 sm:p-4 md:p-6 shadow-lg transition-colors duration-300">
         <div className="space-y-4">
           {movements.map((movement, index) => {
             const MovementIcon = movementTypes[movement.type as keyof typeof movementTypes].icon;
@@ -116,49 +117,63 @@ const StockMovements = () => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 whileHover={{ scale: 1.01, x: 5 }}
-                className="flex items-center space-x-4 p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all group relative duration-300"
+                className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4 p-3 sm:p-4 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all group relative duration-300"
               >
                 {/* Movement Type Icon */}
-                <div className={`p-3 rounded-full ${typeConfig.bg}`}>
-                  <MovementIcon className={`w-5 h-5 ${typeConfig.color}`} />
+                <div className={`p-2 sm:p-3 rounded-full ${typeConfig.bg}`}>
+                  <MovementIcon className={`w-5 h-5 ${
+                    movement.type === 'inbound'
+                      ? 'text-lime-accent dark:text-lime-400'
+                      : movement.type === 'outbound'
+                      ? 'text-orange-400 dark:text-orange-300'
+                      : 'text-blue-400 dark:text-blue-300'
+                  }`} />
                 </div>
 
                 {/* Product Details */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-3 mb-1">
-                    <p className="font-medium text-gray-900 dark:text-white truncate">{movement.product}</p>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[movement.status as keyof typeof statusColors]}`}>
+                <div className="flex-1 min-w-0 w-full">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3 mb-1">
+                    <p className="font-medium text-gray-900 dark:text-white truncate text-base sm:text-lg">{movement.product}</p>
+                    <span
+                      className={`mt-1 sm:mt-0 px-2 py-1 rounded-full text-xs font-medium ${statusColors[movement.status as keyof typeof statusColors]} dark:border dark:border-opacity-10 dark:text-white`}
+                    >
                       {movement.status}
                     </span>
                   </div>
-                  <div className="flex items-center space-x-3 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs sm:text-sm text-gray-600 dark:text-gray-300">
                     <span>SKU: {movement.sku}</span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                     <span>{movement.location}</span>
-                    <span>•</span>
+                    <span className="hidden sm:inline">•</span>
                     <span>{movement.supplier}</span>
                   </div>
                   <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">{movement.category}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-300">{movement.category}</span>
                   </div>
                 </div>
 
                 {/* Quantity and Value */}
-                <div className="text-right">
+                <div className="text-right w-full sm:w-auto mt-2 sm:mt-0">
                   <motion.div
                     initial={{ scale: 0.8 }}
                     animate={{ scale: 1 }}
                     transition={{ duration: 0.3, delay: index * 0.1 + 0.2 }}
                     className="space-y-1"
                   >
-                    <p className={`font-bold font-editorial text-lg ${typeConfig.color}`}>
+                    <p className={`font-bold font-editorial text-base sm:text-lg ${
+                      movement.type === 'inbound'
+                        ? 'text-lime-accent dark:text-lime-400'
+                        : movement.type === 'outbound'
+                        ? 'text-orange-400 dark:text-orange-300'
+                        : 'text-blue-400 dark:text-blue-300'
+                    }`}>
                       {movement.type === 'outbound' || movement.quantity < 0 ? '' : '+'}{movement.quantity} units
                     </p>
-                    <p className={`text-sm ${movement.value >= 0 ? 'text-gray-900 dark:text-white' : 'text-red-400'}`}>
+                    <p className={`text-xs sm:text-sm ${movement.value >= 0 ? 'text-gray-900 dark:text-white' : 'text-red-400 dark:text-red-400'}`}>
                       {movement.value >= 0 ? '+' : ''}₹{Math.abs(movement.value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
                     </p>
                   </motion.div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{movement.time}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">{movement.time}</p>
                 </div>
 
                 {/* Hover effect line */}
@@ -176,7 +191,7 @@ const StockMovements = () => {
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full mt-6 py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white hover:border-green-500 hover:border-opacity-30 hover:text-green-600 transition-all font-medium duration-300"
+          className="w-full mt-4 sm:mt-6 py-2 sm:py-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white hover:border-green-500 hover:border-opacity-30 hover:text-green-600 transition-all font-medium duration-300 text-sm sm:text-base"
         >
           View All Movements
         </motion.button>
