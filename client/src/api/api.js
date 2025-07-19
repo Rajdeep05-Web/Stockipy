@@ -65,7 +65,7 @@ export const setupResponseInterceptor = (store) => {
           const userData = JSON.parse(localStorage.getItem('user'));
           store.dispatch(logOutUser(userData)) // Dispatch logout action for server db cleanup
           store.dispatch(resetAuthState()); // Dispatch reset auth state action for client cleanup
-          window.location.href = '/auth'; // Redirect to login
+          window.location.href = '/'; // Redirect to login
         }
       }
 

@@ -21,6 +21,7 @@ import AllStockIns from "./components/stock/allStockIns";
 import UpdateStockIn from "./components/stock/updateStockIn";
 import AuthForm from "./components/user/auth";
 import Layout from "./components/useful/layout";
+import LandingPage from "./components/landingPage/landingPage";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -60,9 +61,11 @@ const App = () => {
     <> 
       <Routes>
 
-        {!userLoggedIn && <Route path="/auth" element={<AuthForm />} />}
+        {!userLoggedIn && <Route path="/" element={<LandingPage />} />}
 
-        {!userLoggedIn && <Route path="*" element={<Navigate to="/auth" />} />}
+        {!userLoggedIn && <Route path="*" element={<Navigate to="/" />} />}
+
+        {!userLoggedIn && <Route path="/auth" element={<AuthForm />} />}
       
         {userLoggedIn && <Route path="*" element={<Navigate to="/dashboard" />} />}
 
