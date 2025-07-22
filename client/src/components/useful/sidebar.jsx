@@ -83,11 +83,11 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
   return (
     <div
       id="sidebar"
-      className={`fixed z-20 inset-y-0 left-0 w-[200px] bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 backdrop-blur-md border-b border-neutral-50 dark:border-gray-700 transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
+      className={`fixed z-20 inset-y-0 left-0 w-[200px] bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 backdrop-blur-md border border-neutral-200 dark:border-gray-700 transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static`}
     >
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stockipy.</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white hidden md:block">Stockipy.</h1>
       </div>
       <nav className="mt-4">
         {navItems.map((navitem) => (

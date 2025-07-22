@@ -3,6 +3,8 @@ import {
   Menu, Globe
 } from "lucide-react";
 import UserDropdown from "./userDropDown";
+import {UserDropdownNew} from "./userDropDownNew";
+import {Notification} from "./notification";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import ThemeToggle from "../useful/themeToggle/themeToggle"
@@ -23,7 +25,7 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
               <button
                 id="sidebar-toggle"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+                className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
               >
                 <Menu className="h-6 w-6" />
               </button>
@@ -32,7 +34,9 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
             {/* Right side */}
             <div className="flex items-center space-x-6">
               {/* toggle */}
+             <div className="flex items-center space-x-4">
               <ThemeToggle />
+              </div> 
               {/* Encrypted */}
               <div className="items-center space-x-4 hidden md:flex">
                 <motion.div
@@ -44,7 +48,8 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
                 </motion.div>
               </div>
               {/* Notifications */}
-              <motion.button
+              <Notification />
+              {/* <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="relative p-2 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-green-500 hover:bg-opacity-10 transition-colors duration-300"
@@ -55,15 +60,16 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
                   animate={{ scale: 1 }}
                   className="absolute -top-1 -right-1 w-3 h-3 bg-green-600 rounded-full"
                 />
-              </motion.button>
+              </motion.button> */}
 
               {/* User dropdown */}
-              <UserDropdown />
+              <UserDropdownNew />
             </div>
             
       </motion.div>
     </>
   )
+
 }
 
 export default Navbar;
