@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../context/themeContext';
 import { Sun, Moon, Mail, Lock, User, Eye, EyeOff, Facebook, Chrome } from 'lucide-react';
-import { createUser, loginUser, logOutUser } from '../../redux/slices/auth/authSlice';
+import { createUser, loginUser, logOutUser, googleAuth } from '../../redux/slices/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router';
 import ThemeToggle from '../useful/themeToggle/themeToggle';
-
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import Loading from '../useful/Loading/loading';
 
-export default function AuthForm() {
+function AuthFormContent() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -51,18 +51,26 @@ export default function AuthForm() {
   } catch (error) {
     setError(error || error.message); 
     setLoading(false);
-  }
+  } 
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-        localStorage.setItem('token', 'google_token');
-        navigate(0);
-      
-    } catch (err) {
-     
-    }
-  };
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setLoading(true);
+      try {
+        await dispatch(googleAuth(tokenResponse.access_token)).unwrap(); // Then log in the user
+        setSuccessMessage(`Google ${(isLogin?"log in":"sign up")} successfully`);
+        navigate("/dashboard");
+      } catch (error) {
+        setError(error || error.message || 'Failed to login with Google.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    onError: () => {
+      setError('Google login failed. Please try again.');
+    },
+  });
 
   const handleFacebookLogin = async () => {
     try {
@@ -108,8 +116,8 @@ export default function AuthForm() {
           )}
 
           <div className="space-y-4 mb-8">
-            {/* <button
-              onClick={handleGoogleLogin}
+            <button
+              onClick={() => handleGoogleLogin()}
               disabled={loading}
               className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50"
             >
@@ -117,6 +125,7 @@ export default function AuthForm() {
               <span>Continue with Google</span>
             </button>
 
+              {/* 
             <button
               onClick={handleFacebookLogin}
               disabled={loading}
@@ -241,5 +250,13 @@ export default function AuthForm() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthForm() {
+  return (
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthFormContent />
+    </GoogleOAuthProvider>
   );
 }

@@ -32,6 +32,14 @@ export const logOutUser = createAsyncThunk("user/Logout", async (userData, { rej
     return rejectWithValue(error?.response?.data.error || error.message);
   }
 });
+export const googleAuth = createAsyncThunk("user/googleAuth", async (googleAccessToken, { rejectWithValue }) => {
+  try {
+    const { data } = await API.post(`${API_URL_AUTH}/google-signin`, { token: googleAccessToken });
+    return data;
+  } catch (error) {
+    return rejectWithValue(error?.response?.data.error || error.message);
+  }
+});
 
 //verify user
 export const verifyUserOnPageLoad = createAsyncThunk("user/Verify", async (_, { rejectWithValue }) => {
@@ -136,6 +144,29 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      
+      .addCase(googleAuth.pending, (state) => {
+        state.loading = true;
+        state.message = null;
+      })
+      .addCase(googleAuth.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user; // Update user data from Google sign-in
+        state.token = action.payload.token; // Update token from Google sign-in
+        state.isAuthenticated = true;
+        state.message = action.payload.message;
+        localStorage.setItem("user", JSON.stringify(action.payload.user));
+        localStorage.setItem("token", action.payload.token);
+      })
+      .addCase(googleAuth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.message = null;
+        state.user = null;
+        state.token = null;
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      })
 
       .addCase(logOutUser.pending, (state) => {
         state.loading = true;
@@ -153,6 +184,7 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.message = null;
       })
+
 
       .addCase(verifyUserOnPageLoad.pending, (state) => {
         state.loading = true;

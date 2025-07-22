@@ -167,6 +167,10 @@ export const updateVendor = async (req, res) => {
 };
 export const deleteVendor = async (req, res) => {
     const { id } = req.params;
+     const userId = req.user.userId;
+   if (!userId || !ObjectId.isValid(userId)) {
+    return res.status(400).send("User ID is required");
+   }
     if (!id) {
         return res.status(400).json({ error: 'ID is required' });
     }
@@ -174,7 +178,7 @@ export const deleteVendor = async (req, res) => {
         return res.status(400).json({ error: 'Invalid vendor ID' });
     }
     try {
-        await Vendor.findByIdAndDelete(id);
+        await Vendor.findByIdAndDelete({ _id: id, userId: userId });
         return res.status(200).json({ message: 'Vendor deleted successfully' });
     } catch (error) {
         console.log(error);

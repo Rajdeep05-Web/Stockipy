@@ -44,6 +44,7 @@ app.get("/", (req, res) => {
 app.use("/api", authRouter);
 app.post("/v1/auth/signup", authRouter);
 app.post("/v1/auth/login", authRouter);
+app.post('/v1/auth/google-signin', authRouter);
 app.post("/v1/auth/regenerate-access-token", authRouter);
 app.put("/v1/auth/logout/:id", authRouter);
 app.post('/v1/auth/verify-user', authRouter);

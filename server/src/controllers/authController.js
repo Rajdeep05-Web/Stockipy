@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken'; // to generate signed token
 import bcrypt from 'bcryptjs'; // to hash password
 import mongoose from 'mongoose'; // to check object id
 import connectDB from '../DB/index.js'; // to connect to db
+import {OAuth2Client} from 'google-auth-library'; // to verify google token}
+import axios from 'axios'; 
 
 const createAccessToken = async (user) => {
     return jwt.sign({userId:user._id}, process.env.JWT_SECRET, {expiresIn: process.env.ACCESS_TOKEN_LIFE })  
@@ -127,6 +129,70 @@ export const logOutUser = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
+export const googleSignIn = async (req, res) => {
+    // const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+    try {
+        await connectDB();
+        const { token } = req.body;
+        if (!token) {
+            return res.status(400).json({ error: "No token provided" });
+        }
+        // Verify the access token
+    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    console.log(userInfo.data);
+
+        const { email, name, picture, email_verified } = userInfo.data;
+
+        //check if user exists in db
+        let user = await User.findOne({ email: { $eq: email } });
+        if (!user) {
+            //create new user if not exists
+            user = new User({
+                name: name,
+                email: email,
+                password: "google-auth", //google auth does not require password
+                profilePicture: picture,
+                isVerified: email_verified, //google auth is verified by default
+            });
+            await user.save();
+        } else {
+            //update user info if exists
+            user.name = name;
+            user.profilePicture = picture;
+            user.isVerified = email_verified; //google auth is verified by default
+            await user.save();
+        }
+
+        //generate access token
+        const accessToken = await createAccessToken(user);
+
+        //generate refresh token
+        const refreshToken = await generateRefreshToken(user);
+
+        //save refresh token in db
+        user.refreshToken = refreshToken;
+        user.refreshTokenExpire = new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000));
+        
+        //save user in db
+        await user.save();
+
+        //send refresh token in cookie for security
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true, //cookie is not accessible via client side js (XSS attacks)
+            secure : false, //cookie is only sent over https (secure connection)
+            maxAge: parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000, //cookie expire
+            sameSite: "lax",//cookie is only sent to the same origin as the domain in the address bar
+
+        });
+        return res.status(201).json({user:{_id:user._id, email:user.email, name:user.name}, token:accessToken, isAuthenticated:user.isVerified, message : "User logged in successfully"});
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
+}
 
 export const reGenerateAccessToken = async (req, res) => {
   try {
@@ -139,7 +205,9 @@ export const reGenerateAccessToken = async (req, res) => {
      //verify refresh token
      const decode = jwt.verify(refreshToken, process.env.REFRESH_SECRET);
 
-     console.log("Decoded refresh token",decode);
+     if(!decode?.email){
+        return res.status(401).json({ error: "Unauthorized: Invalid token" });
+     }
      
      //check if user exists in db
         const user = await User.findOne({email:{ $eq : decode.email}});
