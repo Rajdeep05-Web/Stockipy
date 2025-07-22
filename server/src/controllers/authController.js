@@ -1,10 +1,8 @@
-import { response } from 'express';
 import {User} from '../models/userModel.js';
 import jwt from 'jsonwebtoken'; // to generate signed token
 import bcrypt from 'bcryptjs'; // to hash password
 import mongoose from 'mongoose'; // to check object id
 import connectDB from '../DB/index.js'; // to connect to db
-import {OAuth2Client} from 'google-auth-library'; // to verify google token}
 import axios from 'axios'; 
 
 const createAccessToken = async (user) => {
@@ -86,7 +84,7 @@ export const logInUser = async (req, res) => {
             path: '/', // Accessible across all routes
         })
         //send res body with access token and user details
-        return res.status(201).json({user:{_id:existUser._id, email:existUser.email, name:existUser.name}, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
+        return res.status(201).json({user:{_id:existUser._id, email:existUser.email, name:existUser.name, profilePicture:existUser.profilePicture}, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -133,15 +131,15 @@ export const googleSignIn = async (req, res) => {
     // const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
     try {
         await connectDB();
-        const { token } = req.body;
-        if (!token) {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
             return res.status(400).json({ error: "No token provided" });
         }
+        const token = authHeader.split(' ')[1];
         // Verify the access token
     const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
       headers: { Authorization: `Bearer ${token}` },
     });
-    console.log(userInfo.data);
 
         const { email, name, picture, email_verified } = userInfo.data;
 
@@ -186,7 +184,7 @@ export const googleSignIn = async (req, res) => {
             sameSite: "lax",//cookie is only sent to the same origin as the domain in the address bar
 
         });
-        return res.status(201).json({user:{_id:user._id, email:user.email, name:user.name}, token:accessToken, isAuthenticated:user.isVerified, message : "User logged in successfully"});
+        return res.status(201).json({user:{_id:user._id, email:user.email, name:user.name, profilePicture:user.profilePicture}, token:accessToken, isAuthenticated:user.isVerified, message : "User logged in successfully"});
 
     } catch (error) {
         console.log(error);

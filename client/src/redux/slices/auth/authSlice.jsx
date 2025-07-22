@@ -34,7 +34,11 @@ export const logOutUser = createAsyncThunk("user/Logout", async (userData, { rej
 });
 export const googleAuth = createAsyncThunk("user/googleAuth", async (googleAccessToken, { rejectWithValue }) => {
   try {
-    const { data } = await API.post(`${API_URL_AUTH}/google-signin`, { token: googleAccessToken });
+    const { data } = await API.post(`${API_URL_AUTH}/google-signin`, {}, {
+      headers: {
+        Authorization: `Bearer ${googleAccessToken}`,
+      }
+    });
     return data;
   } catch (error) {
     return rejectWithValue(error?.response?.data.error || error.message);

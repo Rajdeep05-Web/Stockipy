@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme } from '../../context/themeContext';
 import { Sun, Moon, Mail, Lock, User, Eye, EyeOff, Facebook, Chrome } from 'lucide-react';
 import { createUser, loginUser, logOutUser, googleAuth } from '../../redux/slices/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,9 +14,9 @@ function AuthFormContent() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isGoogleAuthLoading, setIsGoogleAuthLoading] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-  const { theme, toggleTheme } = useTheme();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -57,14 +56,16 @@ function AuthFormContent() {
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setLoading(true);
+      setIsGoogleAuthLoading(true);
       try {
         await dispatch(googleAuth(tokenResponse.access_token)).unwrap(); // Then log in the user
-        setSuccessMessage(`Google ${(isLogin?"log in":"sign up")} successfully`);
+        setSuccessMessage(`Google authentication successfully`);
         navigate("/dashboard");
       } catch (error) {
         setError(error || error.message || 'Failed to login with Google.');
       } finally {
         setLoading(false);
+        setIsGoogleAuthLoading(false);
       }
     },
     onError: () => {
@@ -121,8 +122,14 @@ function AuthFormContent() {
               disabled={loading}
               className="w-full flex items-center justify-center gap-3 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 disabled:opacity-50"
             >
-              <Chrome className="w-5 h-5" />
-              <span>Continue with Google</span>
+              {!isGoogleAuthLoading ? (
+                <>
+                  <Chrome className="w-5 h-5" />
+                  <span>Continue with Google</span>
+                </>
+              ) : (
+                <span>Authorizing...</span>
+              )}
             </button>
 
               {/* 
@@ -163,6 +170,7 @@ function AuthFormContent() {
                     required
                     autoComplete="name"
                     value={name}
+                    disabled={loading}
                     onChange={(e) => setName(e.target.value)}
                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Enter name"
@@ -185,6 +193,7 @@ function AuthFormContent() {
                   required
                   autoComplete="email"
                   value={email}
+                  disabled={loading}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="you@example.com"
@@ -205,6 +214,7 @@ function AuthFormContent() {
                   name="password"
                   required
                   value={password}
+                  disabled={loading}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="••••••••"
@@ -212,6 +222,7 @@ function AuthFormContent() {
                 />
                 <button
                   type="button"
+                  disabled={loading}
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
@@ -229,7 +240,7 @@ function AuthFormContent() {
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? 'Loading...' : (isLogin ? 'Sign in' : 'Sign up')}
+              {loading || isGoogleAuthLoading ? 'Loading...' : (isLogin ? 'Sign in' : 'Sign up')}
             </button>
           </form>
 

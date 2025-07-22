@@ -7,6 +7,7 @@ const UserDropdown = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userName, setUserName] = useState('');
+  const [userProfilePicture, setUserProfilePicture] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -14,6 +15,7 @@ const UserDropdown = () => {
    const user = JSON.parse(localStorage.getItem("user"));
    setUserEmail(user.email);
    setUserName(user.name);
+   setUserProfilePicture(user.profilePicture || 'https://flowbite.com/docs/images/people/profile-picture-5.jpg');
   }, [])
 
   const handleLogout = async () => {
@@ -48,7 +50,7 @@ const UserDropdown = () => {
           <span className="sr-only">Open user menu</span>
           <img
             className="w-8 h-8 rounded-full"
-            src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+            src={userProfilePicture}
             alt="user photo"
           />
         </button>
