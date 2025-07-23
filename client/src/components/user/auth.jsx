@@ -58,11 +58,11 @@ function AuthFormContent() {
       setLoading(true);
       setIsGoogleAuthLoading(true);
       try {
-        await dispatch(googleAuth(tokenResponse.access_token)).unwrap(); // Then log in the user
-        setSuccessMessage(`Google authentication successfully`);
-        navigate("/dashboard");
+        await dispatch(googleAuth(tokenResponse.access_token)).unwrap();
+        setSuccessMessage('Google authentication successful');
+        navigate('/dashboard');
       } catch (error) {
-        setError(error || error.message || 'Failed to login with Google.');
+        setError(error?.message || 'Failed to login with Google.');
       } finally {
         setLoading(false);
         setIsGoogleAuthLoading(false);
@@ -71,6 +71,7 @@ function AuthFormContent() {
     onError: () => {
       setError('Google login failed. Please try again.');
     },
+    ux_mode: 'popup',
   });
 
   const handleFacebookLogin = async () => {

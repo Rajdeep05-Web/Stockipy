@@ -2,12 +2,12 @@ import {
   Bell,
   Menu, Globe
 } from "lucide-react";
-import UserDropdown from "./userDropDown";
-import {UserDropdownNew} from "./userDropDownNew";
-import {Notification} from "./notification";
+import UserDropdown from "./useful/userDropDown";
+import {UserDropdownNew} from "./useful/userDropDownNew";
+import {Notification} from "./useful/notification";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import ThemeToggle from "../useful/themeToggle/themeToggle"
+import ThemeToggle from "./useful/themeToggle/themeToggle"
 
 const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
   const [notifications, setNotifications] = useState(3); // Example notification count

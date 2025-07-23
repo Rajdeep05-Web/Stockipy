@@ -20,8 +20,10 @@ import AddStockIn from "./components/stock/addStockIn";
 import AllStockIns from "./components/stock/allStockIns";
 import UpdateStockIn from "./components/stock/updateStockIn";
 import AuthForm from "./components/user/auth";
-import Layout from "./components/useful/layout";
+import Layout from "./components/layout";
 import LandingPage from "./components/landingPage/landingPage";
+import ProfilePage from "./components/user/profilePage";
+import AccountSettings from "./components/user/accountSetting";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -85,6 +87,8 @@ const App = () => {
             <Route path="/add-stock-in" element={<AddStockIn />} />
             <Route path="/stock-ins" element={<AllStockIns />} />
             <Route path="/stock-in/edit/:id" element={<UpdateStockIn />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/account-settings" element={<AccountSettings />} />
           </Route>
         )}
 

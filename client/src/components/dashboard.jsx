@@ -20,7 +20,6 @@ function Dashboard() {
   return (
     <>
     <div>
-
     <Inventory />
     <StockMovements />
     </div>

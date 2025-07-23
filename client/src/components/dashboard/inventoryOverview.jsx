@@ -12,7 +12,7 @@ const Inventory = () => {
       totalValue: 89432.50 * USD_TO_INR, 
       change: +5.2, 
       lowStock: 23,
-      icon: '📱',
+    //   icon: '📱',
       color: 'bg-blue-500/20 text-blue-400'
     },
     { 
@@ -21,7 +21,7 @@ const Inventory = () => {
       totalValue: 45678.90 * USD_TO_INR, 
       change: -2.1, 
       lowStock: 45,
-      icon: '👕',
+    //   icon: '👕',
       color: 'bg-purple-500/20 text-purple-400'
     },
     { 
@@ -30,7 +30,7 @@ const Inventory = () => {
       totalValue: 23456.78 * USD_TO_INR, 
       change: +8.7, 
       lowStock: 12,
-      icon: '🏠',
+    //   icon: '🏠',
       color: 'bg-green-500/20 text-green-400'
     },
     { 
@@ -39,7 +39,7 @@ const Inventory = () => {
       totalValue: 34567.89 * USD_TO_INR, 
       change: +3.4, 
       lowStock: 8,
-      icon: '⚽',
+    //   icon: '⚽',
       color: 'bg-orange-500/20 text-orange-400'
     },
   ];

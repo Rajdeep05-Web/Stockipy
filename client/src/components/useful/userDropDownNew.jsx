@@ -165,7 +165,7 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
           {/* Menu Items */}
           <div className="py-2">
             <motion.button
-              onClick={() => handleNavigation('profile')}
+              onClick={() => navigate('/profile')}
               className="w-full px-3 sm:px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-3 transition-colors"
               whileHover={{ x: 4 }}
             >
@@ -181,7 +181,7 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
             </motion.button>
 
             <motion.button
-              onClick={() => handleNavigation('account-settings')}
+              onClick={() => navigate('/account-settings')}
               className="w-full px-3 sm:px-4 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-3 transition-colors"
               whileHover={{ x: 4 }}
             >
