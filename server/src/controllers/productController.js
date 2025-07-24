@@ -9,9 +9,6 @@ export const fetchProducts = async (req, res) => {
   }
   try {
     const existingProductsWithUserId = await Product.findOne({ userId: userId });
-    // if(!existingProductsWithUserId) {
-    //   return res.status(400).json({error : "User not found"});
-    // }
     if (existingProductsWithUserId && existingProductsWithUserId?.productDetails.length > 0) {
       return res.status(200).json(existingProductsWithUserId.productDetails);
     }
