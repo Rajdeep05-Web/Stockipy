@@ -8,9 +8,9 @@ export const fetchProducts = async (req, res) => {
     return res.status(400).send("User ID is required");
   }
   try {
-    const existingProductsWithUserId = await Product.findOne({ userId: userId });
-    if (existingProductsWithUserId && existingProductsWithUserId?.productDetails.length > 0) {
-      return res.status(200).json(existingProductsWithUserId.productDetails);
+    const existingProductsWithUserId = await Product.find({ userId: userId });
+    if (existingProductsWithUserId && existingProductsWithUserId.length > 0) {
+      return res.status(200).json(existingProductsWithUserId);
     }
     return res.status(404).json("No products found");
   } catch (error) {
@@ -27,18 +27,11 @@ export const getProduct = async (req, res) => {
     return res.status(400).send("Product ID is required");
   }
   try {
-    const response = await Product.findOne({ userId: userId }, {
-      productDetails: {
-        $elemMatch: { _id: id }
-      }
-    });
+    const response = await Product.findOne({ userId: userId, _id: id });
     if (!response) {
       return res.status(404).json({ error: "User not found" });
     }
-    if (response.productDetails.length > 0) {
-      return res.status(200).json(response.productDetails[0]);
-    }
-    return res.status(200).json("product not found");
+      return res.status(200).json(response);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
@@ -50,7 +43,6 @@ export const addProduct = async (req, res) => {
   if (!userId || !ObjectId.isValid(userId)) {
     return res.status(400).send("User ID is required");
   }
-  console.log("product", product);
   let gstOk;
   if (!product) {
     return res.status(400).send("Product is required");
@@ -74,33 +66,28 @@ export const addProduct = async (req, res) => {
   } else {
     gstOk = false;
   }
-  console.log(product.gst);
   if (!gstOk) {
     return res.status(400).json({ error: "GST can be only 18 or 28" })
   }
   try {
     //user things
-    const existingProductsWithUserId = await Product.findOne({ userId: userId });
-
+    const existingProductsWithUserId = await Product.find({ userId: userId });
     // Check if product already exists
-    if (!existingProductsWithUserId) {
-      const newProduct = new Product({
-        userId: userId, productDetails: [product]
-      });
-      await newProduct.save();
-      const products = await Product.find();
-      return res.status(201).json(products);
-    } else {
-      const isProductPresent = existingProductsWithUserId.productDetails.some(
+    if (existingProductsWithUserId || existingProductsWithUserId.length > 0) {
+      const isProductPresent = existingProductsWithUserId.some(
         (p) => product.name.toLowerCase() === p.name.toLowerCase()
       );
       if (isProductPresent) {
         return res.status(400).json({ error: "Product already exists" });
       }
-      existingProductsWithUserId.productDetails.push(product);
-      const savedUserProducts = await existingProductsWithUserId.save();
-      return res.status(201).json(savedUserProducts.productDetails);
     }
+      const newProduct = new Product({
+        userId: userId,
+        ...product
+      });
+      await newProduct.save();
+      const products = await Product.find({ userId: userId });
+      return res.status(201).json(products);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
@@ -144,27 +131,27 @@ export const updateProduct = async (req, res) => {
   }
   try {
     //check if exist
-    const existingProductsWithUserId = await Product.findOne({ userId: userId });
-    if(!existingProductsWithUserId) {
-      return res.status(200).json("User not found");
+    const existingProduct = await Product.findOne({ userId: userId, _id: id });
+    
+    if(!existingProduct) {
+      return res.status(200).json("Product not found to update");
     }
-    if(!existingProductsWithUserId.productDetails || existingProductsWithUserId.productDetails.length === 0) {
-      return res.status(200).json("No products found");
-    }
-    const prodIndex = existingProductsWithUserId.productDetails.findIndex(
-      (product) => product._id.equals(id)
-    )
-    if(prodIndex === -1) {
-      return res.status(400).json({ error: "Product not found" });
-    }
-      const isProductPresent = existingProductsWithUserId.productDetails.some((p) => p.name.toLowerCase() === product.name.toLowerCase() && !p._id.equals(id));
+    //now get all products with userId to check for duplicates
+    const allProducts = await Product.find({userId: userId});
+
+    if (allProducts && allProducts.length > 0) {
+      // Check if the product name already exists for another product
+      const isProductPresent = allProducts.some((p) => p.name.toLowerCase() === product.name.toLowerCase() && !p._id.equals(id));
       if (isProductPresent) {
         return res.status(400).json({ error: "Product already exists" });
       }
-      existingProductsWithUserId.productDetails[prodIndex] = {...product, _id: id };
-
-    const updateResponse = await existingProductsWithUserId.save();
-    return res.status(200).json(updateResponse.productDetails);
+    }
+    // update it
+    const updateResponse = await Product.findOneAndUpdate(
+      { userId: userId, _id: id },
+      { $set: product }
+    );
+    return res.status(200).json(updateResponse);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });
@@ -181,20 +168,14 @@ export const deleteProduct = async (req, res) => {
     return res.status(400).send("Product ID is required");
   }
   try {
-    const response = await Product.findOne({ userId: userId });
-    if (!response || response?.productDetails.length === 0) {
+    const response = await Product.findOne({ userId: userId, _id: id });
+    if (!response) {
       return res.status(400).json({ error: "No products found" });
     }
 
-    const productIndex = response.productDetails.findIndex(
-      (product) => product._id.equals(id)
-    );
-    if(productIndex === -1) {
-      return res.status(400).json({ error: "Product not found" });
-    }
-    response.productDetails.splice(productIndex, 1);
-    const deleteRes = await response.save();
-    return res.status(200).json(deleteRes.productDetails);
+    const deletedResponse = await Product.findOneAndDelete({ userId: userId, _id: id });
+
+    return res.status(200).json(deletedResponse);
   } catch (error) {
     console.log(error);
     return res.status(500).json({ error: error.message });

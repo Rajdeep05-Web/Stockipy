@@ -2,8 +2,13 @@ import { StockIn } from "../models/stockInModel.js";
 import { Vendor } from "../models/vendorModel.js";
 import { Product } from "../models/productModel.js";
 import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 export const addStockIn = async (req, res) => {
+     const userId = req.user.userId;
+  if (!userId || !ObjectId.isValid(userId)) {
+    return res.status(400).send({error: "User ID is required"});
+  }
     const {vendor, invNo, date, description, time, products, totalAmount, fileCloudUrl} = req.body;//destructuring the request body
     if(!vendor || !invNo || !date || !products || !totalAmount){
         return res.status(400).json({error: "All fields are required"});
@@ -19,7 +24,7 @@ export const addStockIn = async (req, res) => {
     const invoiceNo = (invNo).replace(/\s+/g, '').toUpperCase();//remove white spaces
     const utcDate = new Date(date);
     //no dupplicate invoice no
-    const invoiceExists = await StockIn.findOne({invoiceNo});
+    const invoiceExists = await StockIn.findOne({ userId: userId, invoiceNo: invoiceNo });
     if(invoiceExists){
         return res.status(400).json({error: "Invoice No already exists"});
     }
@@ -52,7 +57,8 @@ export const addStockIn = async (req, res) => {
 
 
     try {
-        const newStockIn= new StockIn({
+        const newStockIn = new StockIn({
+            userId,
             vendor,
             invoiceNo,
             date : utcDate,
@@ -66,7 +72,7 @@ export const addStockIn = async (req, res) => {
         
         //update product quantity, purchase rate and quantity
         for(const item of products){
-            const product = await Product.findById(item.product);
+            const product = await Product.findOne({ userId: userId, _id: item.product });
             if(product){
 
                 product.quantity += parseInt(item.quantity); // update quantity
@@ -74,9 +80,7 @@ export const addStockIn = async (req, res) => {
                 if(!product.productPurchaseRate){
                     //if the the product purchase is new or is 0 (null)
                     product.productPurchaseRate = item.productPurchaseRate; // update purchase rate
-                }
-                
-                //only sotckin prouduct MRP is updated not the product DB MRP
+                } 
 
                 product.productStockIns.push(newStockIn._id); // add stockin id to product
                 await product.save();
@@ -84,7 +88,7 @@ export const addStockIn = async (req, res) => {
         }
 
         //add the stockin details to the vendor
-        const vendorFromDB = await Vendor.findById(vendor);
+        const vendorFromDB = await Vendor.findOne({ userId: userId, _id: vendor });
         if(vendorFromDB){
             vendorFromDB.stockIns.push(newStockIn._id);
             await vendorFromDB.save();
@@ -101,53 +105,15 @@ export const addStockIn = async (req, res) => {
 
 export const getStockIns = async (req, res) => {
     const userId = req.user.userId;
-    if(!userId){
+    if(!userId || !ObjectId.isValid(userId)){
         return res.status(400).json({error: "User ID is required"});
     }
     try {
-        // First get the user's product document which contains all products
-        const userProductDocument = await Product.findOne({ userId: userId });
-        
-        if (!userProductDocument) {
-            return res.status(404).json({ message: "No products found for this user." });
-        }
-        
-        // Extract all product IDs from productDetails array
-        const productDetailsMap = {};
-        const userProductIds = userProductDocument.productDetails.map(p => {
-            // Create a map of product IDs to their details for easy lookup
-            productDetailsMap[p._id.toString()] = p;
-            return p._id;
-        });
-        
-        // Find stockIns that contain any of these products
         const stockIns = await StockIn.find({
-            'products.product': { $in: userProductIds }
-        }).populate("vendor");
-        
-        // Manually "populate" the product details using our map
-        const populatedStockIns = stockIns.map(stockIn => {
-            // Convert to plain object so we can modify it
-            const stockInObj = stockIn.toObject();
-            
-            // Replace each product reference with the actual product details
-            stockInObj.products = stockInObj.products.map(productEntry => {
-                const productId = productEntry.product.toString();
-                
-                // Replace the ID reference with the actual product details
-                if (productDetailsMap[productId]) {
-                    return {
-                        ...productEntry,
-                        product: productDetailsMap[productId]
-                    };
-                }
-                return productEntry;
-            });
-            
-            return stockInObj;
-        });
-        
-        return res.status(200).json(populatedStockIns);
+            userId: userId,
+        }).populate("vendor").populate("products.product", "name _id mrp quantity rate");//populate the vendor and product fields
+
+        return res.status(200).json(stockIns);
     } catch (error) {
         console.log(error);
         res.status(500).json({error: error.message});
@@ -159,8 +125,12 @@ export const getStockInById = async (req, res) => {
     if(!id){
         return res.status(400).json({error: "ID is required"});
     }
+    const userId = req.user.userId;
+  if (!userId || !ObjectId.isValid(userId)) {
+    return res.status(400).send({error: "User ID is required"});
+  }
     try {
-        const stockIn = await StockIn.findById(id).populate("vendor").populate("products.product");//populate the vendor and product fields
+        const stockIn = await StockIn.findById({userId, _id: id}).populate("vendor").populate("products.product", "name _id");//populate the vendor and product fields
         return res.status(200).json(stockIn);
     } catch (error) {
         console.log(error);
@@ -169,7 +139,14 @@ export const getStockInById = async (req, res) => {
 }
 
 export const updateStockIn = async (req, res) => {
+     const userId = req.user.userId;
+  if (!userId || !ObjectId.isValid(userId)) {
+    return res.status(400).send({error: "User ID is required"});
+  }
     const id = req.params.id;
+    if(!id){
+        return res.status(400).json({error: "ID is required"});
+    }
     const {vendor, invNo, date, description, products, totalAmount, fileCloudUrl, isFileUpdated} = req.body;
     // console.log(vendor, invNo, date, description, products, totalAmount, fileCloudUrl);
     if(!vendor || !invNo || !date || !products || !totalAmount){
@@ -217,7 +194,7 @@ export const updateStockIn = async (req, res) => {
         const newStockInDataToSave = {};
 
         //check if the stockin is present or not in the db
-        const stockInDataFromDB = await StockIn.findById(id);
+        const stockInDataFromDB = await StockIn.findOne({userId: userId, _id: id});
         //if not present send error
         if(!stockInDataFromDB){
             return res.status(404).json({error : "Stock In not found to update"});
@@ -366,9 +343,18 @@ export const updateStockIn = async (req, res) => {
 
 export const deleteStockIn = async (req, res) => {
     const id = req.params.id;
+    if(!id){
+        return res.status(400).json({error: "ID is required"});
+    }
+    const userId = req.user.userId;
+    if (!userId || !ObjectId.isValid(userId)) {
+        return res.status(400).send({error: "User ID is required"});
+    }
     try {
         //check if the stockin is present or not in the db
-        const stockInData = await StockIn.findById(id);
+        const stockInData = await StockIn.findById(
+            { _id: id, userId: userId }
+        );
         //if not present send error
         if(!stockInData){
             return res.status(404).json({error: "Stock In not found"});

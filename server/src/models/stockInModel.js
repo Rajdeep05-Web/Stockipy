@@ -1,6 +1,11 @@
 import mongoose from "mongoose";
 
 const stockInSchema = mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "User"
+    },
     vendor:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Vendor",
@@ -52,10 +57,9 @@ const stockInSchema = mongoose.Schema({
             }
         },
     ],
-    createdAt:{
-        type: Date,
-        default: new Date()
-    }
-});
+}, { timestamps: true });
+
+// Index for faster search
+stockInSchema.index({ userId: 1, _id: 1 }); // Index for userId and stock-in ID
 
 export const StockIn = mongoose.model("StockIn", stockInSchema);
