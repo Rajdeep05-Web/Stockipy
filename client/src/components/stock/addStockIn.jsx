@@ -254,7 +254,7 @@ const AddStockIn = () => {
       <div className="flex flex-col gap-6 h-auto lg:h-screen md:flex-row dark:bg-gray-900">
 
         {/* vendor */}
-        <div className="basis-full sm:basis-2/5 min-w-[360px] bg-red-50 p-5 border border-red-300 rounded-md overflow-auto dark:bg-gray-800 dark:border-gray-700">
+        <div className="basis-full sm:basis-2/5 min-w-[320px] bg-red-50 p-5 border border-red-300 rounded-md overflow-auto dark:bg-gray-800 dark:border-gray-700">
           <form className=" max-w-full lg:max-w-sm mx-auto">
             <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
               Add Vendor Details
@@ -495,7 +495,7 @@ const AddStockIn = () => {
         </div>
         
         {/* product */}
-        <div className="basis-full sm:basis-3/5 min-w-[360px] bg-green-50 p-5 border border-green-300 rounded-md dark:bg-gray-800 dark:border-gray-700">
+        <div className="basis-full sm:basis-3/5 min-w-[320px] bg-green-50 p-5 border border-green-300 rounded-md dark:bg-gray-800 dark:border-gray-700">
           <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
             Add Products
           </h1>
