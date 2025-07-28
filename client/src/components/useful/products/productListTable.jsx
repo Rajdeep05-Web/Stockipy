@@ -18,6 +18,15 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
   );
 
   const handleDelete = async (product) => {
+    const userConfirmed = window.confirm(`Are you sure you want to delete ${product.name}?`);
+    if (!userConfirmed) return;
+    if(product.quantity > 0){
+      setErrorMsg("Cannot delete product with available stock");
+      setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
+      return;
+    }
     try {
       await dispatch(deleteProduct(product)).unwrap();
       setSuccessMsg("Product deleted successfully");

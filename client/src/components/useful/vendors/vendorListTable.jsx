@@ -5,7 +5,7 @@ import {
   deleteVendor,
   fetchVendors,
 } from "../../../redux/slices/vendor/vendorsSlice";
-import { Edit, Trash2 } from "lucide-react";
+import { Captions, Edit, Trash2 } from "lucide-react";
 
 import SearchBar from "../searchBar";
 
@@ -28,6 +28,17 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
   };
 
   const handleDelete = async (vendor) => {
+    const userConfirmed = window.confirm(`Are you sure you want to delete ${vendor.name}?`);
+    if(!userConfirmed){
+      return;
+    }
+    if(vendor.stockIns.length > 0){
+      setErrorMsg("Cannot delete vendor with available stock ins");
+      setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
+      return;
+    }
     try {
       await dispatch(deleteVendor(vendor)).unwrap();
       setSuccessMsg("Vendor deleted successfully");

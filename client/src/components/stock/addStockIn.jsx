@@ -24,6 +24,7 @@ import { fetchProducts } from "../../redux/slices/products/productsSlice";
 
 const AddStockIn = () => {
   const dispatch = useDispatch();
+  function nextInvNoGen(){};
   const { vendors, loading: vendorsLoading } = useSelector((state) => state.vendors);
   const { products, loading: productsLoading } = useSelector((state) => state.products);
   const { stockIns, loading: stockInsLoading } = useSelector((state) => state.stockIns);
@@ -32,7 +33,7 @@ const AddStockIn = () => {
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-  const [invNo, setInvNo] = useState("");
+  const [invNo, setInvNo] = useState(stockIns ? nextInvNoGen(stockIns[stockIns?.length-1]?.invoiceNo) : "");
   const [totalAmount, setTotalAmount] = useState("");
   const [description, setDescription] = useState("");
   const [name, setName] = useState("");
@@ -108,6 +109,25 @@ const AddStockIn = () => {
       }, 3000);
     }
   };
+
+function nextInvNoGen(oldInv) {
+  if (!oldInv) return null;
+  
+  const oldInvSplit = oldInv.split("/");
+  const lastPart = oldInvSplit[oldInvSplit.length - 1];
+  
+  // Extract leading zeros info
+  const numberLength = lastPart.length;
+  const number = parseInt(lastPart, 10);
+  
+  if (isNaN(number)) return null;
+  
+  const incremented = (number + 1).toString().padStart(numberLength, '0');
+  
+  oldInvSplit[oldInvSplit.length - 1] = incremented;
+  console.log(oldInvSplit);
+  return oldInvSplit.join("/");
+};
 
   //product
 
