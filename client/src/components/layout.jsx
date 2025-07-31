@@ -5,28 +5,50 @@ import Navbar from './navbar';
 import Sidebar from './useful/sidebar';
 import Loading from "./useful/Loading/loading";
 
+
 const Layout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { loading: authLoading } = useSelector((state) => state.auth);
+ const [sidebarOpen, setSidebarOpen] = useState(false);
+ const { loading: authLoading } = useSelector((state) => state.auth);
 
-  return (
-    <div className="flex bg-gray-100 dark:bg-slate-900">
-      <Sidebar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} /> {/* Left navigation bar */}
-      <div className="flex-1 flex flex-col min-h-screen overflow-scroll"> {/* Main content area */}
-        <Navbar setSidebarOpen={setSidebarOpen} sidebarOpen={sidebarOpen} /> {/* Top navigation bar */}
-        <main className="flex-1 w-dvw h-dvh md:w-full bg-[#F25F6] p-6 sm:px-28">
-          {authLoading ? <Loading /> : <Outlet />}
-        </main>
-      </div>
 
-      {/* Dark layer with smooth transition */}
-      <div 
-        className={`fixed inset-0 bg-black z-40 pointer-events-none transition-all duration-300 ease-in-out ${
-          sidebarOpen ? 'bg-opacity-30 backdrop-blur-md pointer-events-auto' : 'bg-opacity-0 backdrop-blur-none'
-        }`} 
-      />
-    </div>
-  );
+ return (
+   <div className="flex min-h-screen w-full dark:bg-slate-900 relative">
+ {/* Sidebar */}
+ <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+
+ {/* Main content wrapper */}
+ <div className="flex flex-col flex-1 min-h-0 w-full">
+   <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+
+   <main className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6">
+     {authLoading ? <Loading /> : <Outlet />}
+   </main>
+ </div>
+
+
+ {/* Overlay for mobile sidebar */}
+ <div
+   className={`fixed inset-0 z-30 transition-all duration-300 ease-in-out ${
+     sidebarOpen
+       ? "bg-black bg-opacity-30 backdrop-blur-sm pointer-events-auto"
+       : "bg-transparent pointer-events-none"
+   }`}
+   onClick={() => setSidebarOpen(false)}
+ />
+</div>
+
+
+
+
+
+
+ );
 };
 
+
 export default Layout;
+
+
+
