@@ -554,11 +554,11 @@ function nextInvNoGen(oldInv) {
                           <tr
                             key={product._id}
                             className=" cursor-pointer bg-gray-50 border-b dark:bg-gray-900 text-base dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700"
-                            onClick={() => handleProductSelect(product)}
+                            onClick={() => handleProductSelect(product)} title={`${product.name}`}
                           >
                             <th
                               scope="row"
-                              className="px-4 py-2 text-left font-medium text-wrap text-gray-900 whitespace-nowrap dark:text-white"
+                              className="px-4 py-2 text-left font-medium text-wrap text-gray-900 dark:text-white whitespace-nowrap max-w-6 text-ellipsis overflow-hidden"
                             >
                               {filteredProducts.indexOf(product) + 1}
                               {". "}

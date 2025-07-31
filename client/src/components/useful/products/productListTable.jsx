@@ -6,7 +6,7 @@ import {
 } from "../../../redux/slices/products/productsSlice";
 import { useDispatch } from "react-redux";
 import SearchBar from "../searchBar";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Info } from "lucide-react";
 
 const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
   const [search, setSearch] = useState("");
@@ -20,7 +20,7 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
   const handleDelete = async (product) => {
     const userConfirmed = window.confirm(`Are you sure you want to delete ${product.name}?`);
     if (!userConfirmed) return;
-    if(product.quantity > 0){
+    if (product.quantity > 0) {
       setErrorMsg("Cannot delete product with available stock");
       setTimeout(() => {
         setErrorMsg("");
@@ -46,10 +46,12 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
 
   const handleEdit = (product) => {
     const userResponse = window.confirm(`Do you want to edit ${product.name}?`);
-    if(userResponse){
+    if (userResponse) {
       navigate(`/edit-product/${product._id}`, { state: { product } });
     }
   };
+
+  const handleInfo = (product) => { }
 
   return (
     <>
@@ -66,22 +68,22 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
           <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
             <thead class="text-sm sm:text-base text-gray-200 uppercase bg-gray-700 dark:bg-gray-700 dark:text-gray-400">
               <tr>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col" class="px-4 md:px-6 py-3">
                   Product name
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col" class="px-4 md:px-6 py-3">
                   quantity
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col" class="px-4 md:px-6 py-3">
                   rate
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col" class="px-4 md:px-6 py-3">
                   MRP
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col" class="px-4 md:px-6 py-3">
                   GST
                 </th>
-                <th scope="col" class="px-6 py-3">
+                <th scope="col" class="px-4 md:px-6 py-3">
                   Actions
                 </th>
               </tr>
@@ -90,27 +92,27 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
               {filteredProducts.map((product) => (
                 <tr
                   key={product._id}
-                  class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out"
                 >
                   <th
                     scope="row"
-                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white max-w-12 text-ellipsis overflow-hidden"
                     title={product.description}
                   >
                     {product.name}
                   </th>
-                  <td class="px-6 py-4">{product.quantity}</td>
-                  <td class="px-6 py-4">{product.rate}</td>
-                  <td class="px-6 py-4">{product.mrp}</td>
-                  <td class="px-6 py-4">{product.gstPercentage}</td>
-                  <td class="inline-flex px-6 py-4">
+                  <td class="px-4 md:px-6 py-4">{product.quantity}</td>
+                  <td class="px-4 md:px-6 py-4">{product.rate}</td>
+                  <td class="px-4 md:px-6 py-4">{product.mrp}</td>
+                  <td class="px-4 md:px-6 py-4">{product.gstPercentage}</td>
+                  <td class="inline-flex px-4 md:px-6 py-4">
                     <button
                       type="button"
                       onClick={() => handleEdit(product)}
                       class="flex items-center justify-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                     >
                       <Edit className="flex-shrink-0" size={16} />
-                      <span className="hidden xl:inline ml-1">Edit</span>
+                      {/* <span className="hidden xl:inline ml-1">Edit</span> */}
                     </button>
                     <button
                       type="button"
@@ -118,7 +120,15 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
                       class="flex items-center justify-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                     >
                       <Trash2 className="flex-shrink-0" size={16} />
-                      <span className="hidden xl:inline ml-1">Delete</span>
+                      {/* <span className="hidden xl:inline ml-1">Delete</span> */}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleInfo(product)}
+                      class="flex items-center justify-center focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
+                    >
+                      <Info className="flex-shrink-0" size={16} />
+                      {/* <span className="hidden sm:inline ml-1">Info</span> */}
                     </button>
                   </td>
                 </tr>

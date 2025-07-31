@@ -318,7 +318,7 @@ const AllStockIns = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-auto">
+                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-hidden md:overflow-x-auto">
                     <div className="flex justify-between">
                       <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white basis-[40%] min-w-[150px]">
                         PRODUCT
@@ -330,7 +330,7 @@ const AllStockIns = () => {
                         Qnty.
                       </h6>
                     </div>
-                    <hr className="h-px my-1 bg-gray-300 border-0 w-screen sm:w-auto overflow-x-visible dark:bg-gray-700" />
+                    <hr className="h-px my-1 bg-gray-300 border-0 w-full dark:bg-gray-700" />
                     {/* //w-screen overflow-x-visible --- Learning*/}
                     <div className="">
                       {item.products.map((product) => (
@@ -339,7 +339,9 @@ const AllStockIns = () => {
                           className="flex justify-between text-sm sm:text-base dark:border-gray-700"
                         >
                           <span className="flex basis-[40%] min-w-[150px] items-start">
-                            <h4 className="font-medium text-gray-600 dark:text-gray-200">
+                            <h4 className="font-medium text-gray-600 dark:text-gray-200 text-ellipsis overflow-hidden whitespace-nowrap"
+                              title={product.product.name}
+                            >
                               {item.products.indexOf(product) + 1}
                               {")"}&nbsp;{product.product.name}
                             </h4>

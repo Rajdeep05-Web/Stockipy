@@ -5,7 +5,7 @@ import {
   deleteVendor,
   fetchVendors,
 } from "../../../redux/slices/vendor/vendorsSlice";
-import { Captions, Edit, Trash2 } from "lucide-react";
+import { Captions, Edit, Trash2, Info } from "lucide-react";
 
 import SearchBar from "../searchBar";
 
@@ -54,6 +54,9 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
       }, 3000);
     }
   };
+
+  const handleInfo = (vendor) => {}
+
   return (
     <>
       <h1 class="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
@@ -89,16 +92,16 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
             {filteredVendors.map((vendor) => (
               <tr
                 key={vendor._id}
-                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out"
               >
                 <th
                   scope="row"
-                  class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white max-w-12 text-ellipsis overflow-hidden"
                 >
                   {vendor.name}
                 </th>
                 <td class="px-6 py-4">{vendor.phone}</td>
-                <td class="px-6 py-4">{vendor.address}</td>
+                <td class="px-6 py-4 max-w-12 text-ellipsis overflow-hidden whitespace-nowrap">{vendor.address}</td>
                 <td class="px-6 py-4">{vendor.gstNo}</td>
                 <td class="inline-flex px-6 py-4">
                   <button
@@ -107,7 +110,7 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
                     class="flex items-center justify-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
                   >
                     <Edit className="flex-shrink-0" size={16} />
-                    <span className="hidden sm:inline ml-1">Edit</span>
+                    {/* <span className="hidden sm:inline ml-1">Edit</span> */}
                   </button>
                   <button
                     type="button"
@@ -115,7 +118,15 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
                     class="flex items-center justify-center focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
                   >
                     <Trash2 className="flex-shrink-0" size={16} />
-                    <span className="hidden sm:inline ml-1">Delete</span>
+                    {/* <span className="hidden sm:inline ml-1">Delete</span> */}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleInfo(vendor)}
+                    class="flex items-center justify-center focus:outline-none text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
+                  >
+                    <Info className="flex-shrink-0" size={16} />
+                    {/* <span className="hidden sm:inline ml-1">Info</span> */}
                   </button>
                 </td>
               </tr>
