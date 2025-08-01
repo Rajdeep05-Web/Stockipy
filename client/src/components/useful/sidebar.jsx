@@ -92,7 +92,7 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
    <div
      id="sidebar"
      className={`fixed z-50 inset-y-0 left-0 w-64 bg-white bg-opacity-80 dark:bg-gray-800 dark:bg-opacity-80 backdrop-blur-md border-r border-neutral-200 rounded-r-xl lg:rounded-none dark:border-gray-700 transform transition-transform duration-200 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
-       } lg:translate-x-0 lg:static`}
+       } lg:translate-x-0`}
    >
      <div className="p-6 flex">
        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Stockipy.</h1>

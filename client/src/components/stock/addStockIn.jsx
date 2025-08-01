@@ -291,7 +291,7 @@ function nextInvNoGen(oldInv) {
 
 
        {/* vendor */}
-      <div className="basis-full md:basis-2/5 min-w-[320px] max-w-[400px] max-h-[690px] overflow-auto border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:border-gray-700 p-4">
+      <div className="basis-full md:basis-2/5 min-w-[320px] max-h-[690px] overflow-auto border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:border-gray-700 p-4">
          <form className=" max-w-full lg:max-w-sm mx-auto">
            <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
              Add Vendor Details
@@ -536,7 +536,7 @@ function nextInvNoGen(oldInv) {
        </div>
       
        {/* product */}
-       <div className="basis-full md:basis-3/5 min-w-[320px] lg:max-w-[400px] xl:max-w-[800px] h-full overflow-y-auto border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:border-gray-700 p-4">
+       <div className="basis-full md:basis-3/5 min-w-[320px] h-full overflow-y-auto border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:border-gray-700 p-4">
          <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-4xl dark:text-white">
            Add Products
          </h1>
