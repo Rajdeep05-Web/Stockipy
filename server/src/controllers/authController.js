@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs'; // to hash password
 import mongoose from 'mongoose'; // to check object id
 import connectDB from '../DB/index.js'; // to connect to db
 import axios from 'axios'; 
+import nodemailer from 'nodemailer'; // to send email
 
 const createAccessToken = async (user) => {
     return jwt.sign({userId:user._id}, process.env.JWT_SECRET, {expiresIn: process.env.ACCESS_TOKEN_LIFE })  
@@ -250,4 +251,131 @@ export const verifyUser = async (req, res) => {
         }
         return res.status(403).json({error: error.message || "Error during User Verification"});
     }
+}
+
+export const forgetPassword = async (req, res) => {
+ const {email} = req.body;
+ if(!email){
+    return res.status(400).json({ error: "Please provide an email" });
+ }
+ try {
+    await connectDB();
+    const user = await User.findOne({email: { $eq: email }});
+    if(!user){
+        return res.status(404).json({ error: "User not found" });
+    }
+    if(user.password === "google-auth") {
+        return res.status(400).json({ error: "This account is linked to Google. Please use Google sign-in to access your account." });
+    }
+    
+    // Generate OTP and set expiration time
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
+    user.resetPasswordOTP = otp;
+    user.resetPasswordOTPExpire = new Date(Date.now() + 10 * 60 * 1000); // OTP valid for 10 minutes
+
+    await user.save();
+
+    // Send OTP to user's email
+    // await sendEmail({
+    //     to: user.email,
+    //     subject: "Password Reset OTP",
+    //     text: `Your OTP for password reset is ${otp}. It is valid for 1 minute.`
+    // });
+    // sendOtpToMail(user.email, otp);
+
+    return res.status(200).json({
+      message: "We have sent a verification code to your email. Code is valid for 10 minutes.",
+      // In development only:
+    //   otp: otp
+    });
+
+ } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: error.message });
+ }
+}
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: '121rajpaul@gmail.com',
+    pass: 'your-app-password', 
+  },
+});
+
+const sendOtpToMail = async (email, otp) => {
+  const mailOptions = {
+    from: '"Stockipy" <121rajpaul@gmail.com>',
+    to: email,
+    subject: 'Your OTP Code to Reset Password',
+    text: `Your OTP code is ${otp}. It will expire in 1 minute.`,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent: ' + info.response);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
+};
+
+
+export const verifyOtp = async (req, res) => {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+        return res.status(400).json({ error: "Please provide email and OTP" });
+    }
+    try {
+        await connectDB();
+        const user = await User.findOne({ email: { $eq: email } });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if (user.resetPasswordOTP !== otp || !user.resetPasswordOTPExpire || user.resetPasswordOTPExpire < new Date()) {
+            return res.status(400).json({ error: "Invalid or expired OTP" });
+        }
+        
+        await user.save();
+
+        return res.status(200).json({ message: "OTP verified successfully. You can now reset your password." });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
+
+}
+
+export const resetPassword = async (req, res) => {
+    const { email, newPassword, otp } = req.body;
+    if(!email || !newPassword || !otp){
+        return res.status(400).json({ error: "Please provide email, new password and OTP" });
+    }
+    try {
+        await connectDB();
+        const user = await User.findOne({ email: { $eq: email } });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        if(user.password === "google-auth") {
+        return res.status(400).json({ error: "This account is linked to Google. Please use Google sign-in to access your account." });
+        }
+        if(user.resetPasswordOTP !== otp || !user.resetPasswordOTPExpire || user.resetPasswordOTPExpire < new Date()){
+            return res.status(400).json({ error: "Invalid or expired OTP, try again" });
+        }
+        user.password = await bcrypt.hash(newPassword, 12);
+        user.resetPasswordOTP = null;
+        user.resetPasswordOTPExpire = null;
+        user.refreshToken = null;
+        user.refreshTokenExpire = null;
+        user.isVerified = false;
+        await user.save();
+        
+        //send a confirmation email to the user
+
+        return res.status(200).json({ message: "Password reset successfully" });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({ error: error.message });
+    }
+
 }

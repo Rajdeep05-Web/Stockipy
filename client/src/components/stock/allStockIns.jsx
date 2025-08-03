@@ -318,7 +318,7 @@ const AllStockIns = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-hidden md:overflow-x-auto">
+                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-auto">
                     <div className="flex justify-between">
                       <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white basis-[40%] min-w-[150px]">
                         PRODUCT

@@ -258,6 +258,14 @@ function AuthFormContent() {
                 ? "Don't have an account? Sign up"
                 : 'Already have an account? Sign in'}
             </button>
+            <br />
+            <button
+              onClick={() => navigate('/password-reset')}
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
+            >
+              {isLogin
+                && `Forgot Password?`}
+            </button>
           </div>
         </div>
       </div>

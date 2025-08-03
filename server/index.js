@@ -47,7 +47,10 @@ app.post("/v1/auth/login", authRouter);
 app.post('/v1/auth/google-signin', authRouter);
 app.post("/v1/auth/regenerate-access-token", authRouter);
 app.put("/v1/auth/logout/:id", authRouter);
-app.post('/v1/auth/verify-user', authRouter);
+app.post("/v1/auth/verify-user", authRouter);
+app.post("/v1/auth/forget-password", authRouter);
+app.post("/v1/auth/verify-otp", authRouter);
+app.put("/v1/auth/reset-password", authRouter);
 
 //middleware
 app.use(authTokenVerifyMiddleware);

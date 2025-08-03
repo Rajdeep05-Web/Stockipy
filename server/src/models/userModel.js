@@ -44,6 +44,18 @@ const userSchema = new mongoose.Schema({
     refreshTokenExpire: {
         type: Date,
         default: null
+    },
+    resetPasswordOTP: {
+        type: String,
+        default: null
+    }, 
+    resetPasswordOTPExpire: {
+        type: Date,
+        default: null
+    },
+    isTwoFactorEnabled: {
+        type: Boolean,
+        default: false,
     }
 });
 

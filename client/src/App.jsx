@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
@@ -24,6 +24,7 @@ import Layout from "./components/layout";
 import LandingPage from "./components/landingPage/landingPage";
 import ProfilePage from "./components/user/profilePage";
 import AccountSettings from "./components/user/accountSetting";
+import {PasswordResetFlow} from './components/user/passwordResetFlow';
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -33,6 +34,7 @@ import { fetchStockIns } from "./redux/slices/stock/stockInSlice";
 import { Contact, Cookie } from "lucide-react";
 
 const App = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const [userLoggedIn, setUserLoggedIn] = useState(!!localStorage.getItem("token"));
@@ -68,7 +70,11 @@ const App = () => {
         {!userLoggedIn && <Route path="*" element={<Navigate to="/" />} />}
 
         {!userLoggedIn && <Route path="/auth" element={<AuthForm />} />}
-      
+
+        {!userLoggedIn && <Route path='/password-reset' element={<PasswordResetFlow onBackToLogin={() => {
+          navigate("/auth");
+        }} />} />}
+
         {userLoggedIn && <Route path="*" element={<Navigate to="/dashboard" />} />}
 
         {/* Protected Routes inside Layout */}
@@ -89,6 +95,7 @@ const App = () => {
             <Route path="/stock-in/edit/:id" element={<UpdateStockIn />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account-settings" element={<AccountSettings />} />
+            <Route path="/password-reset" element={<PasswordResetFlow />} />
           </Route>
         )}
 
