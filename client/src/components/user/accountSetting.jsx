@@ -4,6 +4,10 @@ import {
   Shield, Bell, Eye, EyeOff, Smartphone, Globe, Lock, Key, Trash2, Save, AlertTriangle
   , ArrowLeft, RefreshCw, Clock, CheckCircle
 } from 'lucide-react';
+import { useDispatch, useSelector } from "react-redux";
+import { forgetPassword, verifyOTP, resetPassword } from '../../redux/slices/auth/authSlice';
+import ErrorAlert from "../useful/alerts/errorAlert.jsx";
+import SuccessAlert from "../useful/alerts/successAlert.jsx";
 
 const initialSettings = {
   twoFactorEnabled: true,
@@ -19,6 +23,11 @@ const initialSettings = {
 
 const AccountSettings = () => {
   const inputRefs = useRef([]);
+  const dispatch = useDispatch();
+  const { user, otpSent: authOtpSentState, message, otpLoading: otploadingState } = useSelector((state) => state.auth);
+
+  const [errorMsg, setErrorMsg] = useState("");
+   const [successMsg, setSuccessMsg] = useState("");
   const [countdown, setCountdown] = useState(60);
   const [settings, setSettings] = useState(initialSettings);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -29,13 +38,20 @@ const AccountSettings = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [otpFromDB, setOtpFromDB] = useState('123456'); // Mock OTP from DB
-  const [isLoading, setIsLoading] = useState(false);
+  const [otpSubmitLoading, setOtpSubmitLoading] = useState(false);
+  const [otpReqLoading, setOtpReqLoading] = useState(false);
+  const [passResetLoading, setPassResetLoading] = useState(false);
+  const [authMsg, setAuthMsg] = useState('');
+  const [resetPassMsg, setResetPassMsg] = useState('');
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
+
+  const { email } = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {};
 
   const handleSettingChange = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -50,30 +66,78 @@ const AccountSettings = () => {
     // Handle save logic here
   };
 
-  const handleChangePassword = () => {
-    setIsChangePassword(true);
-    startOtpCountdown();
-    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('New passwords do not match');
-      return;
+  const reqOtpForForgetPassword = async () => {
+    setOtpReqLoading(true);
+    try {
+      const res = await dispatch(forgetPassword(email)).unwrap();
+      setIsChangePassword(true);
+      setIsOtpSent(true);
+      setAuthMsg(res.message);
+      startOtpCountdown();
+      console.log("forget pass", res);
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      setErrorMsg('Failed to send OTP. Please try again.');
+      setTimeout(() => {
+        setErrorMsg("");
+      }, 3000);
+    } finally {
+      setOtpReqLoading(false);
     }
-    console.log('Changing password');
-    // Handle password change logic here
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  }
+
+  const handleChangePassword = async () => {
+    await reqOtpForForgetPassword();
   };
-  const handleSavePassword = () => {
+
+  const handleSavePassword = async (e) => {
+    e.preventDefault();
+    setPassResetLoading(true);
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('New passwords do not match');
+      setErrorMsg('Passwords do not match');
+     setTimeout(() => {
+       setErrorMsg("");
+     }, 3000);
       return;
     }
-    // Handle save password logic here
-    alert('Password changed successfully');
-    console.log('Saving new password');
+
+    let otpNum = 0;
+    for(let i = 0; i < otp.length; i++){
+      otpNum += Number(otp[i]) * Math.pow(10, 5 - i);
+    }
+
+    try {
+      const res = await dispatch(resetPassword({
+        email: email,
+        newPassword: passwordForm.confirmPassword,
+        otp: otpNum
+      })).unwrap();
+      setSuccessMsg(res.message || "Password Updated successfully");
+      setTimeout(() => {
+       setSuccessMsg("");
+      }, 3000);
+      setIsChangePassword(false);
+      setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      setOtp(['', '', '', '', '', '']);
+      setIsOtpVerified(false);
+    } catch (error) {
+      console.error(error || "error during password reset");
+      setErrorMsg(error);
+     setTimeout(() => {
+       setErrorMsg("");
+     }, 3000);
+    } finally {
+      setPassResetLoading(false);
+    }
+  };
+
+  const handleCancelSavePassword = () => {
     setIsChangePassword(false);
     setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     setOtp(['', '', '', '', '', '']);
     setIsOtpVerified(false);
   };
+
   const handleInputChange = (index, value) => {
     if (value.length > 1) return;
 
@@ -109,26 +173,42 @@ const AccountSettings = () => {
     }
   };
   const handleVerifyOTP = async (otpCode) => {
-    setIsLoading(true);
+    setOtpSubmitLoading(true);
     setError('');
+    try {
+      await dispatch(verifyOTP({ email, otp: otpCode })).unwrap();
+      setSuccess('OTP verified successfully!');
+      setTimeout(() => {
+        setIsOtpVerified(true);
+      }, 1500);
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      setError('Invalid verification code. Please try again.');
+      setOtp(['', '', '', '', '', '']);
+      inputRefs.current[0]?.focus();
+    } finally {
+      setOtpSubmitLoading(false);
+    }
 
     // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    // setTimeout(() => {
+    //   setOtpSubmitLoading(false);
 
-      // Mock validation (in real app, this would be an API call)
-      if (otpCode === otpFromDB) {
-        setIsOtpVerified(true);
-      } else {
-        setError('Invalid verification code. Please try again.');
-        setOtp(['', '', '', '', '', '']);
-        inputRefs.current[0]?.focus();
-      }
-    }, 1500);
+    //   // Mock validation (in real app, this would be an API call)
+    //   if (otpCode === otpFromDB) {
+    //     setIsOtpVerified(true);
+    //   } else {
+    //     setError('Invalid verification code. Please try again.');
+    //     setOtp(['', '', '', '', '', '']);
+    //     inputRefs.current[0]?.focus();
+    //   }
+    // }, 1500);
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (countdown > 0) return;
+
+    await reqOtpForForgetPassword();
 
     setCountdown(60);
     setError('');
@@ -144,10 +224,8 @@ const AccountSettings = () => {
       });
     }, 1000);
 
-    // if (onResendOTP) {
-    //   onResendOTP();
-    // }
   };
+
   const startOtpCountdown = () => {
     setCountdown(60);
     const timer = setInterval(() => {
@@ -168,7 +246,9 @@ const AccountSettings = () => {
     }
   };
 
-  return (
+  return (<>
+    {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
+    {successMsg && <SuccessAlert successMsg={successMsg} />}
     <div className="space-y-6">
       {/* Header */}
       <motion.div
@@ -273,8 +353,9 @@ const AccountSettings = () => {
           <h3 className="text-xl font-bold text-gray-900 dark:text-white">Change Password</h3>
         </div>
         {isChangePassword && isOtpVerified && <>
+          <form onSubmit={handleSavePassword}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div className="sm:col-span-2">
+            {/* <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
               <div className="relative">
                 <input
@@ -291,7 +372,7 @@ const AccountSettings = () => {
                   {showCurrentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-            </div>
+            </div> */}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password</label>
@@ -300,6 +381,7 @@ const AccountSettings = () => {
                   type={showNewPassword ? 'text' : 'password'}
                   value={passwordForm.newPassword}
                   onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
+                  disabled={passResetLoading}
                   className="w-full px-3 py-2 pr-10 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
                 <button
@@ -319,6 +401,7 @@ const AccountSettings = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={passwordForm.confirmPassword}
                   onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
+                  disabled={passResetLoading}
                   className="w-full px-3 py-2 pr-10 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
                 <button
@@ -331,16 +414,25 @@ const AccountSettings = () => {
               </div>
             </div>
           </div>
-          <div className='flex justify-end'>
+          <div className='flex justify-end space-x-2'>
+            <motion.button
+              type = "submit"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="mt-6 flex items-center space-x-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all"
+            >
+              {passResetLoading ? <span>Loading</span> : <span>Save</span>}
+            </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={handleSavePassword}
-              className="mt-6 flex items-center space-x-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all"
+              onClick={handleCancelSavePassword}
+              className="mt-6 flex items-center space-x-2 bg-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-all"
             >
-              <span>Save</span>
+              <span>Cancel</span>
             </motion.button>
           </div>
+          </form>
         </>}
 
         {!isChangePassword && !isOtpVerified && (
@@ -358,19 +450,19 @@ const AccountSettings = () => {
                   className="mt-6 flex items-center space-x-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all"
                 >
                   <Key className="w-4 h-4" />
-                  <span>Change Password</span>
+                  {otpReqLoading ? <span>Loading</span> : <span>Change Password</span>}
                 </motion.button>
               </div>
             </div>
           </>)}
 
         {/* OTP Form */}
-        {isChangePassword && !isOtpVerified && (
+        {isChangePassword && isOtpSent && !isOtpVerified && (
           <div className="space-y-4">
             <div className="p-4 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg">
               <h4 className="font-medium text-gray-900 dark:text-white mb-2">Verify OTP</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Please enter the OTP sent to your email.
+                {authMsg || "Enter the OTP sent to your email to verify your identity."}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -387,7 +479,7 @@ const AccountSettings = () => {
                         onChange={(e) => handleInputChange(index, e.target.value)}
                         onKeyDown={(e) => handleKeyDown(index, e)}
                         onPaste={handlePaste}
-                        className={`w-12 h-12 text-center text-xl font-bold border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none transition-all ${error
+                        className={`w-10 md:w-12 h-12 text-center text-xl font-bold border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none transition-all ${error
                           ? 'border-red-500 focus:border-red-500'
                           : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
                           }`}
@@ -407,16 +499,25 @@ const AccountSettings = () => {
                       {error}
                     </motion.p>
                   )}
+
+                  {/* //seccess */}
+                  {success && <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-green-500 text-sm text-center"
+                  >
+                    OTP verified successfully!
+                  </motion.p>}
                 </div>
 
                 <motion.button
                   type="submit"
-                  disabled={isLoading || otp.some(digit => digit === '')}
+                  disabled={otpSubmitLoading || otp.some(digit => digit === '' || success)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  {isLoading ? (
+                  {otpSubmitLoading ? (
                     <RefreshCw className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
@@ -442,9 +543,9 @@ const AccountSettings = () => {
                     <Clock className="w-4 h-4" />
                     <span>Resend in {countdown}s</span>
                   </span>
-                ) : (
-                  'Resend verification code'
-                )}
+                ) : 
+                  otpReqLoading ? 'loading' :'Resend verification code'
+                }
               </button>
             </div>
           </div>
@@ -620,7 +721,7 @@ const AccountSettings = () => {
         </motion.button>
       </motion.div>
     </div>
-  );
+  </>);
 };
 
 export default AccountSettings;

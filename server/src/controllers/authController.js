@@ -275,13 +275,7 @@ export const forgetPassword = async (req, res) => {
 
     await user.save();
 
-    // Send OTP to user's email
-    // await sendEmail({
-    //     to: user.email,
-    //     subject: "Password Reset OTP",
-    //     text: `Your OTP for password reset is ${otp}. It is valid for 1 minute.`
-    // });
-    // sendOtpToMail(user.email, otp);
+    await sendOtpToMail(user.email, otp);
 
     return res.status(200).json({
       message: "We have sent a verification code to your email. Code is valid for 10 minutes.",
@@ -291,24 +285,24 @@ export const forgetPassword = async (req, res) => {
 
  } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: "Failed to send otp" || error.message });
  }
 }
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: '121rajpaul@gmail.com',
-    pass: 'your-app-password', 
+    user: process.env.GMAIL_USER2,
+    pass: process.env.APP_GMAIL_PASSWORD2, 
   },
 });
 
 const sendOtpToMail = async (email, otp) => {
   const mailOptions = {
-    from: '"Stockipy" <121rajpaul@gmail.com>',
+    from: process.env.GMAIL_USER2,
     to: email,
-    subject: 'Your OTP Code to Reset Password',
-    text: `Your OTP code is ${otp}. It will expire in 1 minute.`,
+    subject: 'Your OTP Code to Reset Stockipy App Password',
+    text: `Your OTP code is ${otp}. It will expire in 10 minute.`,
   };
 
   try {
@@ -359,7 +353,7 @@ export const resetPassword = async (req, res) => {
         if(user.password === "google-auth") {
         return res.status(400).json({ error: "This account is linked to Google. Please use Google sign-in to access your account." });
         }
-        if(user.resetPasswordOTP !== otp || !user.resetPasswordOTPExpire || user.resetPasswordOTPExpire < new Date()){
+        if(user.resetPasswordOTP != otp || !user.resetPasswordOTPExpire || user.resetPasswordOTPExpire < new Date()){
             return res.status(400).json({ error: "Invalid or expired OTP, try again" });
         }
         user.password = await bcrypt.hash(newPassword, 12);
@@ -370,9 +364,20 @@ export const resetPassword = async (req, res) => {
         user.isVerified = false;
         await user.save();
         
-        //send a confirmation email to the user
+        res.status(200).json({ message: "Password reset successfully" });
 
-        return res.status(200).json({ message: "Password reset successfully" });
+        //send a confirmation email to the user
+       const mailOptions = {
+        from: process.env.GMAIL_USER2,
+        to:email,
+        subject: 'Your Stockipy App Password is changed',
+        text: `It is a confirmation mail to inform you that your stockipy password is changed.`,
+       }
+       const info = await transporter.sendMail(mailOptions);
+       console.log('Email sent: ' + info.response);
+
+       return;
+
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });

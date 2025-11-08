@@ -55,6 +55,33 @@ export const verifyUserOnPageLoad = createAsyncThunk("user/Verify", async (_, { 
   }
 });
 
+export const forgetPassword = createAsyncThunk("user/ForgetPassword", async (email, { rejectWithValue }) => {
+  try {
+    const { data } = await API.post(`${API_URL_AUTH}/forget-password`, { email });
+    return data;
+  } catch (error) {
+    return rejectWithValue(error?.response?.data.error || error.message);
+  }
+})
+
+export const verifyOTP = createAsyncThunk("user/verifyOTP", async ({ email, otp }, { rejectWithValue }) => {
+  try {
+    const { data } = await API.post(`${API_URL_AUTH}/verify-otp`, { email, otp });
+    return data;
+  } catch (error) {
+    return rejectWithValue(error?.response?.data.error || error.message);
+  }
+})
+
+export const resetPassword = createAsyncThunk("user/resetPassword", async (obj, { rejectWithValue }) => {
+  try {
+    const { data } = await API.put(`${API_URL_AUTH}/reset-password`, { ...obj });
+    return data;
+  } catch (error) {
+    return rejectWithValue(error?.response?.data.error || error.message);
+  }
+})
+
 const initialState = {
   user: JSON.parse(localStorage.getItem('user')) || null,
   isAuthenticated: false,
@@ -62,6 +89,9 @@ const initialState = {
   error: false,
   message: null,
   token: localStorage.getItem('token') || null,
+  otpSent: false,
+  otpLoading: false,
+  otpVerified: false,
 }
 
 const authSlice = createSlice({
@@ -206,6 +236,51 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+      })
+
+      .addCase(forgetPassword.pending, (state) =>{
+        state.otpLoading = true;
+        state.message = null;
+        state.otpSent = false;
+      })
+      .addCase(forgetPassword.fulfilled, (state, action) =>{
+        state.otpLoading = false;
+        state.message = action.payload.message;
+        state.otpSent = true;
+      })
+      .addCase(forgetPassword.rejected, (state, action) =>{
+        state.otpLoading = false;
+        state.error = action.payload;
+        state.message = action.payload;
+        state.otpSent = false;
+      })
+
+      .addCase(verifyOTP.pending, (state) => {
+        state.otpLoading = true;
+        state.otpVerified = false;
+        state.message = null;
+      })
+      .addCase(verifyOTP.fulfilled, (state, action) => {
+        state.otpLoading = false;
+        state.otpVerified = true;
+        state.message = action.payload.message;
+      })
+      .addCase(verifyOTP.rejected, (state, action) => {
+        state.otpLoading = false;
+        state.otpVerified = false;
+        state.message = action.payload;
+      })
+
+      .addCase(resetPassword.pending, (state) => {
+        state.message = null;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.message = action.payload.message;
+        state.otpVerified = false; 
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.message = action.payload.message;
+        state.error = action.payload;
       })
 
   }
