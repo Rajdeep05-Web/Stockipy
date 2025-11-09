@@ -95,6 +95,8 @@ const AccountSettings = () => {
     setPassResetLoading(true);
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
       setErrorMsg('Passwords do not match');
+      setPassResetLoading(false);
+      setSuccess('');
      setTimeout(() => {
        setErrorMsg("");
      }, 3000);
