@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, CheckCircle, RefreshCw, Shield } from 'lucide-react';
 import ThemeToggle from '../themeToggle/themeToggle';
+import { useDispatch } from "react-redux";
+import ErrorAlert from "../alerts/errorAlert.jsx";
+import { resetPassword } from '../../../redux/slices/auth/authSlice.jsx';
 
 const ResetPassword = ({
     email,
@@ -9,6 +12,7 @@ const ResetPassword = ({
     onPasswordReset,
     onBackToLogin
 }) => {
+    const dispatch = useDispatch();
     const [formData, setFormData] = useState({
         password: '',
         confirmPassword: ''
@@ -18,6 +22,7 @@ const ResetPassword = ({
     const [isLoading, setIsLoading] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [errors, setErrors] = useState({});
+    const [errorMsg, setErrorMsg] = useState("");
 
     const calculatePasswordStrength = (password) => {
         let score = 0;
@@ -91,25 +96,33 @@ const ResetPassword = ({
         return Object.keys(newErrors).length === 0;
     };
 
+    const savePassword = async () => {
+        setIsLoading(true);
+        try {
+            const res = await dispatch(resetPassword({
+                email: email,
+                newPassword: formData.confirmPassword,
+                otp: otp
+            })).unwrap();
+            setIsSuccess(true);
+            // if (onPasswordReset) {
+            //     onPasswordReset();
+            // }
+        } catch (error) {
+            console.error(error || "error during password reset");
+            setErrorMsg(error);
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         if (!validateForm()) return;
-
-        setIsLoading(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            setIsSuccess(true);
-
-            // Auto redirect after success
-            setTimeout(() => {
-                if (onPasswordReset) {
-                    onPasswordReset();
-                }
-            }, 2000);
-        }, 2000);
+        await savePassword();
     };
 
     if (isSuccess) {
@@ -156,14 +169,15 @@ const ResetPassword = ({
         );
     }
 
-    return (
+    return (<>
+        {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-             <div className="absolute  top-4 left-4">
-                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Stockipy.</h2>
-                </div>
-                <div className="absolute top-4 right-4">
-                    <ThemeToggle />
-                </div>
+            <div className="absolute  top-4 left-4">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Stockipy.</h2>
+            </div>
+            <div className="absolute top-4 right-4">
+                <ThemeToggle />
+            </div>
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -216,8 +230,8 @@ const ResetPassword = ({
                                 value={formData.password}
                                 onChange={(e) => handleInputChange('password', e.target.value)}
                                 className={`w-full px-4 py-3 pr-12 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-colors ${errors.password
-                                        ? 'border-red-500 focus:ring-red-500'
-                                        : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-transparent'
+                                    ? 'border-red-500 focus:ring-red-500'
+                                    : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-transparent'
                                     }`}
                                 placeholder="Enter new password"
                             />
@@ -276,8 +290,8 @@ const ResetPassword = ({
                                 value={formData.confirmPassword}
                                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                                 className={`w-full px-4 py-3 pr-12 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-colors ${errors.confirmPassword
-                                        ? 'border-red-500 focus:ring-red-500'
-                                        : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-transparent'
+                                    ? 'border-red-500 focus:ring-red-500'
+                                    : 'border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-transparent'
                                     }`}
                                 placeholder="Confirm new password"
                             />
@@ -313,7 +327,7 @@ const ResetPassword = ({
                 </form>
             </motion.div>
         </div>
-    );
+    </>);
 };
 
 export default ResetPassword;

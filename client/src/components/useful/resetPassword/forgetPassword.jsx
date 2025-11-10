@@ -2,61 +2,70 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, ArrowLeft, Send, Clock, RefreshCw } from 'lucide-react';
 import ThemeToggle from '../themeToggle/themeToggle';
+import { useDispatch, useSelector } from "react-redux";
+import { forgetPassword } from '../../../redux/slices/auth/authSlice.jsx';
+import ErrorAlert from "../alerts/errorAlert.jsx";
+// import SuccessAlert from "../alerts/successAlert.jsx";
 
 const ForgotPassword = ({
     onBackToLogin,
     onOTPSent
 }) => {
+      const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isEmailSent, setIsEmailSent] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const [errorMsg, setErrorMsg] = useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+     const reqOtpForForgetPassword = async () => {
         if (!email) return;
-
         setIsLoading(true);
-
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            setIsEmailSent(true);
-            setCountdown(60);
-
-            // Start countdown
-            const timer = setInterval(() => {
-                setCountdown(prev => {
-                    if (prev <= 1) {
-                        clearInterval(timer);
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
-
+        try {
+          const res = await dispatch(forgetPassword(email)).unwrap();
+          setIsEmailSent(true);
+          console.log("email sent")
+          setIsLoading(false);
+        //   startCountdown();
             if (onOTPSent) {
                 onOTPSent(email);
             }
-        }, 2000);
+        } catch (error) {
+          console.error('Error sending OTP:', error);
+          setErrorMsg(error);
+          setIsLoading(false);
+          setTimeout(() => {
+            setErrorMsg("");
+          }, 3000);
+        }
+      }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        await reqOtpForForgetPassword();
     };
 
-    const handleResendEmail = () => {
+    const handleResendEmail = async () => {
         if (countdown > 0) return;
-
-        setCountdown(60);
-        const timer = setInterval(() => {
-            setCountdown(prev => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+        await reqOtpForForgetPassword();
+        startCountdown();
     };
 
-    return (
+    const startCountdown = () => {
+    setCountdown(60);
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+    return (<>
+        {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
             <div className="absolute  top-4 left-4">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Stockipy.</h2>
@@ -158,7 +167,8 @@ const ForgotPassword = ({
                                 disabled={countdown > 0}
                                 className="text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
-                                {countdown > 0 ? (
+                                {/* <>isLoading ? <span>Loading</span> */}
+                                {!isLoading && countdown > 0 ? (
                                     <span className="flex items-center space-x-2">
                                         <Clock className="w-4 h-4" />
                                         <span>Resend in {countdown}s</span>
@@ -166,6 +176,7 @@ const ForgotPassword = ({
                                 ) : (
                                     'Resend verification code'
                                 )}
+                                {/* </> */}
                             </button>
                         </div>
                     </div>
@@ -183,7 +194,7 @@ const ForgotPassword = ({
                 </div>
             </motion.div>
         </div>
-    );
+    </>);
 };
 
 export default ForgotPassword;

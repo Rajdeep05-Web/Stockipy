@@ -2,17 +2,24 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, ArrowLeft, RefreshCw, Clock, CheckCircle } from 'lucide-react';
 import ThemeToggle from '../themeToggle/themeToggle';
+import { useDispatch, useSelector } from "react-redux";
+import { forgetPassword, verifyOTP } from '../../../redux/slices/auth/authSlice.jsx';
+import ErrorAlert from "../alerts/errorAlert.jsx";
+
 const OTPVerification = ({
     email,
     onBackToForgot,
     onOTPVerified,
     onResendOTP
 }) => {
+    const dispatch = useDispatch();
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [isLoading, setIsLoading] = useState(false);
+    const [isOtpLoading, setIsOtpLoading] = useState(false);
     const [error, setError] = useState('');
     const [countdown, setCountdown] = useState(60);
     const inputRefs = useRef([]);
+    const [errorMsg, setErrorMsg] = useState("");
 
     useEffect(() => {
         // Start countdown
@@ -68,27 +75,40 @@ const OTPVerification = ({
     const handleVerifyOTP = async (otpCode) => {
         setIsLoading(true);
         setError('');
-
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-
-            // Mock validation (in real app, this would be an API call)
-            if (otpCode === '123456') {
-                if (onOTPVerified) {
-                    onOTPVerified(otpCode);
-                }
-            } else {
-                setError('Invalid verification code. Please try again.');
-                setOtp(['', '', '', '', '', '']);
-                inputRefs.current[0]?.focus();
+        try {
+            await dispatch(verifyOTP({ email, otp: otpCode })).unwrap();
+            if (onOTPVerified) {
+                onOTPVerified(otpCode);
             }
-        }, 1500);
+        } catch (error) {
+            console.error('Error verifying OTP:', error);
+            setError('Invalid verification code. Please try again.');
+            setOtp(['', '', '', '', '', '']);
+            inputRefs.current[0]?.focus();
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleResend = () => {
-        if (countdown > 0) return;
+    const reqOtpForForgetPassword = async () => {
+        if (!email) return;
+        setIsOtpLoading(true);
+        try {
+            const res = await dispatch(forgetPassword(email)).unwrap();
+            setIsOtpLoading(false);
+        } catch (error) {
+            console.error('Error sending OTP:', error);
+            setErrorMsg('Failed to send OTP. Please try again.');
+            setIsOtpLoading(false);
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        }
+    }
 
+    const handleResend = async () => {
+        if (countdown > 0) return;
+        await reqOtpForForgetPassword();
         setCountdown(60);
         setError('');
         setOtp(['', '', '', '', '', '']);
@@ -116,7 +136,8 @@ const OTPVerification = ({
         }
     };
 
-    return (
+    return (<>
+        {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
             <div className="absolute  top-4 left-4">
                 <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Stockipy.</h2>
@@ -165,8 +186,8 @@ const OTPVerification = ({
                                     onKeyDown={(e) => handleKeyDown(index, e)}
                                     onPaste={handlePaste}
                                     className={`w-12 h-12 text-center text-xl font-bold border-2 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none transition-all ${error
-                                            ? 'border-red-500 focus:border-red-500'
-                                            : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
+                                        ? 'border-red-500 focus:border-red-500'
+                                        : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
                                         }`}
                                     initial={{ scale: 0.8 }}
                                     animate={{ scale: 1 }}
@@ -220,7 +241,7 @@ const OTPVerification = ({
                                 <span>Resend in {countdown}s</span>
                             </span>
                         ) : (
-                            'Resend verification code'
+                            isOtpLoading ? 'loading' : 'Resend verification code'
                         )}
                     </button>
                 </div>
@@ -237,7 +258,7 @@ const OTPVerification = ({
                 </div>
             </motion.div>
         </div>
-    );
+    </>);
 };
 
 export default OTPVerification;

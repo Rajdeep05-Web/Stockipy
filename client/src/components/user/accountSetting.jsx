@@ -191,20 +191,6 @@ const AccountSettings = () => {
     } finally {
       setOtpSubmitLoading(false);
     }
-
-    // Simulate API call
-    // setTimeout(() => {
-    //   setOtpSubmitLoading(false);
-
-    //   // Mock validation (in real app, this would be an API call)
-    //   if (otpCode === otpFromDB) {
-    //     setIsOtpVerified(true);
-    //   } else {
-    //     setError('Invalid verification code. Please try again.');
-    //     setOtp(['', '', '', '', '', '']);
-    //     inputRefs.current[0]?.focus();
-    //   }
-    // }, 1500);
   };
 
   const handleResend = async () => {
