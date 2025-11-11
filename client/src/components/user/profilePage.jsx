@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, MapPin, Calendar, Edit, Save, X, Camera, Shield, Award, Clock } from 'lucide-react';
+import { useDispatch } from "react-redux";
 
 const userProfile = {
   firstName: 'John',
   lastName: 'Doe',
   email: 'john.doe@stockflow.com',
-  phone: '+1 (555) 123-4567',
+  phone: '',
   address: '123 Business Ave',
   city: 'San Francisco',
   state: 'CA',
@@ -26,8 +27,25 @@ const achievements = [
 ];
 
 const ProfilePage = () => {
+  const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(userProfile);
+  const [userEmail, setUserEmail] = useState('');
+  const [userName, setUserName] = useState('');
+  const [lastLogin, setLastLogin] = useState('');
+  const [joinDate, setJoinDate] = useState('');
+  const [role, setRole] = useState('');
+  const [userProfilePicture, setUserProfilePicture] = useState("");
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    setUserEmail(user.email);
+    setUserName(user.name);
+    setLastLogin(UTCtoIST(user.lastLogin));
+    setJoinDate(UTCtoISTShort(user.createdAt));
+    setRole(user.role)
+    setUserProfilePicture(user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=059669&color=ffffff`); // Fallback to generated avatar based on name
+  }, [])
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -44,6 +62,49 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
+  const UTCtoISTShort = (utcTimestamp) => {
+    if(!utcTimestamp) return;
+    const dateObj = new Date(utcTimestamp);
+    const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'Asia/Kolkata',
+    };
+const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj);
+ return istReadableTime;
+  }
+
+  const UTCtoIST = (utcTimestamp) => {
+    if(!utcTimestamp) return;
+    const dateObj = new Date(utcTimestamp);
+    const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true, // Use 12-hour format (AM/PM)
+    timeZone: 'Asia/Kolkata',
+    timeZoneName: 'short' // Add the "IST" abbreviation
+    };
+  const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj);
+  return istReadableTime;
+  }
+
+  const getInitials = () => {
+    if(userName.includes(' ')) {
+      const [firstname] = userName.split(' ')[0] || " ";
+      const [lastName] = userName.split(' ')[1] || " ";
+      return `${firstname.toUpperCase()}${lastName?.toUpperCase()}`;
+    } else {
+      return userName.charAt(0).toUpperCase();
+    }
+  };
+
+  
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -57,7 +118,9 @@ const ProfilePage = () => {
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">My Profile</h2>
           <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">Manage your personal information and preferences</p>
         </div>
-        <motion.button
+        
+        {/* Edit Btn */}
+        {/* <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsEditing(!isEditing)}
@@ -69,7 +132,7 @@ const ProfilePage = () => {
         >
           {isEditing ? <X className="w-4 h-4 sm:w-5 sm:h-5" /> : <Edit className="w-4 h-4 sm:w-5 sm:h-5" />}
           <span className="hidden sm:inline">{isEditing ? 'Cancel' : 'Edit Profile'}</span>
-        </motion.button>
+        </motion.button> */}
       </motion.div>
 
       {/* Profile Header Card */}
@@ -83,7 +146,12 @@ const ProfilePage = () => {
           {/* Avatar */}
           <div className="relative">
             <div className="w-24 h-24 sm:w-32 sm:h-32 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl sm:text-4xl font-bold">
-              {formData.firstName[0]}{formData.lastName[0]}
+              {/* {formData.firstName[0]}{formData.lastName[0]} */}
+              {userProfilePicture ? (
+                      <img src={userProfilePicture} alt="User Avatar" className="w-full h-full rounded-full" />
+                    ) : (
+                      getInitials()
+                    )}
             </div>
             {isEditing && (
               <motion.button
@@ -118,24 +186,24 @@ const ProfilePage = () => {
                 </div>
               ) : (
                 <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
-                  {formData.firstName} {formData.lastName}
+                  <span>{userName || `${formData.firstName} ${formData.lastName}`}</span>
                 </h3>
               )}
               
               <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 text-gray-600 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Mail className="w-4 h-4" />
-                  <span className="text-sm">{formData.email}</span>
+                  <span className="text-sm">{userEmail || formData.email}</span>
                 </div>
-                <div className="flex items-center space-x-2">
+                {/* <div className="flex items-center space-x-2">
                   <Shield className="w-4 h-4" />
                   <span className="text-sm">{formData.jobTitle}</span>
-                </div>
+                </div> */}
               </div>
               
               <div className="flex items-center justify-center sm:justify-start space-x-2 text-gray-500 dark:text-gray-400">
                 <Calendar className="w-4 h-4" />
-                <span className="text-sm">Joined {new Date(formData.joinDate).toLocaleDateString()}</span>
+                <span className="text-sm">Joined {joinDate || new Date(formData.joinDate).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
@@ -164,11 +232,11 @@ const ProfilePage = () => {
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
-                <p className="text-gray-900 dark:text-white">{formData.email}</p>
+                <p className="text-gray-900 dark:text-white">{userEmail || formData.email}</p>
               )}
             </div>
 
-            <div>
+            {formData.phone && <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
               {isEditing ? (
                 <input
@@ -180,9 +248,9 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.phone}</p>
               )}
-            </div>
+            </div>}
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Job Title</label>
               {isEditing ? (
                 <input
@@ -194,9 +262,9 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.jobTitle}</p>
               )}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Department</label>
               {isEditing ? (
                 <input
@@ -208,9 +276,9 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.department}</p>
               )}
-            </div>
+            </div> */}
 
-            <div className="sm:col-span-2">
+            {/* <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Address</label>
               {isEditing ? (
                 <input
@@ -222,9 +290,9 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.address}</p>
               )}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">City</label>
               {isEditing ? (
                 <input
@@ -236,9 +304,9 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.city}</p>
               )}
-            </div>
+            </div> */}
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">State / ZIP</label>
               {isEditing ? (
                 <div className="flex space-x-2">
@@ -260,9 +328,9 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.state} {formData.zipCode}</p>
               )}
-            </div>
+            </div> */}
 
-            <div className="sm:col-span-2">
+            {/* <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Bio</label>
               {isEditing ? (
                 <textarea
@@ -274,7 +342,7 @@ const ProfilePage = () => {
               ) : (
                 <p className="text-gray-900 dark:text-white">{formData.bio}</p>
               )}
-            </div>
+            </div> */}
           </div>
 
           {isEditing && (
@@ -301,7 +369,7 @@ const ProfilePage = () => {
         {/* Achievements & Activity */}
         <div className="space-y-6">
           {/* Achievements */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
@@ -321,7 +389,7 @@ const ProfilePage = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </motion.div> */}
 
           {/* Activity Summary */}
           <motion.div
@@ -334,16 +402,16 @@ const ProfilePage = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Last Login</span>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">{formData.lastLogin}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-white">{lastLogin || formData.lastLogin}</span>
               </div>
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Total Sessions</span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">1,247</span>
-              </div>
-              <div className="flex items-center justify-between">
+              </div> */}
+              {/* <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Avg. Session</span>
                 <span className="text-sm font-medium text-gray-900 dark:text-white">2h 15m</span>
-              </div>
+              </div> */}
             </div>
           </motion.div>
         </div>

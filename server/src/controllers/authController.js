@@ -72,6 +72,7 @@ export const logInUser = async (req, res) => {
         existUser.isVerified = true;
         existUser.refreshToken = refreshToken;
         existUser.refreshTokenExpire = new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000));
+        existUser.lastLogin = new Date();
 
         //save user in db
         await existUser.save();
@@ -85,7 +86,15 @@ export const logInUser = async (req, res) => {
             path: '/', // Accessible across all routes
         })
         //send res body with access token and user details
-        return res.status(201).json({user:{_id:existUser._id, email:existUser.email, name:existUser.name, profilePicture:existUser.profilePicture}, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
+        return res.status(201).json({user: {
+            _id: existUser._id, 
+            email: existUser.email,
+            name: existUser.name,
+            profilePicture: existUser.profilePicture,
+            lastLogin: existUser.lastLogin,
+            createdAt: existUser.createdAt,
+            role: existUser.role
+            }, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });
@@ -173,7 +182,7 @@ export const googleSignIn = async (req, res) => {
         //save refresh token in db
         user.refreshToken = refreshToken;
         user.refreshTokenExpire = new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000));
-        
+        user.lastLogin = new Date();
         //save user in db
         await user.save();
 
@@ -185,7 +194,15 @@ export const googleSignIn = async (req, res) => {
             sameSite: "lax",//cookie is only sent to the same origin as the domain in the address bar
 
         });
-        return res.status(201).json({user:{_id:user._id, email:user.email, name:user.name, profilePicture:user.profilePicture}, token:accessToken, isAuthenticated:user.isVerified, message : "User logged in successfully"});
+        return res.status(201).json({user:{
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+            profilePicture: user.profilePicture,
+            lastLogin: user.lastLogin,
+            createdAt: user.createdAt,
+            role: user.role
+        }, token:accessToken, isAuthenticated:user.isVerified, message : "User logged in successfully"});
 
     } catch (error) {
         console.log(error);

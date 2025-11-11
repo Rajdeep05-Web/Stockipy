@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { ChevronDown, User, Settings, LogOut, Camera, Shield, Award, Clock } from 'lucide-react';
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import ThemeToggle from "../useful/themeToggle/themeToggle"
 import { logOutUser, resetAuthState, setLoader } from "../../redux/slices/auth/authSlice";
+
 const userData = {
   firstName: 'John',
   lastName: 'Doe',
@@ -20,6 +20,8 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [userName, setUserName] = useState('');
+  const [lastLogin, setLastLogin] = useState('');
+  const [role, setRole] = useState('');
   const [userProfilePicture, setUserProfilePicture] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -28,6 +30,8 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
     const user = JSON.parse(localStorage.getItem("user"));
     setUserEmail(user.email);
     setUserName(user.name);
+    setLastLogin(UTCtoIST(user.lastLogin));
+    setRole(user.role)
     setUserProfilePicture(user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=059669&color=ffffff`); // Fallback to generated avatar based on name
   }, [])
 
@@ -70,10 +74,23 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
     }
   };
 
-  const handleSignOut = () => {
-    setIsOpen(false);
-    console.log('Signing out...');
-  };
+  const UTCtoIST = (utcTimestamp) => {
+    if(!utcTimestamp) return;
+    const dateObj = new Date(utcTimestamp);
+    const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true, // Use 12-hour format (AM/PM)
+    timeZone: 'Asia/Kolkata',
+    timeZoneName: 'short' // Add the "IST" abbreviation
+    };
+  const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj);
+  return istReadableTime;
+  }
 
   const getInitials = () => {
     if(userName.includes(' ')) {
@@ -100,7 +117,7 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
           <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">
             {userName}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">{userData.role}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">{role || userData.role}</div>
         </div>
 
         {/* Avatar */}
@@ -154,11 +171,11 @@ export const UserDropdownNew = ({ onNavigate, className = '' }) => {
                 <div className="text-xs sm:text-sm opacity-90 truncate">
                   {userEmail || userData.email}
                 </div>
-                <div className="text-xs opacity-75">{userData.role}</div>
+                <div className="text-xs opacity-75">{role || userData.role}</div>
               </div>
             </div>
             <div className="mt-2 text-xs opacity-75">
-              Last login: {userData.lastLogin}
+              Last login: {lastLogin || userData.lastLogin}
             </div>
           </div>
 

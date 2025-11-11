@@ -19,20 +19,12 @@ const userSchema = new mongoose.Schema({
     },
     role : {
         type:String,
-        default:"user",
+        default:"Admin",
     },
     profilePicture :{
         type:String,
         default:"",
         required: false,
-    },
-    createdAt: {
-        type: Date,
-        default: new Date(),
-    },
-    updatedAt: {
-        type: Date,
-        default: new Date(),
     },
     isVerified: {
         type: Boolean,
@@ -56,7 +48,11 @@ const userSchema = new mongoose.Schema({
     isTwoFactorEnabled: {
         type: Boolean,
         default: false,
+    },
+    lastLogin: {
+        type: Date,
+        default: new Date()
     }
-});
+}, { timestamps: true });
 
 export const User = mongoose.model("User", userSchema);
