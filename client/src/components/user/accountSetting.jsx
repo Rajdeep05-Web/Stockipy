@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import { motion } from 'framer-motion';
+import {Nav} from 'react-dom'
 import {
   Shield, Bell, Eye, EyeOff, Smartphone, Globe, Lock, Key, Trash2, Save, AlertTriangle
   , ArrowLeft, RefreshCw, Clock, CheckCircle
@@ -22,6 +24,7 @@ const initialSettings = {
 };
 
 const AccountSettings = () => {
+  const navigate = useNavigate();
   const inputRefs = useRef([]);
   const dispatch = useDispatch();
   const { user, otpSent: authOtpSentState, message, otpLoading: otploadingState } = useSelector((state) => state.auth);
@@ -51,7 +54,7 @@ const AccountSettings = () => {
     confirmPassword: ''
   });
 
-  const { email } = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {};
+  const { email, isEmailVerified } = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : {};
 
   const handleSettingChange = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -87,6 +90,11 @@ const AccountSettings = () => {
   }
 
   const handleChangePassword = async () => {
+    if(!isEmailVerified){
+      const res = confirm("Email is not verified. Would you like to verify it first to change password?");
+      if(res) navigate('/profile');
+      return;
+    }
     const res = confirm("Are you sure to change password?")
     if(res) await reqOtpForForgetPassword();
   };
@@ -436,7 +444,7 @@ const AccountSettings = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={handleChangePassword}
-                  className="mt-6 flex items-center space-x-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all"
+                  className={`mt-6 flex items-center space-x-2 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-all`}
                 >
                   <Key className="w-4 h-4" />
                   {otpReqLoading ? <span>Loading</span> : <span>Change Password</span>}
