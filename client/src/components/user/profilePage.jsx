@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, MapPin, Calendar, Edit, Save, X, Camera, Shield, Award, Clock } from 'lucide-react';
 import { useDispatch } from "react-redux";
+import ModalOTP from "./modalOTP";
+import { forgetPassword, verifyOTP, resetPassword } from '../../redux/slices/auth/authSlice';
 
 const userProfile = {
   firstName: 'John',
@@ -20,12 +22,6 @@ const userProfile = {
   bio: 'Experienced inventory manager with over 8 years in supply chain management. Passionate about optimizing warehouse operations and implementing efficient inventory systems.'
 };
 
-const achievements = [
-  { title: 'Efficiency Expert', description: 'Improved inventory turnover by 25%', icon: Award, color: 'text-yellow-500' },
-  { title: 'Team Leader', description: 'Successfully managed team of 12', icon: Shield, color: 'text-blue-500' },
-  { title: 'Cost Saver', description: 'Reduced operational costs by $50K', icon: Award, color: 'text-green-500' },
-];
-
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
@@ -37,17 +33,35 @@ const ProfilePage = () => {
   const [role, setRole] = useState('');
   const [userProfilePicture, setUserProfilePicture] = useState("");
 
+  //otp and email
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+const inputRefs = useRef([]);
+  const [isOTPModalVisible, setIsOTPModalVisible] = useState(false);
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);  //ch
+  const [authMsg, setAuthMsg] = useState('');
+  const [otpReqLoading, setOtpReqLoading] = useState(false);
+  const [countdown, setCountdown] = useState(60);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState('');
+  const [otpSubmitLoading, setOtpSubmitLoading] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     setUserEmail(user.email);
     setUserName(user.name);
     setLastLogin(UTCtoIST(user.lastLogin));
     setJoinDate(UTCtoISTShort(user.createdAt));
-    setRole(user.role)
+    setRole(user.role);
+    setIsEmailVerified(user.isEmailVerified);
     setUserProfilePicture(user.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=059669&color=ffffff`); // Fallback to generated avatar based on name
-  }, [])
+  }, [localStorage.getItem('user')])
 
-  const handleInputChange = (field, value) => {
+  const handleEditFormInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -103,9 +117,106 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
     }
   };
 
-  
+  //OTP handlers
+  const handleEmailVerify = async () => {
+    setIsOTPModalVisible(!isOTPModalVisible);
+    await reqOtpForForgetPassword();
+  }
+
+  const reqOtpForForgetPassword = async () => {
+      setOtpReqLoading(true);
+      try {
+        const res = await dispatch(forgetPassword(userEmail)).unwrap();
+        setIsOtpSent(true);
+        setAuthMsg(res.message);
+        startOtpCountdown();
+        console.log("forget pass", res);
+      } catch (error) {
+        console.error('Error sending OTP:', error);
+        setErrorMsg('Failed to send OTP. Please try again.');
+        setTimeout(() => {
+          setErrorMsg("");
+        }, 3000);
+      } finally {
+        setOtpReqLoading(false);
+      }
+    }
+
+    const startOtpCountdown = () => {
+    setCountdown(60);
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  const handleVerifyOTP = async (otpCode) => {
+      setOtpSubmitLoading(true);
+      setError('');
+      try {
+        await dispatch(verifyOTP({ email: userEmail, otp: otpCode })).unwrap();
+        setSuccess('OTP verified successfully!');
+        setTimeout(() => {
+          setIsOtpVerified(true);
+        }, 1500);
+      } catch (error) {
+        console.error('Error verifying OTP:', error);
+        setError('Invalid verification code. Please try again.');
+        setOtp(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+      } finally {
+        setOtpSubmitLoading(false);
+      }
+    };
+    const handleResend = async () => {
+    if (countdown > 0) return;
+
+    await reqOtpForForgetPassword();
+
+    setCountdown(60);
+    setError('');
+    setOtp(['', '', '', '', '', '']);
+
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+  };
 
   return (
+    <>
+      <ModalOTP
+        isModalVisible={isOTPModalVisible}
+        setIsModalVisible={setIsOTPModalVisible}
+        isOtpSent={isOtpSent}
+        isOtpVerified={isOtpVerified}
+        authMsg={authMsg}
+        errorMsg={errorMsg}
+        successMsg={successMsg}
+        handleVerifyOTP={handleVerifyOTP}
+        setError={setError}
+        error={error}
+        setSuccess={setSuccess}
+        success={success}
+        otpSubmitLoading={otpSubmitLoading}
+        handleResend={handleResend}
+        countdown={countdown}
+        setOtp={setOtp}
+        otp={otp}
+        otpReqLoading={otpReqLoading}
+        inputRefs={inputRefs}
+      />
     <div className="space-y-6">
       {/* Header */}
       <motion.div
@@ -172,14 +283,14 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                   <input
                     type="text"
                     value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                    onChange={(e) => handleEditFormInputChange('firstName', e.target.value)}
                     className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                     placeholder="First Name"
                   />
                   <input
                     type="text"
                     value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                    onChange={(e) => handleEditFormInputChange('lastName', e.target.value)}
                     className="px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                     placeholder="Last Name"
                   />
@@ -193,12 +304,23 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
               <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 text-gray-600 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <Mail className="w-4 h-4" />
-                  <span className="text-sm">{userEmail || formData.email}</span>
+                  <span className="text-sm">{userEmail || formData.email} {isEmailVerified ?
+                   <> (<span className='font-bold text-green-500'>verified</span>) </>
+                   :
+                    <button
+                      type="button"
+                      onClick={handleEmailVerify}
+                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs w-full sm:w-auto px-3 py-1.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    >
+                     { otpReqLoading ? <span>loading</span> : <span>Verifiy</span> }
+                    </button>
+                    // <span className='font-bold text-red-500'>Not verified</span>
+                   }</span>
                 </div>
-                {/* <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4" />
-                  <span className="text-sm">{formData.jobTitle}</span>
-                </div> */}
+              </div>
+              <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
+                <Shield className="w-4 h-4" />
+                <span className="text-sm">{role || formData.jobTitle}</span>
               </div>
               
               <div className="flex items-center justify-center sm:justify-start space-x-2 text-gray-500 dark:text-gray-400">
@@ -228,7 +350,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('email', e.target.value)}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
@@ -242,7 +364,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                 <input
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('phone', e.target.value)}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
@@ -256,7 +378,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                 <input
                   type="text"
                   value={formData.jobTitle}
-                  onChange={(e) => handleInputChange('jobTitle', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('jobTitle', e.target.value)}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
@@ -270,7 +392,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                 <input
                   type="text"
                   value={formData.department}
-                  onChange={(e) => handleInputChange('department', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('department', e.target.value)}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
@@ -284,7 +406,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                 <input
                   type="text"
                   value={formData.address}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('address', e.target.value)}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
@@ -298,7 +420,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                 <input
                   type="text"
                   value={formData.city}
-                  onChange={(e) => handleInputChange('city', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('city', e.target.value)}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
               ) : (
@@ -313,14 +435,14 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
                   <input
                     type="text"
                     value={formData.state}
-                    onChange={(e) => handleInputChange('state', e.target.value)}
+                    onChange={(e) => handleEditFormInputChange('state', e.target.value)}
                     className="flex-1 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                     placeholder="State"
                   />
                   <input
                     type="text"
                     value={formData.zipCode}
-                    onChange={(e) => handleInputChange('zipCode', e.target.value)}
+                    onChange={(e) => handleEditFormInputChange('zipCode', e.target.value)}
                     className="w-24 px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                     placeholder="ZIP"
                   />
@@ -335,7 +457,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
               {isEditing ? (
                 <textarea
                   value={formData.bio}
-                  onChange={(e) => handleInputChange('bio', e.target.value)}
+                  onChange={(e) => handleEditFormInputChange('bio', e.target.value)}
                   rows={3}
                   className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:outline-none focus:border-green-500 transition-colors"
                 />
@@ -417,7 +539,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
         </div>
       </div>
     </div>
-  );
+  </>);
 };
 
 export default ProfilePage;

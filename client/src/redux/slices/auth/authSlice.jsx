@@ -264,6 +264,9 @@ const authSlice = createSlice({
         state.otpLoading = false;
         state.otpVerified = true;
         state.message = action.payload.message;
+        let storedUser = JSON.parse(localStorage.getItem('user'));
+        storedUser.isEmailVerified = action.payload.isEmailVerified;
+        localStorage.setItem("user", JSON.stringify(storedUser));
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.otpLoading = false;
