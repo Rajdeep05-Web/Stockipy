@@ -6,6 +6,11 @@ import connectDB from '../DB/index.js'; // to connect to db
 import axios from 'axios'; 
 import nodemailer from 'nodemailer'; // to send email
 
+const roleObj = {
+    0 : "Admin",
+    1 : "User"
+}
+
 const createAccessToken = async (user) => {
     return jwt.sign({userId:user._id}, process.env.JWT_SECRET, {expiresIn: process.env.ACCESS_TOKEN_LIFE })  
 }
@@ -47,7 +52,7 @@ export const signUpUser = async (req, res) => {
 export const logInUser = async (req, res) => {
     try {
         await connectDB();
-       const {email, password} = req.body;
+       const {email, password, roleId} = req.body;
        //check if email and password are provided
        if(!email || !password){
            return res.status(400).json({ error: "Please fill all the fields" });   
@@ -74,6 +79,9 @@ export const logInUser = async (req, res) => {
         existUser.refreshTokenExpire = new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000));
         existUser.lastLogin = new Date();
 
+        //role
+        existUser.role = (!roleId ? "Admin" : roleObj[roleId]);
+
         //save user in db
         await existUser.save();
 
@@ -93,7 +101,8 @@ export const logInUser = async (req, res) => {
             profilePicture: existUser.profilePicture,
             lastLogin: existUser.lastLogin,
             createdAt: existUser.createdAt,
-            role: existUser.role
+            role: existUser.role,
+            isEmailVerified: existUser.isEmailVerified
             }, token:accessToken, isAuthenticated:existUser.isVerified, message : "User logged in successfully"});
     } catch (error) {
         console.log(error);
@@ -142,6 +151,7 @@ export const googleSignIn = async (req, res) => {
     try {
         await connectDB();
         const authHeader = req.headers.authorization;
+        const {roleId} = req.body;
         if (!authHeader) {
             return res.status(400).json({ error: "No token provided" });
         }
@@ -163,6 +173,7 @@ export const googleSignIn = async (req, res) => {
                 password: "google-auth", //google auth does not require password
                 profilePicture: picture,
                 isVerified: email_verified, //google auth is verified by default
+                isEmailVerified: email_verified
             });
             await user.save();
         } else {
@@ -170,19 +181,25 @@ export const googleSignIn = async (req, res) => {
             user.name = name;
             user.profilePicture = picture;
             user.isVerified = email_verified; //google auth is verified by default
+            user.isEmailVerified = email_verified,
+            user.password = "google-auth" //for cases when normal signin email converts to google auth email
             await user.save();
         }
-
+        
         //generate access token
         const accessToken = await createAccessToken(user);
-
+        
         //generate refresh token
         const refreshToken = await generateRefreshToken(user);
-
+        
         //save refresh token in db
         user.refreshToken = refreshToken;
         user.refreshTokenExpire = new Date(Date.now() + (parseInt(process.env.REFRESH_TOKEN_LIFE) * 24 * 60 * 60 * 1000));
         user.lastLogin = new Date();
+
+        //role
+        user.role = (!roleId ? "Admin" : roleObj[roleId]);
+        
         //save user in db
         await user.save();
 
@@ -201,7 +218,8 @@ export const googleSignIn = async (req, res) => {
             profilePicture: user.profilePicture,
             lastLogin: user.lastLogin,
             createdAt: user.createdAt,
-            role: user.role
+            role: user.role,
+            isEmailVerified: user.isEmailVerified
         }, token:accessToken, isAuthenticated:user.isVerified, message : "User logged in successfully"});
 
     } catch (error) {
@@ -292,7 +310,14 @@ export const forgetPassword = async (req, res) => {
 
     await user.save();
 
-    await sendOtpToMail(user.email, otp);
+    const sendOTPdata = {
+        email: user.email,
+        otp: otp,
+        subject: 'Your OTP Code to Reset Stockipy App Password',
+        textMsg: `Your OTP code is ${otp}. It will expire in 10 minute.`,
+    }
+
+    await sendOtpToMail(sendOTPdata);
 
     return res.status(200).json({
       message: "We have sent a verification code to your email. Code is valid for 10 minutes.",
@@ -314,12 +339,12 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendOtpToMail = async (email, otp) => {
+const sendOtpToMail = async (sendOTPdata) => {
   const mailOptions = {
     from: process.env.GMAIL_USER2,
-    to: email,
-    subject: 'Your OTP Code to Reset Stockipy App Password',
-    text: `Your OTP code is ${otp}. It will expire in 10 minute.`,
+    to: sendOTPdata.email,
+    subject: sendOTPdata.subject,
+    text: sendOTPdata.textMsg
   };
 
   try {
@@ -345,10 +370,13 @@ export const verifyOtp = async (req, res) => {
         if (user.resetPasswordOTP !== otp || !user.resetPasswordOTPExpire || user.resetPasswordOTPExpire < new Date()) {
             return res.status(400).json({ error: "Invalid or expired OTP" });
         }
-        
+
+        //email verified if OTP success
+        user.isEmailVerified = true;
+
         await user.save();
 
-        return res.status(200).json({ message: "OTP verified successfully. You can now reset your password." });
+        return res.status(200).json({ isEmailVerified: user.isEmailVerified , message: "OTP verified successfully." });
     } catch (error) {
         console.log(error);
         return res.status(500).json({ error: error.message });

@@ -21,12 +21,20 @@ const userSchema = new mongoose.Schema({
         type:String,
         default:"Admin",
     },
+    roleId: {
+        type: Number,
+        default: 0,
+    },
     profilePicture :{
         type:String,
         default:"",
         required: false,
     },
     isVerified: {
+        type: Boolean,
+        default: false,
+    },
+    isEmailVerified: {
         type: Boolean,
         default: false,
     },
