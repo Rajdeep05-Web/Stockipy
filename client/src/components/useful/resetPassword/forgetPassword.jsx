@@ -24,7 +24,6 @@ const ForgotPassword = ({
         try {
           const res = await dispatch(forgetPassword(email)).unwrap();
           setIsEmailSent(true);
-          console.log("email sent")
           setIsLoading(false);
         //   startCountdown();
             if (onOTPSent) {

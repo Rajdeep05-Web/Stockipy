@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import API from "../../../api/api.js";
+import { act } from "react";
 
 const API_URL_AUTH = "/api/v1/auth";
 
@@ -264,9 +265,11 @@ const authSlice = createSlice({
         state.otpLoading = false;
         state.otpVerified = true;
         state.message = action.payload.message;
-        let storedUser = JSON.parse(localStorage.getItem('user'));
-        storedUser.isEmailVerified = action.payload.isEmailVerified;
-        localStorage.setItem("user", JSON.stringify(storedUser));
+        if(localStorage.getItem('user')){ //only when user was logged in
+          let storedUser = JSON.parse(localStorage.getItem('user'));
+          storedUser.isEmailVerified = action.payload.isEmailVerified;
+          localStorage.setItem("user", JSON.stringify(storedUser));
+        }
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.otpLoading = false;
