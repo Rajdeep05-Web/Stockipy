@@ -4,7 +4,7 @@ import { User, Mail, Phone, MapPin, Calendar, Edit, Save, X, Camera, Shield, Awa
 import { useDispatch } from "react-redux";
 import ModalOTP from "./modalOTP";
 import { forgetPassword, verifyOTP, resetPassword } from '../../redux/slices/auth/authSlice';
-
+import { Spinner } from "../UI/spinner";
 const userProfile = {
   firstName: 'John',
   lastName: 'Doe',
@@ -196,6 +196,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
 
   return (
     <>
+    
       <ModalOTP
         isModalVisible={isOTPModalVisible}
         setIsModalVisible={setIsOTPModalVisible}
@@ -218,6 +219,7 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
         inputRefs={inputRefs}
       />
     <div className="space-y-6">
+      
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -302,28 +304,30 @@ const istReadableTime = new Intl.DateTimeFormat('en-IN', options).format(dateObj
               )}
               
               <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 text-gray-600 dark:text-gray-400">
-                <div className="flex items-center space-x-2">
-                  <Mail className="w-4 h-4" />
-                  <span className="text-sm">{userEmail || formData.email} {isEmailVerified ?
-                   <> (<span className='font-bold text-green-500'>verified</span>) </>
-                   :
-                    <button
-                      type="button"
-                      onClick={handleEmailVerify}
-                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs w-full sm:w-auto px-3 py-1.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    >
-                     { otpReqLoading ? <span>loading</span> : <span>Verifiy</span> }
-                    </button>
-                    // <span className='font-bold text-red-500'>Not verified</span>
-                   }</span>
-                </div>
+                  <div className="flex flex-row items-center space-x-2">
+                    <Mail className="flex-none w-4 h-10" />
+
+                    <span className="text-sm">{userEmail || formData.email}</span>
+
+                    {isEmailVerified ? (
+                      <span className='text-sm font-bold text-green-500'>(verified)</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={handleEmailVerify}
+                        className="flex items-center justify-center text-white bg-blue-700 h-8 min-w-[5rem] hover:bg-blue-800 focus:ring-2 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs w-full sm:w-auto px-3 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                      >
+                        {otpReqLoading ? <Spinner /> : <span>Verify</span>}
+                      </button>
+                    )}
+                  </div>
               </div>
               <div className="flex items-center space-x-2 text-gray-600 dark:text-gray-400">
                 <Shield className="w-4 h-4" />
                 <span className="text-sm">{role || formData.jobTitle}</span>
               </div>
               
-              <div className="flex items-center justify-center sm:justify-start space-x-2 text-gray-500 dark:text-gray-400">
+              <div className="flex items-center sm:justify-start space-x-2 text-gray-500 dark:text-gray-400">
                 <Calendar className="w-4 h-4" />
                 <span className="text-sm">Joined {joinDate || new Date(formData.joinDate).toLocaleDateString()}</span>
               </div>

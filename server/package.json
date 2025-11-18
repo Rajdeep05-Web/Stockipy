@@ -13,6 +13,7 @@
   "author": "Rajdeep Paul",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.29.1",
     "axios": "^1.10.0",
     "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
