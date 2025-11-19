@@ -9,8 +9,11 @@ import {
 import {useNavigate} from "react-router";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 
+import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from "../useful/datePickerReact"
 import { StockInPDF } from "../pdf/stockInPdf";
 import { fetchStockIns, deleteStockIn } from "../../redux/slices/stock/stockInSlice";
+import { fetchProducts } from "../../redux/slices/products/productsSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import Loading from "../useful/Loading/loading";
@@ -22,11 +25,20 @@ const AllStockIns = () => {
   const contentRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { stockIns, loading, error } = useSelector((state) => state.stockIns);
+  const { products } = useSelector(state => state.products);
 
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [search, setSearch] = useState("");
+
+  const [filteredStockIns, setFilteredStockIns] = useState([]);
+   const [startDate, setStartDate] = useState("");
+   const [endDate, setEndDate] = useState("");
+   const [dateReset, setDateReset] = useState(false);
+
+   const [selectedProduct, setSelectedProduct] = useState("");
 
   const [openAccordions, setOpenAccordions] = useState({});
   const [collapseAll, setCollapseAll] = useState(false);
@@ -36,7 +48,21 @@ const AllStockIns = () => {
       setCollapseAll(true);
     }
   }, [stockIns, openAccordions]);
-  
+
+  useEffect(() => {
+    //setting stockin, when stockin data loads
+    if (stockIns) {
+      setFilteredStockIns(stockIns.filter((item) => {
+        return item;
+      }).reverse());
+    }
+  }, [stockIns]);
+
+// fetch prods in page load
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [])
+
   const toggleAccordion = (id) => {
     setOpenAccordions((prevState) => ({
       ...prevState,
@@ -88,15 +114,106 @@ const AllStockIns = () => {
       }, 3000);
     }
   }
+  //filter ---
+  const fiilterApplyHandler = () => {
+    let textsearchFilteredData;
+    if (!stockIns) {
+      return;
+    }
+    textsearchFilteredData = stockIns;
 
-  const filteredStockIns = stockIns.filter((item) => {
-    const searchLower = search.toLowerCase().trim();
-    return (
-      (item.vendor?.name?.toLowerCase() || "").includes(searchLower) ||
-      item.totalAmount?.toString().includes(searchLower) ||
-      (item.invoiceNo?.toLowerCase() || "").includes(searchLower)
-    );
-  });
+    //search text filtering
+      textsearchFilteredData = textsearchFilteredData.filter((item) => {
+        const searchLower = search.toLowerCase().trim();
+        return (
+          (item.vendor?.name?.toLowerCase() || "").includes(searchLower) ||
+          item.totalAmount?.toString().includes(searchLower) ||
+          (item.invoiceNo?.toLowerCase() || "").includes(searchLower)
+        );
+      }).reverse();
+
+      setFilteredStockIns(textsearchFilteredData);
+
+    //search date filter
+    if (startDate && endDate) {
+      // 1. Adjust the End Date to cover the full day (23:59:59.999 local time)
+      // We create a copy so we don't mutate the state variable directly.
+      const adjustedEndDate = new Date(endDate);
+      adjustedEndDate.setHours(23, 59, 59, 999);
+
+      // 2. Get the universal UTC milliseconds for the filter range
+      // JavaScript's .getTime() handles the IST offset correctly when parsing the original date objects.
+      const filterStartMillis = new Date(startDate).getTime();
+      const filterEndMillis = adjustedEndDate.getTime();
+
+      // console.log("Start Date (User's View):", new Date(startDate).toLocaleString());
+      // console.log("End Date (User's View):", adjustedEndDate.toLocaleString());
+
+      // 3. Apply the filter to the data
+      const filteredDateResults = [];
+      for (let i = 0; i < textsearchFilteredData.length; i++) {
+        const item = textsearchFilteredData[i];
+        // Data in 'item.date' should be a valid UTC string (e.g., "...Z" or "...+00:00")
+
+        const stockCreateDateMilSec = new Date(item.date).getTime();
+
+        // The comparison works because both sides of the comparison are now UTC milliseconds
+        if (stockCreateDateMilSec >= filterStartMillis && stockCreateDateMilSec <= filterEndMillis) {
+          filteredDateResults.push(item);
+        }
+      }
+      textsearchFilteredData = filteredDateResults;
+    }
+
+    if (selectedProduct) {
+      textsearchFilteredData = textsearchFilteredData.reduce((acc, item) => {
+        // 1. Iterate over the products array only ONCE.
+        const matchingProducts = item.products.filter(
+          (prod) => prod.product.name.toString() === selectedProduct
+        );
+
+        // 2. If there are any matching products, add a modified item to the accumulator.
+        if (matchingProducts.length > 0) {
+          const newItem = {
+            ...item,
+          };
+          acc.push(newItem);
+        }
+
+        // 3. Return the accumulator array.
+        return acc;
+      }, []);
+    }
+
+  console.log("Filtered prod stockins Ins:", textsearchFilteredData);
+  setFilteredStockIns(textsearchFilteredData);
+};
+
+
+const handleStartDateChange = (newDate) => {
+    if (newDate) {
+      setDateReset(false)
+      setStartDate(newDate);
+    } else {
+      setStartDate("");
+    }
+  };
+
+  const handleEndDateChange = (newDate) => {
+    if (newDate) {
+      setDateReset(false)
+      setEndDate(newDate);
+    } else {
+      setEndDate("");
+    }
+  };
+
+  const resetStartEndDate = () => {
+    setStartDate("");
+    setEndDate("");
+    setDateReset(true);
+  }
+
 
   if (loading) {
     return <Loading />;
@@ -111,30 +228,90 @@ const AllStockIns = () => {
         <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
           All Stock-Ins
         </h1>
-        <div className="flex justify-between gap-2">
-          <SearchBar
-            placeholderText={"Search for Stock-ins"}
-            setSearch={setSearch}
-            search={search}
-          />
-          <button
-            type="button"
-            onClick={() => collapseAllFunction()}
-            title="Collapse All"
-            className="text-white bg-blue-700 mb-4 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg md:text-sm sm:text-xs sm:w-auto px-2 s:p-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            <ListCollapse size={34} />
-          </button>
+        <div className="flex justify-between gap-2 flex-col sm:flex-row">
+          <div className="flex-1 flex-row">
+            <SearchBar
+              style={"mb-0"}
+              placeholderText={"Search for Stock-ins"}
+              setSearch={setSearch}
+              search={search}
+            />
+            <div className="flex flex-col sm:flex-row gap-2 py-2">
+              {/* //start */}
+              <div className="flex flex-row gap-2">
+                <div>
+                  <h3 className="font-medium dark:text-white">Start date</h3>
+                  <DatePicker onDateChange={handleStartDateChange} dateReset={dateReset} />
+                </div>
+                <div>
+                  <h3 className="font-medium dark:text-white">End date</h3>
+                  <DatePicker onDateChange={handleEndDateChange} dateReset={dateReset} />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => resetStartEndDate()}
+                  className=" text-blue-500 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-0 py-0 text-center transition-all duration-300 items-center"
+                >
+                  clear
+                </button>
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-white">
+                  {/* <Package className="inline w-4 h-4 mr-1" /> */}
+                  Product
+                </label>
+                <select
+                  value={selectedProduct}
+                  onChange={(e) => setSelectedProduct(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 dark:text-slate-200"
+                >
+                  <option value="">All Products</option>
+                  {products.map((product) => (
+                    <option key={product.id} value={product.id}>
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Apply Button */}
+          <div className="flex-none">
+            <button
+              type="button"
+              onClick={() => fiilterApplyHandler()}
+              // Standardized classes for consistent height and alignment
+              className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
+            >
+              Apply
+            </button>
+          </div>
+
+          {/* Collapse All Button */}
+          <div className="flex-none">
+            <button
+              type="button"
+              onClick={() => collapseAllFunction()}
+              title="Collapse All"
+              // Standardized classes for consistent height and alignment
+              className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
+            >
+              {/* Reduced size of icon to fit the standardized button height (h-8) */}
+              <ListCollapse size={18} />
+            </button>
+          </div>
         </div>
+        
         {filteredStockIns.reverse().map((item) => (
           <div
             key={item._id}
             id={`accordion-item-${item._id}`}
-            className="mb-4"
+            className="mb-4 mt-4"
           >
             <button
               type="button"
-            className="flex w-full p-3 rounded-md shadow hover:shadow-lg font-medium text-xs md:text-sm lg:text-base text-gray-500 bg-green-100 border border-gray-200 hover:ring-2 hover:ring-blue-500 transition-all duration-500 ease-in-out dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-emerald-100 dark:bg-gray-800 dark:bg-opacity-60 dark:hover:bg-gray-900"
+            className="flex w-full p-3 rounded-md shadow hover:shadow-lg font-medium text-xs md:text-sm lg:text-base text-gray-500 bg-gray-200 border border-gray-200 hover:ring-2 hover:ring-blue-500 transition-all duration-500 ease-in-out dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:bg-gray-800 dark:bg-opacity-60 dark:hover:bg-gray-900"
               onClick={() => toggleAccordion(item._id)}
               aria-expanded={openAccordions[item._id] || false}
               aria-controls={`accordion-body-${item._id}`}
@@ -289,7 +466,7 @@ const AllStockIns = () => {
                 </div>
                 {/* product and vendor details */}
                 <div className="flex flex-col sm:flex-row gap-2 mt-2 mx-0">
-                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2">
+                  <div className="flex flex-col basis-1/2 bg-gray-200 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2">
                     <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">
                       VENDOR
                     </h6>
@@ -318,7 +495,7 @@ const AllStockIns = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-col basis-1/2 bg-teal-100 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-auto">
+                  <div className="flex flex-col basis-1/2 bg-gray-200 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-auto">
                     <div className="flex justify-between">
                       <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white basis-[40%] min-w-[150px]">
                         PRODUCT
