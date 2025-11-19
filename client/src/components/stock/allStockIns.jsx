@@ -54,7 +54,7 @@ const AllStockIns = () => {
     if (stockIns) {
       setFilteredStockIns(stockIns.filter((item) => {
         return item;
-      }).reverse());
+      }));
     }
   }, [stockIns]);
 
@@ -130,7 +130,7 @@ const AllStockIns = () => {
           item.totalAmount?.toString().includes(searchLower) ||
           (item.invoiceNo?.toLowerCase() || "").includes(searchLower)
         );
-      }).reverse();
+      });
 
       setFilteredStockIns(textsearchFilteredData);
 
