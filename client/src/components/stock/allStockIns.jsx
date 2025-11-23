@@ -123,6 +123,7 @@ const AllStockIns = () => {
     textsearchFilteredData = stockIns;
 
     //search text filtering
+    if(search && search.trim() !== "") {
       textsearchFilteredData = textsearchFilteredData.filter((item) => {
         const searchLower = search.toLowerCase().trim();
         return (
@@ -133,6 +134,7 @@ const AllStockIns = () => {
       });
 
       setFilteredStockIns(textsearchFilteredData);
+    }
 
     //search date filter
     if (startDate && endDate) {
@@ -185,7 +187,6 @@ const AllStockIns = () => {
       }, []);
     }
 
-  console.log("Filtered prod stockins Ins:", textsearchFilteredData);
   setFilteredStockIns(textsearchFilteredData);
 };
 
@@ -214,6 +215,13 @@ const handleStartDateChange = (newDate) => {
     setDateReset(true);
   }
 
+  const filterAllReset = () => {
+    resetStartEndDate();
+    setSearch("");
+    setSelectedProduct("");
+    setFilteredStockIns(stockIns);
+  }
+
 
   if (loading) {
     return <Loading />;
@@ -231,14 +239,14 @@ const handleStartDateChange = (newDate) => {
         <div className="flex justify-between gap-2 flex-col sm:flex-row">
           <div className="flex-1 flex-row">
             <SearchBar
-              style={"mb-0"}
+              style={"mb-0 max-w-none"}
               placeholderText={"Search for Stock-ins"}
               setSearch={setSearch}
               search={search}
             />
-            <div className="flex flex-col sm:flex-row gap-2 py-2">
+            <div className="flex flex-col xl:flex-row gap-2 py-2">
               {/* //start */}
-              <div className="flex flex-row gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <div>
                   <h3 className="font-medium dark:text-white">Start date</h3>
                   <DatePicker onDateChange={handleStartDateChange} dateReset={dateReset} />
@@ -276,34 +284,47 @@ const handleStartDateChange = (newDate) => {
             </div>
           </div>
 
-          {/* Apply Button */}
-          <div className="flex-none">
-            <button
-              type="button"
-              onClick={() => fiilterApplyHandler()}
-              // Standardized classes for consistent height and alignment
-              className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
-            >
-              Apply
-            </button>
-          </div>
+          <div className="flex gap-2">
+            {/* Apply Button */}
+            <div className="flex-none">
+              <button
+                type="button"
+                onClick={() => fiilterApplyHandler()}
+                // Standardized classes for consistent height and alignment
+                className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
+              >
+                Apply
+              </button>
+            </div>
 
-          {/* Collapse All Button */}
-          <div className="flex-none">
-            <button
-              type="button"
-              onClick={() => collapseAllFunction()}
-              title="Collapse All"
-              // Standardized classes for consistent height and alignment
-              className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
-            >
-              {/* Reduced size of icon to fit the standardized button height (h-8) */}
-              <ListCollapse size={18} />
-            </button>
+             <div className="flex-none">
+              <button
+                type="button"
+                onClick={() => filterAllReset()}
+                // Standardized classes for consistent height and alignment
+                className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
+              >
+                Reset
+              </button>
+            </div>
+
+            {/* Collapse All Button */}
+            <div className="flex-none">
+              <button
+                type="button"
+                onClick={() => collapseAllFunction()}
+                title="Collapse All"
+                // Standardized classes for consistent height and alignment
+                className="flex items-center justify-center h-8 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-colors"
+              >
+                {/* Reduced size of icon to fit the standardized button height (h-8) */}
+                <ListCollapse size={18} />
+              </button>
+            </div>
           </div>
         </div>
         
-        {filteredStockIns.reverse().map((item) => (
+        {filteredStockIns.slice().reverse().map((item) => (
           <div
             key={item._id}
             id={`accordion-item-${item._id}`}
