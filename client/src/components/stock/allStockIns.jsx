@@ -17,7 +17,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
+} from "../../components/UI/pagination";
 
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "../useful/datePickerReact"
