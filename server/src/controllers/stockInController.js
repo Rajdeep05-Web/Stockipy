@@ -120,6 +120,48 @@ export const getStockIns = async (req, res) => {
     }
 }
 
+export const getStockInsByPage = async (req, res) => {
+     const userId = req.user.userId;
+    if(!userId || !ObjectId.isValid(userId)){
+        return res.status(400).json({error: "User ID is required"});
+    }
+    const pageNo = parseInt(req.query.pageNo || "1");
+    const limit = parseInt(req.query.limit || "10");
+    if(isNaN(pageNo) || isNaN(limit) || pageNo <= 0 || limit <= 0){
+        return res.status(400).json({error: "Invalid page number or limit"});
+    }
+    const skip = (pageNo - 1) * limit;
+    
+    try {
+        const query = { userId: userId };
+        const [data, total] = await Promise.all([
+            StockIn.find(query)
+            .skip(skip)        
+            .limit(limit)     
+            .sort({ createdAt: -1 }).populate("vendor").populate("products.product", "name _id mrp quantity rate"), // Optional: Show newest first
+            
+            StockIn.countDocuments(query), // Get total count for frontend math
+            
+        ]);
+        console.log("Pagination params - pageNo:", pageNo, "limit:", limit, "totalPages:", Math.ceil(total / limit), "totalItems:", total);
+        
+        res.status(200).json({
+            data: data,
+            meta: {
+                currentPage: pageNo,
+                itemsPerPage: limit,
+                totalItems: total,
+                totalPages: Math.ceil(total / limit),
+                nextInvNo: "INV/" + new Date().getFullYear() + "/" + (new Date().getMonth() + 1).toString().padStart(2, '0') + "/" + (total + 1).toString().padStart(3, '0'),
+            }
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 export const getStockInById = async (req, res) => {
     const id = req.params.id;
     if(!id){

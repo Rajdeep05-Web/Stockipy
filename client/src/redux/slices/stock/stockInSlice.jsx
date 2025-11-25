@@ -12,9 +12,10 @@ const API_URL_FILE = "/api/v1/file";
 //Async Actions for product api calls
 export const fetchStockIns = createAsyncThunk(
   "stockIn/fetchStockIns",
-  async (_, { rejectWithValue }) => {
+  async (fetchQuery={}, { rejectWithValue }) => {
+    const { pageNo = 1, limit = 10 } = fetchQuery;
     try {
-      const { data } = await API.get(`${API_URL}`);
+      const {data} = await API.get(`${API_URL}?pageNo=${pageNo}&limit=${limit}`);
       return data;
     } catch (error) {
       return rejectWithValue(error?.response?.data.error || error.message);
@@ -128,6 +129,7 @@ const stockInSlice = createSlice({
     status: "idle",
     error: null,
     loading: false,
+    metadata: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -140,7 +142,8 @@ const stockInSlice = createSlice({
       .addCase(fetchStockIns.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.loading = false;
-        state.stockIns = action.payload;
+        state.stockIns = action.payload.data;
+        state.metadata = action.payload.meta;
       })
       .addCase(fetchStockIns.rejected, (state, action) => {
         state.status = "failed";

@@ -45,10 +45,12 @@ const Sidebar = ({ setSidebarOpen, sidebarOpen }) => {
    {
      icon: BoxesIcon,
      label: "Stock",
-     path: "/stock-ins",
+     path: "/stock-ins/1/5",
      subFolders: [
        { label: "Add Stock-In", path: "/add-stock-in" },
-       { label: "Stock-Ins", path: "/stock-ins" },
+       { label: "Stock-Ins", path: "/stock-ins/1/5" },
+       { label: "Add Stock-Out", path: "/add-stock-out" },
+       { label: "Stock-Outs", path: "/stock-outs" },
      ],
    },
  ];

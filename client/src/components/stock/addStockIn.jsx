@@ -30,14 +30,14 @@ const AddStockIn = () => {
  function nextInvNoGen(){};
  const { vendors, loading: vendorsLoading } = useSelector((state) => state.vendors);
  const { products, loading: productsLoading } = useSelector((state) => state.products);
- const { stockIns, loading: stockInsLoading } = useSelector((state) => state.stockIns);
+ const { stockIns, loading: stockInsLoading, metadata } = useSelector((state) => state.stockIns);
 
 
  //vendor
  const [successMsg, setSuccessMsg] = useState("");
  const [errorMsg, setErrorMsg] = useState("");
  const [startDate, setStartDate] = useState(new Date());
- const [invNo, setInvNo] = useState(stockIns ? nextInvNoGen(stockIns[stockIns?.length-1]?.invoiceNo) : "");
+ const [invNo, setInvNo] = useState("");
  const [totalAmount, setTotalAmount] = useState("");
  const [description, setDescription] = useState("");
  const [name, setName] = useState("");
@@ -123,14 +123,16 @@ const AddStockIn = () => {
 function nextInvNoGen(oldInv) {
  if (!oldInv) return null;
   const oldInvSplit = oldInv.split("/");
- const lastPart = oldInvSplit[oldInvSplit.length - 1];
+//  const lastPart = oldInvSplit[oldInvSplit.length - 1];
   // Extract leading zeros info
- const numberLength = lastPart.length;
- const number = parseInt(lastPart, 10);
+  // const number = parseInt(lastPart, 10);
+  const numberLength = 3;
+  const number = metadata.totalItems;
   if (isNaN(number)) return null;
-  const incremented = (number + 1).toString().padStart(numberLength, '0');
+  const incremented = (number + 1).toString().padStart(numberLength, (metadata.totalItems < 99) ? "0" : "");
   oldInvSplit[oldInvSplit.length - 1] = incremented;
- console.log(oldInvSplit);
+  // console.log(incremented)
+//  console.log(oldInvSplit);
  return oldInvSplit.join("/");
 };
 
@@ -209,6 +211,14 @@ function nextInvNoGen(oldInv) {
    setAllProductMRPs({...allProductMRPs});
    // console.log(productQuantities);
  };
+  
+ //stockins
+
+ //set next inv no from metadata
+ useEffect(() => {
+  setInvNo(metadata?.nextInvNo || "");
+ }, [metadata]);
+  
   //final submit of stock in
  const handleSubmitStockIn = async () => {
 

@@ -5,9 +5,19 @@ import {
   Trash,
   Eye,
   Edit,
+  Contact,
 } from "lucide-react";
-import {useNavigate} from "react-router";
+import { useNavigate, useParams } from 'react-router';
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 import "react-datepicker/dist/react-datepicker.css";
 import DatePicker from "../useful/datePickerReact"
@@ -23,10 +33,11 @@ import ErrorAlert from "../useful/alerts/errorAlert";
 
 const AllStockIns = () => {
   const contentRef = useRef(null);
+  const { page, pageLimit } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { stockIns, loading, error } = useSelector((state) => state.stockIns);
+  const { stockIns, loading, error, metadata } = useSelector((state) => state.stockIns);
   const { products } = useSelector(state => state.products);
 
   const [successMsg, setSuccessMsg] = useState("");
@@ -42,6 +53,27 @@ const AllStockIns = () => {
 
   const [openAccordions, setOpenAccordions] = useState({});
   const [collapseAll, setCollapseAll] = useState(false);
+
+  const [limit, setLimit] = useState(parseInt(pageLimit) || 5); //items per page
+  const [pageNo, setPageNo] = useState(parseInt(page) || 1);
+  const [totalPages, setTotalPages] = useState(1);
+  const itemsPerPageOptions = [5, 10];
+  
+   //setting total pages when metadata changes
+  useEffect(() => {
+    if (metadata && metadata.totalPages) {
+      setTotalPages(metadata.totalPages);
+    }
+  }, [metadata]);
+
+  //fetch stockIns on pageNo or limit change
+  useEffect(() => {
+    dispatch(fetchStockIns({pageNo: pageNo, limit: limit}));
+    filterAllReset();
+  }, [pageNo, limit]);
+
+  //fetch products on load
+  useEffect(() => {dispatch(fetchProducts());}, [])
  
   useEffect(() => {
     if(stockIns.length == Object.entries(openAccordions).length){
@@ -58,10 +90,6 @@ const AllStockIns = () => {
     }
   }, [stockIns]);
 
-// fetch prods in page load
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [])
 
   const toggleAccordion = (id) => {
     setOpenAccordions((prevState) => ({
@@ -107,7 +135,7 @@ const AllStockIns = () => {
     if(userResponse){
       // Delete the stock-in
       await dispatch(deleteStockIn({id: stockIn._id})).unwrap();
-      dispatch(fetchStockIns());
+      dispatch(fetchStockIns({pageNo: pageNo, limit: limit}));
       setSuccessMsg(`Stock-in with invoice no. ${stockIn.invoiceNo} deleted successfully`);
       setTimeout(() => {
         setSuccessMsg("");
@@ -171,7 +199,7 @@ const AllStockIns = () => {
       textsearchFilteredData = textsearchFilteredData.reduce((acc, item) => {
         // 1. Iterate over the products array only ONCE.
         const matchingProducts = item.products.filter(
-          (prod) => prod.product.name.toString() === selectedProduct
+          (prod) => prod.product._id.toString() === selectedProduct
         );
 
         // 2. If there are any matching products, add a modified item to the accumulator.
@@ -232,7 +260,7 @@ const handleStartDateChange = (newDate) => {
       {/* {alarts} */}
       {successMsg && <SuccessAlert successMsg={successMsg} />}
       {errorMsg && <ErrorAlert errorMsg={errorMsg} />}
-      <div className="lg:px-8">
+      <div className="lg:px-8 flex flex-col min-h-[70vh]">
         <h1 className="mb-4 text-2xl font-extrabold leading-none tracking-tight text-gray-900 md:text-4xl lg:text-5xl dark:text-white">
           All Stock-Ins
         </h1>
@@ -273,9 +301,9 @@ const handleStartDateChange = (newDate) => {
                   onChange={(e) => setSelectedProduct(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 dark:text-slate-200"
                 >
-                  <option value="">All Products</option>
+                  <option value={""}>All Products</option>
                   {products.map((product) => (
-                    <option key={product.id} value={product.id}>
+                    <option key={product._id} value={product._id}>
                       {product.name}
                     </option>
                   ))}
@@ -323,257 +351,352 @@ const handleStartDateChange = (newDate) => {
             </div>
           </div>
         </div>
-        
-        {filteredStockIns.slice().reverse().map((item) => (
-          <div
-            key={item._id}
-            id={`accordion-item-${item._id}`}
-            className="mb-4 mt-4"
-          >
-            <button
-              type="button"
-            className="flex w-full p-3 rounded-md shadow hover:shadow-lg font-medium text-xs md:text-sm lg:text-base text-gray-500 bg-gray-200 border border-gray-200 hover:ring-2 hover:ring-blue-500 transition-all duration-500 ease-in-out dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:bg-gray-800 dark:bg-opacity-60 dark:hover:bg-gray-900"
-              onClick={() => toggleAccordion(item._id)}
-              aria-expanded={openAccordions[item._id] || false}
-              aria-controls={`accordion-body-${item._id}`}
-            >
-            <div className="flex flex-col basis-5/6">
-              <div className="flex basis-6/12 w-full gap-2 text-left">
-                <div className="flex-1">
-                  <span className=" flex basis-1/5 justify-start items-center ">
-                    <h4 className="font-bold text-gray-600">Date:</h4>
-                    &nbsp;
-                    {convertUTC(item.date)}
-                  </span>
-                  <span className="flex basis-1/5 justify-start items-center ">
-                    <h4 className="font-bold text-gray-600">INV no:</h4>
-                    &nbsp;
-                    {item.invoiceNo}
-                  </span>
-                </div>
-                <div className="flex-1">
-                  <span className="flex basis-1/5 justify-start items-center">
-                    <h4 className="font-bold text-gray-600">Amount:</h4>
-                    &nbsp;
-                    {item.totalAmount}
-                  </span>
-                  
-                </div>
-              </div>
-              <div className=" basis-6/12 md:basis-4/12 text-left">
-                {" "}
-                <span className="flex basis-1/5 justify-start items-center">
-                    <h4 className="font-bold text-gray-600">Vendor:</h4>
-                    &nbsp;
-                    {item.vendor.name}
-                  </span>
-                  {item.vendor.gstNo && <span className="flex basis-1/5 justify-start items-center">
-                    <h4 className="font-bold text-gray-600">GST:</h4>
-                    &nbsp;
-                    {item.vendor.gstNo}
-                  </span>}
-                {item.description && <span className="w-full flex">
-                  <h4 className="font-bold text-gray-600">Description:</h4>
-                  &nbsp;
-                  {item.description}
-                </span>}
-              </div>
-            </div>
-              <div className="justify-center items-center m-auto asis-1/6">
-              <div>
-                
-              </div>
-                <svg
-                  data-accordion-icon
-                  className={`w-3 h-3 ${
-                    openAccordions[item._id] ? "rotate-180" : ""
-                  } transition-transform`}
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 10 6"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="3"
-                    d="M9 5 5 1 1 5"
-                  />
-                </svg>{" "}
-              </div>
-            </button>
 
-            <div
-              className={`transform transition-all duration-300 ease-in-out origin-top ${
-                openAccordions[item._id]
-                  ? "opacity-100 scale-y-100 max-h-[1000px]"
-                  : "opacity-0 scale-y-0 max-h-0"
-              }`}
-            >
+        <div className="flex-1">
+          {filteredStockIns.length > 0 ? (
+            filteredStockIns.map((item) => (
               <div
-                className={`p-5 shadow hover:shadow-lg border border-gray-200 bg-slate-100 rounded-b-lg dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-70`}
-                id={`accordion-body-${item._id}`}
+                key={item._id}
+                id={`accordion-item-${item._id}`}
+                className="mb-4 mt-4"
               >
-                <div className="flex flex-row justify-between">
-                  <div>
-                  <h4 className="text-[15px] md:text-2xl font-bold text-gray-900 dark:text-white">Details:</h4>
-                  </div>
-                  <div name="buttons" className="flex flex-row gap-2">
-                    {item.fileCloudUrl && (
-                      // View the invoice uploaded during stock-In (In a new tab)
-                      <button
-                        type="button"
-                        onClick={() => handleOpenInvoice(item.fileCloudUrl)}
-                        className="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
-                      >
-                        <Eye className="lg:mr-2" size={20} />
-                         <span className="hidden lg:inline">View Invoice</span>
-                      </button>
-                    )}
-                    {/* Download stock In details as invoice PDF */}
-                    <PDFDownloadLink
-                      document={<StockInPDF data={item} />}
-                      fileName={`stock-in-${item.invoiceNo}.pdf`}
-                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 inline-flex items-center"
-                    >
-                      {({ blob, url, loading, error }) =>
-                        loading ? (
-                          <span className="flex items-center">
-                            <svg
-                              className="animate-spin h-5 w-5 mr-2"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              />
-                            </svg>
-                            Generating...
-                          </span>
-                        ) : (
-                          <span className="flex items-center">
-                            <Download className="lg:mr-2" size={20} />
-                            <span className="hidden lg:inline">Download as PDF</span>
-                          </span>
-                        )
-                      }
-                    </PDFDownloadLink>
-                    <button
-                      type="button"
-                      onClick={() => handleEditStockIn(item)}
-                      className="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
-                    >
-                      <Edit className="lg:mr-2" size={20} />
-                      <span className="hidden lg:inline">Edit</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteStockIn(item)}
-                      className="flex text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 transition-all duration-300 items-center"
-                    >
-                      <Trash className="lg:mr-2" size={20} />
-                      <span className="hidden lg:inline ">Delete</span>
-                    </button>
-                  </div>
-                </div>
-                {/* product and vendor details */}
-                <div className="flex flex-col sm:flex-row gap-2 mt-2 mx-0">
-                  <div className="flex flex-col basis-1/2 bg-gray-200 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2">
-                    <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">
-                      VENDOR
-                    </h6>
-                    <hr className="h-px my-1 bg-gray-300 border-0 dark:bg-gray-700" />
-                    <div className="text-sm sm:text-lg flex flex-col gap-1">
-                      <span className="flex basis-1/5 justify-start items-start">
-                        <h4 className="font-bold text-gray-600 dark:text-gray-200">Name:</h4>
-                        <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.name || "NA"}</span>
+                <button
+                  type="button"
+                  className="flex w-full p-3 rounded-md shadow hover:shadow-lg font-medium text-xs md:text-sm lg:text-base text-gray-500 bg-gray-200 border border-gray-200 hover:ring-2 hover:ring-blue-500 transition-all duration-500 ease-in-out dark:focus:ring-gray-800 dark:border-gray-700 dark:text-gray-400 hover:bg-gray-200 dark:bg-gray-800 dark:bg-opacity-60 dark:hover:bg-gray-900"
+                  onClick={() => toggleAccordion(item._id)}
+                  aria-expanded={openAccordions[item._id] || false}
+                  aria-controls={`accordion-body-${item._id}`}
+                >
+                  <div className="flex flex-col basis-5/6">
+                    <div className="flex basis-6/12 w-full gap-2 text-left">
+                      <div className="flex-1">
+                        <span className="flex basis-1/5 justify-start items-center ">
+                          <h4 className="font-bold text-gray-600">Date:</h4>
+                          &nbsp;
+                          {convertUTC(item.date)}
+                        </span>
+                        <span className="flex basis-1/5 justify-start items-center ">
+                          <h4 className="font-bold text-gray-600">INV no:</h4>
+                          &nbsp;
+                          {item.invoiceNo}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <span className="flex basis-1/5 justify-start items-center">
+                          <h4 className="font-bold text-gray-600">Amount:</h4>
+                          &nbsp;
+                          {item.totalAmount}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="basis-6/12 md:basis-4/12 text-left">
+                      <span className="flex basis-1/5 justify-start items-center">
+                        <h4 className="font-bold text-gray-600">Vendor:</h4>
+                        &nbsp;
+                        {item.vendor.name}
                       </span>
-                      <span className="flex basis-1/5 justify-start items-start">
-                        <h4 className="font-bold text-gray-600 dark:text-gray-200">Email:</h4>
-                        <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.email || "NA"}</span>
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-start">
-                        <h4 className="font-bold text-gray-600 dark:text-gray-200">Phone No:</h4>
-                        <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.phone || "NA"}</span>
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-start">
-                        <h4 className="font-bold text-gray-600 dark:text-gray-200">Address:</h4>
-                        <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.address || "NA"}</span>
-                      </span>
-                      <span className="flex basis-1/5 justify-start items-start">
-                        <h4 className="font-bold text-gray-600 dark:text-gray-200">GST No:</h4>
-                        <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.gstNo || "NA"}</span>
-                      </span>
+                      {item.vendor.gstNo && (
+                        <span className="flex basis-1/5 justify-start items-center">
+                          <h4 className="font-bold text-gray-600">GST:</h4>
+                          &nbsp;
+                          {item.vendor.gstNo}
+                        </span>
+                      )}
+                      {item.description && (
+                        <span className="w-full flex">
+                          <h4 className="font-bold text-gray-600">Description:</h4>
+                          &nbsp;
+                          {item.description}
+                        </span>
+                      )}
                     </div>
                   </div>
+                  <div className="justify-center items-center m-auto asis-1/6">
+                    <svg
+                      data-accordion-icon
+                      className={`w-3 h-3 ${
+                        openAccordions[item._id] ? "rotate-180" : ""
+                      } transition-transform`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 10 6"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="3"
+                        d="M9 5 5 1 1 5"
+                      />
+                    </svg>
+                  </div>
+                </button>
 
-                  <div className="flex flex-col basis-1/2 bg-gray-200 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-auto">
-                    <div className="flex justify-between">
-                      <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white basis-[40%] min-w-[150px]">
-                        PRODUCT
-                      </h6>
-                      <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white border-l border-gray-300 dark:border-gray-700 pl-2 basis-[15%] min-w-[100px]">
-                        P. Rate
-                      </h6>
-                      <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white border-l border-gray-300 dark:border-gray-700 pl-2 basis-[15%] min-w-[100px]">
-                        Qnty.
-                      </h6>
-                    </div>
-                    <hr className="h-px my-1 bg-gray-300 border-0 w-full dark:bg-gray-700" />
-                    {/* //w-screen overflow-x-visible --- Learning*/}
-                    <div className="">
-                      {item.products.map((product) => (
-                        <div
-                          key={product.product._id} // Add a key for performance
-                          className="flex justify-between text-sm sm:text-base dark:border-gray-700"
+                <div
+                  className={`transform transition-all duration-300 ease-in-out origin-top ${
+                    openAccordions[item._id]
+                      ? "opacity-100 scale-y-100 max-h-[1000px]"
+                      : "opacity-0 scale-y-0 max-h-0"
+                  }`}
+                >
+                  <div
+                    className="p-5 shadow hover:shadow-lg border border-gray-200 bg-slate-100 rounded-b-lg dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-70"
+                    id={`accordion-body-${item._id}`}
+                  >
+                    <div className="flex flex-row justify-between">
+                      <div>
+                        <h4 className="text-[15px] md:text-2xl font-bold text-gray-900 dark:text-white">Details:</h4>
+                      </div>
+                      <div name="buttons" className="flex flex-row gap-2">
+                        {item.fileCloudUrl && (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenInvoice(item.fileCloudUrl)}
+                            className="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
+                          >
+                            <Eye className="lg:mr-2" size={20} />
+                            <span className="hidden lg:inline">View Invoice</span>
+                          </button>
+                        )}
+                        <PDFDownloadLink
+                          document={<StockInPDF data={item} />}
+                          fileName={`stock-in-${item.invoiceNo}.pdf`}
+                          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 inline-flex items-center"
                         >
-                          <span className="flex basis-[40%] min-w-[150px] items-start">
-                            <h4 className="font-medium text-gray-600 dark:text-gray-200 text-ellipsis overflow-hidden whitespace-nowrap"
-                              title={product.product.name}
-                            >
-                              {item.products.indexOf(product) + 1}
-                              {")"}&nbsp;{product.product.name}
-                            </h4>
+                          {({ loading }) =>
+                            loading ? (
+                              <span className="flex items-center">
+                                <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  />
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  />
+                                </svg>
+                                Generating...
+                              </span>
+                            ) : (
+                              <span className="flex items-center">
+                                <Download className="lg:mr-2" size={20} />
+                                <span className="hidden lg:inline">Download as PDF</span>
+                              </span>
+                            )
+                          }
+                        </PDFDownloadLink>
+                        <button
+                          type="button"
+                          onClick={() => handleEditStockIn(item)}
+                          className="flex text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 transition-all duration-300 items-center"
+                        >
+                          <Edit className="lg:mr-2" size={20} />
+                          <span className="hidden lg:inline">Edit</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteStockIn(item)}
+                          className="flex text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg md:text-sm w-full text-xs sm:w-auto px-4 py-2 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800 transition-all duration-300 items-center"
+                        >
+                          <Trash className="lg:mr-2" size={20} />
+                          <span className="hidden lg:inline ">Delete</span>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 mt-2 mx-0">
+                      <div className="flex flex-col basis-1/2 bg-gray-200 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2">
+                        <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white">
+                          VENDOR
+                        </h6>
+                        <hr className="h-px my-1 bg-gray-300 border-0 dark:bg-gray-700" />
+                        <div className="text-sm sm:text-lg flex flex-col gap-1">
+                          <span className="flex basis-1/5 justify-start items-start">
+                            <h4 className="font-bold text-gray-600 dark:text-gray-200">Name:</h4>
+                            <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.name || "NA"}</span>
                           </span>
-                          <span className="flex basis-[15%] min-w-[100px] items-start border-gray-300 dark:border-gray-700 pl-2">
-                            <h4 className="font-semibold text-gray-600 dark:text-gray-200">
-                              {"Rs. "}
-                              {product.productPurchaseRate}
-                            </h4>
+                          <span className="flex basis-1/5 justify-start items-start">
+                            <h4 className="font-bold text-gray-600 dark:text-gray-200">Email:</h4>
+                            <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.email || "NA"}</span>
                           </span>
-                          <span className="flex basis-[15%] min-w-[100px] items-start border-gray-300 dark:border-gray-700 pl-2">
-                            <h4 className="font-semibold text-gray-600 dark:text-gray-200">
-                              {"x "}
-                              {product.quantity}
-                              {product.quantity > 1 ? " pcs" : " pc"}
-                            </h4>
+                          <span className="flex basis-1/5 justify-start items-start">
+                            <h4 className="font-bold text-gray-600 dark:text-gray-200">Phone No:</h4>
+                            <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.phone || "NA"}</span>
+                          </span>
+                          <span className="flex basis-1/5 justify-start items-start">
+                            <h4 className="font-bold text-gray-600 dark:text-gray-200">Address:</h4>
+                            <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.address || "NA"}</span>
+                          </span>
+                          <span className="flex basis-1/5 justify-start items-start">
+                            <h4 className="font-bold text-gray-600 dark:text-gray-200">GST No:</h4>
+                            <span className="text-gray-900 dark:text-gray-100">&nbsp;{item.vendor.gstNo || "NA"}</span>
                           </span>
                         </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between order-last mt-auto font-semibold text-gray-900 border-t pt-2 border-gray-300 dark:border-gray-700 dark:text-gray-100">
-                      <span className="flex basis-[40%] min-w-[150px] items-start">
-                        Total Amount
-                      </span>
-                      <span className="flex basis-[15%] min-w-[100px] items-start">
-                        Rs. {item.totalAmount}
-                      </span>
+                      </div>
+
+                      <div className="flex flex-col basis-1/2 bg-gray-200 border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:bg-opacity-60 rounded-lg p-2 overflow-x-auto">
+                        <div className="flex justify-between">
+                          <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white basis-[40%] min-w-[150px]">
+                            PRODUCT
+                          </h6>
+                          <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white border-l border-gray-300 dark:border-gray-700 pl-2 basis-[15%] min-w-[100px]">
+                            P. Rate
+                          </h6>
+                          <h6 className="text-sm sm:text-lg font-bold text-gray-900 dark:text-white border-l border-gray-300 dark:border-gray-700 pl-2 basis-[15%] min-w-[100px]">
+                            Qnty.
+                          </h6>
+                        </div>
+                        <hr className="h-px my-1 bg-gray-300 border-0 w-full dark:bg-gray-700" />
+                        <div>
+                          {item.products.map((product) => (
+                            <div
+                              key={product.product._id}
+                              className="flex justify-between text-sm sm:text-base dark:border-gray-700"
+                            >
+                              <span className="flex basis-[40%] min-w-[150px] items-start">
+                                <h4
+                                  className="font-medium text-gray-600 dark:text-gray-200 text-ellipsis overflow-hidden whitespace-nowrap"
+                                  title={product.product.name}
+                                >
+                                  {item.products.indexOf(product) + 1}
+                                  {")"}&nbsp;{product.product.name}
+                                </h4>
+                              </span>
+                              <span className="flex basis-[15%] min-w-[100px] items-start border-gray-300 dark:border-gray-700 pl-2">
+                                <h4 className="font-semibold text-gray-600 dark:text-gray-200">
+                                  {"Rs. "}
+                                  {product.productPurchaseRate}
+                                </h4>
+                              </span>
+                              <span className="flex basis-[15%] min-w-[100px] items-start border-gray-300 dark:border-gray-700 pl-2">
+                                <h4 className="font-semibold text-gray-600 dark:text-gray-200">
+                                  {"x "}
+                                  {product.quantity}
+                                  {product.quantity > 1 ? " pcs" : " pc"}
+                                </h4>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex justify-between order-last mt-auto font-semibold text-gray-900 border-t pt-2 border-gray-300 dark:border-gray-700 dark:text-gray-100">
+                          <span className="flex basis-[40%] min-w-[150px] items-start">
+                            Total Amount
+                          </span>
+                          <span className="flex basis-[15%] min-w-[100px] items-start">
+                            Rs. {item.totalAmount}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-gray-200 p-6 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400">
+              No stock-ins found.
             </div>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mt-auto pt-6">
+          <div className="w-full sm:w-auto">
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">
+              Rows per page
+            </label>
+            <select
+              value={limit}
+              onChange={(e) => setLimit(Number(e.target.value))}
+              className="w-full sm:w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white dark:bg-gray-800 dark:text-slate-200"
+            >
+              {itemsPerPageOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
           </div>
-        ))}
+          {/* total items */}
+          {/* <div className="flex justify-center items-center w-full sm:flex-1">
+            <span className="text-sm text-gray-600 dark:text-gray-300 text-center">
+              total {metadata?.totalItems || 0} items
+            </span>
+          </div> */}
+          {/* pagination */}
+          <div className="w-full sm:w-auto sm:ml-auto">
+            <Pagination>
+              <PaginationContent className="justify-center sm:justify-end">
+              <PaginationItem>
+                {/* prev btn */}
+                <PaginationPrevious href={(pageNo > 1) && `/stock-ins/${pageNo - 1}/${limit}`} 
+                // onClick={async() => {
+                //   if(pageNo > 1){
+                //     setPageNo(pageNo - 1);
+                //     // navigate({ pathname: location.pathname, search: `?page=${pageNo - 1}` });
+                //   }
+                //   }} 
+                  />
+              </PaginationItem>
+              {(pageNo > 2) && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              {(pageNo > 1) && (
+                <PaginationItem>
+                  <PaginationLink href={(pageNo > 1) && `/stock-ins/${pageNo - 1}/${limit}`} 
+                  // onClick={
+                  //   async() => {
+                  //     if(pageNo > 1) {
+                  //       setPageNo(pageNo - 1);
+                  //     };
+                  //   }
+                  // }
+                  >{pageNo-1}</PaginationLink>
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationLink href="#" isActive={true}>
+                  {pageNo}
+                </PaginationLink>
+              </PaginationItem>
+             
+              {(pageNo+1) <= totalPages && (
+                <PaginationItem>
+                  <PaginationLink href={(pageNo < totalPages) && `/stock-ins/${pageNo + 1}/${limit}`} 
+                  // onClick= {
+                  //   async() => {
+                  //     if(pageNo < totalPages) {setPageNo(pageNo + 1)
+                  //     };
+                  //   }
+                  // }
+                  >{pageNo+1}</PaginationLink>
+                </PaginationItem>
+              )}
+              {(pageNo + 2) <= totalPages && (
+                <PaginationItem>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              )}
+              <PaginationItem>
+                <PaginationNext href={(pageNo < totalPages) && `/stock-ins/${pageNo + 1}/${limit}`} 
+                // onClick={async() => {
+                //   if(pageNo < totalPages) {
+                //     setPageNo(pageNo + 1);
+                //   };
+                  
+                // }} 
+                />
+              </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        </div>
       </div>
     </>
   );

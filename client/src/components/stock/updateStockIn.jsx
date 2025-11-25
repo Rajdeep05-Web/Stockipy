@@ -262,11 +262,11 @@ const UpdateStockIn = () => {
       setSuccessMsg("Stock In updated successfully");
       setTimeout(() => {
         setSuccessMsg("");
-        navigate("/stock-ins");
+        if (window.history.length > 1) navigate(-1);
+        else navigate("/stock-ins");
       }, 3000);
       dispatch(fetchProducts());
       dispatch(fetchVendors());
-      dispatch(fetchStockIns());
       dispatch(fetchStockIns());
     } catch (error) {
       console.log("Failed to add stock in:", error);

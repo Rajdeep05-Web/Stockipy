@@ -25,6 +25,7 @@ import LandingPage from "./components/landingPage/landingPage";
 import ProfilePage from "./components/user/profilePage";
 import AccountSettings from "./components/user/accountSetting";
 import {PasswordResetFlow} from './components/user/passwordResetFlow';
+import {EmptyInputGroup} from "./components/UI/emptyInputGroup";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -51,11 +52,11 @@ const App = () => {
     if (location.pathname === "/products" || location.pathname === "/add-product") dispatch(fetchProducts());
     if (location.pathname === "/customers" || location.pathname === "/add-customer") dispatch(fetchCustomers());
     if (location.pathname === "/vendors" || location.pathname === "/add-vendor") dispatch(fetchVendors());
-    if (location.pathname === "/stock-ins") dispatch(fetchStockIns());
+    if (location.pathname === "/stock-ins"){}
     if (location.pathname === "/add-stock-in" || location.pathname.includes("/stock-in/edit/")) {
       dispatch(fetchProducts());
       dispatch(fetchVendors());
-      dispatch(fetchStockIns());
+      dispatch(fetchStockIns({pageNo: 1, limit: 10}));
     }
   }, [location, dispatch]);
 
@@ -91,8 +92,10 @@ const App = () => {
             <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
             <Route path="/vendors" element={<VendorList />} />
             <Route path="/add-stock-in" element={<AddStockIn />} />
-            <Route path="/stock-ins" element={<AllStockIns />} />
+            <Route path="/stock-ins/:page/:pageLimit" element={<AllStockIns />} />
             <Route path="/stock-in/edit/:id" element={<UpdateStockIn />} />
+            <Route path="/stock-outs" element={<EmptyInputGroup />} />
+            <Route path="/add-stock-out" element={<EmptyInputGroup />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/password-reset" element={<PasswordResetFlow />} />
