@@ -51,7 +51,9 @@ const ProductListTable = ({ products = [], setErrorMsg, setSuccessMsg }) => {
     }
   };
 
-  const handleInfo = (product) => { }
+  const handleInfo = (product) => {
+    navigate(`/product/${product._id}`);
+  }
 
   return (
     <>

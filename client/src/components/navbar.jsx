@@ -38,7 +38,7 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
               <ThemeToggle />
               </div> 
               {/* Encrypted */}
-              <div className="items-center space-x-4 hidden md:flex">
+              {/* <div className="items-center space-x-4 hidden md:flex">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   className="flex items-center space-x-2 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-full transition-colors duration-300"
@@ -46,7 +46,7 @@ const Navbar = ({ setSidebarOpen, sidebarOpen }) => {
                   <Globe className="w-4 h-4 text-green-600" />
                   <span className="text-xs text-gray-900 dark:text-white">Encrypted</span>
                 </motion.div>
-              </div>
+              </div> */}
               {/* Notifications */}
               <Notification />
               {/* <motion.button

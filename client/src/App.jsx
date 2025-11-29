@@ -26,6 +26,10 @@ import ProfilePage from "./components/user/profilePage";
 import AccountSettings from "./components/user/accountSetting";
 import {PasswordResetFlow} from './components/user/passwordResetFlow';
 import {EmptyInputGroup} from "./components/UI/emptyInputGroup";
+import ProductDetail from "./components/products/productDetail";
+import CustomerDetail from "./components/customer/customerDetail";
+import VendorDetail from "./components/vendor/vendorDetail";
+import AddStockOut from "./components/stock/addStockOut";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
@@ -84,18 +88,21 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/add-product" element={<AddProduct />} />
             <Route path="/products" element={<ProductList />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/edit-product/:id" element={<UpdateProduct />} />
             <Route path="/add-customer" element={<AddCustomer />} />
             <Route path="/edit-customer/:id" element={<UpdateCustomer />} />
             <Route path="/customers" element={<CustomerList />} />
+            <Route path="/customer/:id" element={<CustomerDetail />} />
             <Route path="/add-vendor" element={<AddVendor />} />
             <Route path="/edit-vendor/:id" element={<UpdateVendor />} />
             <Route path="/vendors" element={<VendorList />} />
+            <Route path="/vendor/:id" element={<VendorDetail />} />
             <Route path="/add-stock-in" element={<AddStockIn />} />
             <Route path="/stock-ins/:page/:pageLimit" element={<AllStockIns />} />
             <Route path="/stock-in/edit/:id" element={<UpdateStockIn />} />
             <Route path="/stock-outs" element={<EmptyInputGroup />} />
-            <Route path="/add-stock-out" element={<EmptyInputGroup />} />
+            <Route path="/add-stock-out" element={<AddStockOut />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/password-reset" element={<PasswordResetFlow />} />

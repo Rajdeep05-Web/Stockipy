@@ -55,7 +55,9 @@ const VendorListTable = ({ setSuccessMsg, setErrorMsg }) => {
     }
   };
 
-  const handleInfo = (vendor) => {}
+  const handleInfo = (vendor) => {
+    navigate(`/vendor/${vendor._id}`);
+  }
 
   return (
     <>

@@ -37,7 +37,9 @@ const CustomerListTable = ({ customers = [], setSuccessMsg, setErrorMsg }) => {
     }
   };
 
-  const handleInfo = (customer) => {}
+  const handleInfo = (customer) => {
+    navigate(`/customer/${customer._id}`);
+  }
 
   return (
     <>
