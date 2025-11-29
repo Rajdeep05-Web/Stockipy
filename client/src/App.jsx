@@ -102,7 +102,7 @@ const App = () => {
             <Route path="/stock-ins/:page/:pageLimit" element={<AllStockIns />} />
             <Route path="/stock-in/edit/:id" element={<UpdateStockIn />} />
             <Route path="/stock-outs" element={<EmptyInputGroup />} />
-            <Route path="/add-stock-out" element={<AddStockOut />} />
+            {/* <Route path="/add-stock-out" element={<AddStockOut />} /> */}
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/account-settings" element={<AccountSettings />} />
             <Route path="/password-reset" element={<PasswordResetFlow />} />
