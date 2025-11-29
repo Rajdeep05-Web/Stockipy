@@ -29,7 +29,7 @@ import {EmptyInputGroup} from "./components/UI/emptyInputGroup";
 import ProductDetail from "./components/products/productDetail";
 import CustomerDetail from "./components/customer/customerDetail";
 import VendorDetail from "./components/vendor/vendorDetail";
-import AddStockOut from "./components/stock/addStockOut";
+// import AddStockOut from "./components/stock/addStockOut";
 
 // Redux Actions
 import { fetchProducts } from "./redux/slices/products/productsSlice";
