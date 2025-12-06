@@ -27,6 +27,7 @@ import vendorRouter from "./src/routes/vendorRouter.js";
 import stockInRouter from "./src/routes/stockInRouter.js";
 import fileuploadrouter from "./src/routes/fileUploadRouter.js";
 import authRouter from "./src/routes/authRouter.js";
+import taxRouter from "./src/routes/taxRouter.js";
 
 //import Middleware
 import authTokenVerifyMiddleware from "./src/middlewares/authTokenVerifyMiddleware.js";
@@ -91,6 +92,33 @@ app.delete("/v1/stock-ins/:id", stockInRouter);
 app.use("/api", fileuploadrouter);
 app.post("/v1/file", fileuploadrouter);
 app.delete("/v1/file/:public_id", fileuploadrouter);
+
+//tax routing
+app.use("/api", taxRouter);
+
+app.post("/v1/tax/country/:userId", taxRouter);
+app.get("/v1/tax/country/:userId", taxRouter);
+app.put("/v1/tax/country/:userId/:countryId", taxRouter);
+
+app.post('/v1/tax/zone-type/:userId', taxRouter);
+app.get('/v1/tax/zone-type/:userId', taxRouter);
+
+app.post('/v1/tax/zone/:userId', taxRouter);
+app.get('/v1/tax/zone/:userId/:countryId', taxRouter);
+
+app.post('/v1/tax/component/:userId', taxRouter);
+app.get('/v1/tax/component/:userId/:countryId', taxRouter);
+app.put('/v1/tax/component/:userId/:taxComponentId', taxRouter);
+app.delete('/v1/tax/component/:userId/:taxComponentId', taxRouter);
+
+app.post('/v1/tax/rate', taxRouter);
+app.get('/v1/tax/rate/:countryId', taxRouter);
+app.put('/v1/tax/rate/:taxRateId', taxRouter);
+app.delete('/v1/tax/rate/:taxRateId', taxRouter);
+
+app.post('/v1/tax/rule', taxRouter);
+app.get('/v1/tax/rule/:originZoneId/:destZoneId', taxRouter);
+app.get('/v1/tax/rule/:countryId', taxRouter);
 
 
 // Start Server
